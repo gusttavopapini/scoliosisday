@@ -1,0 +1,66 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn()  { return request.auth != null; }
+    function claims()      { return request.auth.token; }
+    function isApproved()  { return isSignedIn() && claims().status == 'approved'; }
+    function isPanelUser() { return isApproved() && (claims().role == 'admin' || claims().role == 'staff'); }
+
+    // Limites espelhados em src/services/storageService.js (UPLOAD_PRESETS).
+    // A validação no cliente existe para dar erro imediato e legível; ESTA é a
+    // que vale, porque o cliente é contornável — qualquer conta aprovada
+    // poderia postar direto na API REST sem passar pelo formulário.
+    function isImage(types) {
+      return request.resource.contentType.matches('image/(' + types + ')');
+    }
+    function underMB(mb) {
+      return request.resource.size < mb * 1024 * 1024;
+    }
+
+    // Leitura pública em todas as pastas: o site público exibe foto de
+    // colaborador, logo de patrocinador e banner de evento sem autenticação.
+    // A escrita continua restrita ao painel.
+    //
+    // O nome do arquivo é curinga (e não fixo em photo.{ext}) porque cada
+    // upload gera um nome único — trocar um JPG por um PNG não pode deixar o
+    // antigo para trás, e é deleteFile() quem apaga o anterior.
+
+    // ── Fotos de colaborador ──
+    match /collaborators/{collaboratorId}/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser() && underMB(2) && isImage('jpeg|png|webp');
+    }
+
+    // ── Logos de patrocinador ──
+    // SVG entra aqui: as logos são renderizadas em <img>, contexto em que
+    // script embutido não executa.
+    match /sponsors/{sponsorId}/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser() && underMB(1) && isImage('png|svg\\+xml|webp');
+    }
+
+    // ── Galeria do evento ──
+    // Declarada antes do curinga de banner: em Storage Rules o match mais
+    // específico é avaliado à parte, e sem esta regra a galeria cairia na
+    // regra de banner (mesmos limites, mas menos explícito).
+    match /events/{eventId}/gallery/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser() && underMB(5) && isImage('jpeg|png|webp');
+    }
+
+    // ── Depoimentos em vídeo (MP4) ──
+    match /events/{eventId}/testimonials/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser()
+                   && underMB(100)
+                   && request.resource.contentType == 'video/mp4';
+    }
+
+    // ── Banners de evento (desktop/tablet/mobile) ──
+    match /events/{eventId}/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser() && underMB(5) && isImage('jpeg|png|webp');
+    }
+  }
+}

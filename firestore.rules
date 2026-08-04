@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──
+    function isSignedIn()  { return request.auth != null; }
+    function claims()      { return request.auth.token; }
+    function isApproved()  { return isSignedIn() && claims().status == 'approved'; }
+    function isAdmin()     { return isApproved() && claims().role == 'admin'; }
+    function isStaff()     { return isApproved() && claims().role == 'staff'; }
+    function isPanelUser() { return isAdmin() || isStaff(); }
+
+    // ── Users (staff/admin accounts) ──
+    match /users/{uid} {
+      allow read: if isAdmin() || request.auth.uid == uid;
+
+      // Auto-cadastro: só o próprio usuário, sempre staff/pending.
+      // Ou o admin criando um membro pela tela /staff (seção 11.6),
+      // que nasce approved e com mustChangePassword.
+      allow create: if (isSignedIn()
+                        && request.auth.uid == uid
+                        && request.resource.data.role == 'staff'
+                        && request.resource.data.status == 'pending')
+                    || isAdmin();
+
+      // O admin gerencia os outros. O próprio usuário só atualiza campos
+      // operacionais (lastLoginAt, mustChangePassword): role e status
+      // precisam permanecer intactos, senão qualquer conta se auto-promove.
+      allow update: if isAdmin()
+                    || (request.auth.uid == uid
+                        && request.resource.data.role == resource.data.role
+                        && request.resource.data.status == resource.data.status);
+
+      allow delete: if isAdmin() && request.auth.uid != uid;
+    }
+
+    // ── Events ──
+    // Rascunho e arquivado seguem restritos ao painel; publicado é público.
+    //
+    // ATENÇÃO a consultas anônimas: numa operação de list, o Firestore só
+    // aceita a query se conseguir provar de antemão que todo documento
+    // retornado passa na regra. Como a condição olha status, TODA query
+    // pública precisa carregar where('status','==','published') — sem isso a
+    // consulta inteira é recusada, mesmo que os documentos fossem elegíveis.
+    // É por isso que existe fetchCurrentPublicEvent, separada da de painel.
+    match /events/{id} {
+      allow read:  if isPanelUser() || resource.data.status == 'published';
+      allow write: if isPanelUser();
+    }
+
+    // ── Collaborators ──
+    // Público: são palestrantes, curadores e organizadores divulgados no site.
+    // Os documentos não guardam contato — só nome, foto, minibio e currículo.
+    match /collaborators/{id} {
+      allow read:  if true;
+      allow write: if isPanelUser();
+    }
+
+    // ── Sponsors ──
+    // Público: nome, site e logo, todos destinados à exibição no site.
+    match /sponsors/{id} {
+      allow read:  if true;
+      allow write: if isPanelUser();
+    }
+
+    // ── Programmings ──
+    // A coleção real usada por src/services/programmings.js.
+    // Substitui o antigo bloco /schedules/, que nunca foi usado pelo código.
+    // Público: é a grade de sessões exibida na página do evento.
+    match /programmings/{id} {
+      allow read:  if true;
+      allow write: if isPanelUser();
+    }
+
+    // ── Mail (Trigger Email extension) ──
+    match /mail/{id} {
+      allow create: if isPanelUser();
+      allow read:   if false;
+    }
+  }
+}

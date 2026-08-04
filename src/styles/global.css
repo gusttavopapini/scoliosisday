@@ -1,0 +1,38 @@
+/* ============================================================
+   global.css — Ajustes mínimos de app
+   Não contém tokens visuais — apenas reset de scroll,
+   seleção de texto e utilitários de impressão.
+   ============================================================ */
+
+/* Scrollbar sutil (WebKit) */
+::-webkit-scrollbar {
+  width: var(--space-2);
+  height: var(--space-2);
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-sunken);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-500);
+}
+
+/* Seleção de texto */
+::selection {
+  background: var(--teal-200);
+  color: var(--text-heading);
+}
+
+/* Impressão */
+@media print {
+  .sda-sidebar,
+  .sda-topbar {
+    display: none !important;
+  }
+  .sda-shell {
+    display: block !important;
+  }
+}

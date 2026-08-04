@@ -1,0 +1,901 @@
+/* ============================================================
+   public.css — Camada de extensão sdp-* para o site público
+   Scoliosis Day
+
+   REGRAS (as mesmas de admin.css):
+   1. Nenhum valor bruto — apenas var(--token)
+   2. Verifique se um sd-* já resolve antes de criar um sdp-*
+   3. design-system.css NUNCA é editado
+
+   O navbar reaproveita .sd-navbar / .sd-navbar__link do kit. Aqui entram
+   apenas as peças que o kit não tem: wordmark, switch de idioma, menu
+   hambúrguer e o comportamento responsivo.
+   ============================================================ */
+
+/* ============================================================
+   0. TOKENS DA CAMADA PÚBLICA
+   ============================================================ */
+
+:root {
+  /* Altura do navbar público fechado, conforme renderizado pelo kit.
+     O hero desconta este valor do 100vh para o conteúdo ancorado na
+     base não cair abaixo da dobra — o navbar é sticky e ocupa fluxo. */
+  --sdp-navbar-h: 64px;
+}
+
+/* ============================================================
+   1. SHELL DO SITE
+   ============================================================ */
+
+.sdp-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface-page);
+}
+
+.sdp-main {
+  flex: 1;
+}
+
+/* ---- Correção de especificidade, válida para o site todo ----
+   design-system.css declara `.sd-body a { color: var(--text-link) }` com
+   especificidade (0,1,1), que vence o `.sd-btn--primary` (0,1,0) sempre que
+   o botão é um <a> — o rótulo sairia teal sobre o laranja. (0,2,0) devolve
+   a cor pretendida pelo kit. A correção mora aqui porque design-system.css
+   não pode ser editado. */
+.sdp-page .sd-btn--primary {
+  color: var(--text-inverse);
+}
+
+/* ============================================================
+   2. NAVBAR
+   ============================================================ */
+
+/* .sd-navbar é flex-row e alinha os filhos na linha. O site público
+   precisa de uma segunda faixa embaixo (a gaveta mobile), então o
+   header vira bloco e a linha passa a ser responsabilidade do __inner. */
+.sdp-navbar {
+  display: block;
+  padding-inline: var(--space-0);
+}
+
+.sdp-navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Mesmo problema do .sd-body a, agora nos links de navegação (0,1,0). */
+.sdp-navbar .sd-navbar__link {
+  color: var(--text-on-dark);
+}
+
+.sdp-navbar .sd-navbar__link:hover,
+.sdp-navbar .sd-navbar__link--active {
+  color: var(--text-inverse);
+}
+
+/* ---- Wordmark ----
+   Não há arquivo de logo no projeto ainda; o wordmark tipográfico segue
+   o mesmo tratamento do .sda-sidebar__logo-text do painel.
+   Ancorado em .sdp-page (e não no navbar) porque o rodapé usa o mesmo
+   wordmark — e (0,2,0) continua vencendo o .sd-body a descrito acima. */
+.sdp-page .sdp-wordmark {
+  font-family:var(--font-display);
+  font-weight: var(--fw-display-heavy);
+  font-size: var(--text-xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  text-transform: uppercase;
+  color: var(--text-inverse);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.sdp-page .sdp-wordmark:hover {
+  color: var(--text-inverse);
+}
+
+.sdp-page .sdp-wordmark em {
+  font-style: normal;
+  color: var(--orange-600);
+}
+
+/* ---- Cluster da direita: idioma + CTA + hambúrguer ---- */
+.sdp-navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* ============================================================
+   3. SWITCH DE IDIOMA
+   ============================================================ */
+
+/* Segmento em pílula, no espírito do .sd-tabs--on-dark. Dois botões
+   reais (não um select): a troca é de um toque e fica legível no mobile. */
+.sdp-lang {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--overlay-light);
+  border: var(--border-width) solid var(--border-on-dark);
+}
+
+.sdp-lang__btn {
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-on-dark);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.sdp-lang__btn:hover {
+  background: var(--overlay-light);
+}
+
+.sdp-lang__btn--active {
+  background: var(--surface-brand);
+  color: var(--text-inverse);
+}
+
+.sdp-lang__btn--active:hover {
+  background: var(--surface-brand);
+}
+
+/* ============================================================
+   4. HAMBÚRGUER + GAVETA MOBILE
+   ============================================================ */
+
+.sdp-navbar__burger {
+  display: none; /* ligado no media query */
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: var(--space-0);
+  border: var(--border-width) solid var(--border-on-dark);
+  border-radius: var(--radius-md);
+  background: var(--overlay-light);
+  color: var(--text-inverse);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.sdp-navbar__burger:hover {
+  background: var(--border-on-dark);
+}
+
+/* A gaveta é irmã do __inner e herda o sticky do header, então desce
+   colada ao navbar sem precisar saber a altura dele. */
+.sdp-navbar__drawer {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--gutter) var(--space-8);
+  border-top: var(--border-width) solid var(--border-on-dark);
+}
+
+/* --open só liga dentro do media query: redimensionar para desktop com a
+   gaveta aberta não pode deixar os links duplicados na tela. */
+
+.sdp-navbar__drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.sdp-navbar__drawer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: var(--border-width) solid var(--border-on-dark);
+}
+
+/* ============================================================
+   5. RESPONSIVO
+   ============================================================ */
+
+@media (max-width: 900px) {
+  /* Links e CTA saem da linha e reaparecem dentro da gaveta. */
+  .sdp-navbar__inner .sd-navbar__nav,
+  .sdp-navbar__inner .sdp-navbar__cta,
+  .sdp-navbar__inner .sdp-lang {
+    display: none;
+  }
+
+  .sdp-navbar__burger {
+    display: inline-flex;
+  }
+
+  .sdp-navbar__drawer--open {
+    display: flex;
+  }
+}
+
+/* ============================================================
+   6. SEÇÃO PLACEHOLDER
+   Enquanto as páginas públicas não têm conteúdo, elas rendem um bloco
+   único e centrado. Sai quando cada página ganhar layout próprio.
+   ============================================================ */
+
+.sdp-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 60vh;
+  text-align: center;
+  padding-inline: var(--gutter);
+}
+
+/* ============================================================
+   7. 404 PÚBLICO
+   ============================================================ */
+
+.sdp-notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 60vh;
+  text-align: center;
+  padding-block: var(--space-16);
+  padding-inline: var(--gutter);
+}
+
+.sdp-notfound__code {
+  font-family:var(--font-display);
+  font-weight: var(--fw-display-black);
+  font-size: var(--display-xl);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--teal-200);
+  margin: var(--space-0);
+}
+
+/* ============================================================
+   8. HOME · HERO
+   Banner do evento atual (ou fundo de marca no fallback), com o
+   conteúdo assentado na base. Alturas: 100vh / 70vh / 60vh.
+   ============================================================ */
+
+.sdp-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  /* 100vh menos o navbar sticky: navbar + hero preenchem exatamente a
+     primeira tela, com o CTA (ancorado na base) sempre acima da dobra. */
+  min-height: calc(100vh - var(--sdp-navbar-h));
+  overflow: hidden;
+  /* Ground escuro enquanto a imagem carrega: o texto on-dark nunca
+     fica sobre fundo claro, nem por um frame. */
+  background: var(--surface-dark);
+}
+
+.sdp-hero--brand {
+  background: var(--grad-hero);
+}
+
+.sdp-hero__media {
+  position: absolute;
+  inset: 0;
+}
+
+.sdp-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sdp-hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-dark);
+}
+
+.sdp-hero__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+  width: 100%;
+  padding-block: var(--space-20);
+}
+
+/* Abaixo do desktop o hero não é full-bleed, então o navbar não entra
+   na conta — 70vh/60vh diretos, como especificado. */
+@media (max-width: 1024px) {
+  .sdp-hero { min-height: 70vh; }
+}
+
+@media (max-width: 640px) {
+  .sdp-hero { min-height: 60vh; }
+
+  /* Headline desce um degrau na escala de display. */
+  .sdp-hero .sd-display--lg { font-size: var(--display-md); }
+}
+
+/* ============================================================
+   9. CABEÇALHO DE SEÇÃO — compartilhado
+   .sd-section-header do kit já dá espaçamento igual entre título, régua
+   e subtítulo em toda seção que usa a classe — isso nunca foi o
+   problema. O que faltava era o respiro *depois*
+   do cabeçalho, antes do conteúdo (grade, abas, logos): só "O que é o
+   Scoliosis Day" tinha. Uma classe só, usada por toda seção com cabeçalho
+   de /edicoes e da Home, mantém esse respiro sempre igual.
+   ============================================================ */
+
+.sdp-section-header {
+  margin-bottom: var(--space-10);
+}
+
+/* ============================================================
+   10. HOME · DEPOIMENTOS
+   Duas colunas — texto/contador à esquerda, carrossel à direita.
+   ============================================================ */
+
+.sdp-testimonials {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Duas colunas de ~512px pedem mais ar do que o gap padrão de grade. */
+  gap: var(--space-16);
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .sdp-testimonials {
+    grid-template-columns: 1fr;
+    /* Empilhado, o vão volta a ser vertical e menor. */
+    gap: var(--space-10);
+  }
+}
+
+.sdp-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* key={index} no JSX remonta o slide a cada troca e reinicia o fade. */
+.sdp-carousel__slide {
+  animation: sdp-carousel-fade var(--dur-slow) var(--ease-out);
+}
+
+@keyframes sdp-carousel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdp-carousel__slide { animation: none; }
+}
+
+.sdp-carousel__nav {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.sdp-carousel__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: var(--space-0);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--teal-700);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.sdp-carousel__btn:hover {
+  background: var(--teal-050);
+  border-color: var(--teal-600);
+}
+
+/* ============================================================
+   11. EDIÇÕES · ABAS
+   Uma aba por evento publicado, no topo de /edicoes. Botões reais
+   (não <a>), então a correção de especificidade da seção 1 não entra
+   em jogo aqui.
+   ============================================================ */
+
+.sdp-edition-tabs {
+  background: var(--surface-card);
+  border-bottom: var(--border-hairline);
+}
+
+.sdp-edition-tabs__inner {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-block: var(--space-4);
+}
+
+.sdp-edition-tabs__tab {
+  flex: 0 0 auto;
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-bold);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  border: var(--border-width) solid var(--border-default);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.sdp-edition-tabs__tab:hover {
+  border-color: var(--teal-600);
+  color: var(--teal-700);
+}
+
+.sdp-edition-tabs__tab--active {
+  background: var(--teal-600);
+  border-color: var(--teal-600);
+  color: var(--text-inverse);
+}
+
+.sdp-edition-tabs__tab--active:hover {
+  color: var(--text-inverse);
+}
+
+/* ============================================================
+   12. EDIÇÕES · HERO COM BORDA
+   Ao contrário do hero da Home (full-bleed), este fica dentro de uma
+   moldura com respiro visível ao redor — o fundo escuro da seção
+   aparece nas margens em todos os tamanhos de tela.
+   ============================================================ */
+
+.sdp-edition-hero {
+  background: var(--surface-dark);
+  padding: var(--space-10) var(--gutter);
+}
+
+.sdp-edition-hero__frame {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 60vh;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--surface-dark);
+}
+
+.sdp-edition-hero__frame--brand {
+  background: var(--grad-hero);
+}
+
+.sdp-edition-hero__media {
+  position: absolute;
+  inset: 0;
+}
+
+.sdp-edition-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sdp-edition-hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-dark);
+}
+
+.sdp-edition-hero__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding: var(--space-10) var(--space-8);
+}
+
+@media (max-width: 1024px) {
+  .sdp-edition-hero__frame { min-height: 50vh; }
+}
+
+@media (max-width: 640px) {
+  /* Margens menores mas visíveis, como pedido — sobrepõe o var(--gutter)
+     do desktop/tablet, que nesta largura já converge para perto disso. */
+  .sdp-edition-hero { padding: var(--space-6) var(--space-4); }
+
+  .sdp-edition-hero__frame { min-height: 40vh; }
+
+  .sdp-edition-hero__content { padding: var(--space-6) var(--space-5); }
+
+  .sdp-edition-hero__headline { font-size: var(--display-md); }
+}
+
+/* ============================================================
+   13. EDIÇÕES · GRADE DE PESSOAS
+   Compartilhada por Presenças Confirmadas, Quem faz o Scoliosis Day
+   e Curadoria Científica.
+   ============================================================ */
+
+.sdp-people-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-5);
+}
+
+.sdp-people-card {
+  align-items: center;
+  text-align: center;
+}
+
+.sdp-people-card__bio {
+  font-size: var(--text-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .sdp-people-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+}
+
+/* ---- Avatar (foto ou iniciais) ----
+   Um único elemento serve os dois casos: <img> quando há foto, <span>
+   com a cor de fundo definida inline (AvatarInitials.jsx) quando não. */
+.sdp-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family:var(--font-display);
+  font-weight: var(--fw-display-bold);
+  font-size: var(--text-lg);
+  color: var(--text-inverse);
+  flex: 0 0 auto;
+}
+
+.sdp-avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: var(--text-xs);
+}
+
+/* ============================================================
+   14. EDIÇÕES · MODALIDADES E VALORES
+   Mobile-first: os dois cards ficam sempre visíveis, empilhados — é
+   o estado-base, sem nada a desligar. O carrossel (um card por vez,
+   com fade e setas) é só um acréscimo a partir do breakpoint.
+   ============================================================ */
+
+.sdp-pricing__track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.sdp-pricing__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+}
+
+.sdp-pricing__card--teal {
+  background: var(--grad-teal);
+}
+
+.sdp-pricing__card--brand {
+  background: var(--grad-brand);
+}
+
+.sdp-pricing__price {
+  margin: var(--space-0);
+}
+
+.sdp-pricing__nav {
+  display: none;
+}
+
+@media (min-width: 901px) {
+  .sdp-pricing__card {
+    display: none;
+  }
+
+  .sdp-pricing__card--active {
+    display: flex;
+    animation: sdp-carousel-fade var(--dur-slow) var(--ease-out);
+  }
+
+  .sdp-pricing__nav {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdp-pricing__card--active {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   15. EDIÇÕES · PROGRAMAÇÃO
+   .sd-session é do kit; aqui só o necessário para caber o tema (que
+   o kit não prevê) e múltiplos palestrantes por sessão.
+   ============================================================ */
+
+.sdp-schedule__tabs {
+  margin-bottom: var(--space-6);
+  overflow-x: auto;
+}
+
+.sdp-schedule .sd-session {
+  grid-template-columns: 90px 1fr auto;
+  gap: var(--space-4);
+}
+
+.sdp-session__theme {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.sdp-session__speakers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  justify-self: end;
+}
+
+.sdp-session__speaker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sdp-session__speaker-name {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-body);
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .sdp-schedule .sd-session {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .sdp-session__speakers {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-self: start;
+  }
+}
+
+/* ============================================================
+   16. EDIÇÕES · PATROCINADORES
+   ============================================================ */
+
+.sdp-sponsors {
+  /* Sobrescreve o padding-block: var(--space-16) de .sd-section--tight que
+     o JSX também aplica — mesma especificidade (1 classe), mas esta regra
+     vem depois na cascata (public.css é importado por último), então vence
+     sem precisar de seletor mais específico. */
+  padding-block: var(--space-20);
+  background: var(--surface-sunken);
+}
+
+.sdp-sponsors__link {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Kit define .sd-logo-strip__items img a 34px de altura, com
+   especificidade (0,1,1). Ancorar em .sdp-sponsors sobe para (0,2,0)
+   e vence, sem precisar editar design-system.css. */
+.sdp-sponsors .sdp-sponsors__logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  opacity: 1;
+}
+
+/* ============================================================
+   17. DEBUG BAR (temporário — só renderiza em localhost)
+   Remover este bloco junto com EditionDebugBar.jsx quando a
+   ferramenta não for mais necessária.
+   ============================================================ */
+
+.sdp-debug-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--gutter);
+  background: var(--ink);
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+}
+
+.sdp-debug-bar__label {
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  color: var(--text-muted);
+}
+
+.sdp-debug-bar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--overlay-light);
+  color: var(--text-on-dark);
+}
+
+.sdp-debug-bar__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.sdp-debug-bar__dot--on {
+  background: var(--success);
+}
+
+.sdp-debug-bar__dot--off {
+  background: var(--danger);
+}
+
+/* ============================================================
+   18. SOBRE · HERO
+   Fundo de marca fixo (não depende de evento) — mais curto que o hero
+   da Home, texto sempre centralizado.
+   ============================================================ */
+
+.sdp-about-hero {
+  background: var(--grad-teal);
+  padding-block: var(--space-24) var(--space-20);
+}
+
+.sdp-about-hero__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-5);
+}
+
+.sdp-about-hero .sd-lead {
+  color: var(--text-on-dark);
+}
+
+@media (max-width: 640px) {
+  .sdp-about-hero { padding-block: var(--space-16) var(--space-12); }
+
+  .sdp-about-hero .sd-display--lg { font-size: var(--display-md); }
+}
+
+/* ============================================================
+   19. SOBRE · TEXTO + CARDS COM HOVER
+   ============================================================ */
+
+.sdp-about-intro__text {
+  max-width: 720px;
+  margin-inline: auto;
+  margin-bottom: var(--space-10);
+  text-align: center;
+}
+
+/* Genérico o bastante para qualquer card do site que precise do mesmo
+   levante ao passar o mouse — hoje só os cards de /sobre usam. */
+.sdp-hover-card {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.sdp-hover-card:hover {
+  transform: translateY(-6px);
+  box-shadow:var(--shadow-lg);
+}
+
+/* ============================================================
+   20. SOBRE · RECIFE
+   Duas colunas em --surface-brand; empilha no mobile.
+   ============================================================ */
+
+.sdp-about-recife {
+  background: var(--surface-brand);
+  padding-block: var(--space-20);
+}
+
+.sdp-about-recife__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-10);
+  align-items: center;
+}
+
+.sdp-about-recife__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.sdp-about-recife__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+  border-radius: var(--radius-xl);
+}
+
+@media (max-width: 900px) {
+  .sdp-about-recife__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .sdp-about-recife__media img { min-height: 260px; }
+}
+
+/* ============================================================
+   21. CTA DE PATROCÍNIO
+   Reaproveitado por /sobre e /edicoes, logo após a seção de
+   patrocinadores de cada página.
+   ============================================================ */
+
+.sdp-sponsor-cta {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--space-12);
+}
+

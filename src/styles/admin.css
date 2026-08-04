@@ -1,0 +1,1609 @@
+/* ============================================================
+   admin.css — Camada de extensão sda-* para o back-office
+   Scoliosis Day Admin Panel
+
+   REGRAS:
+   1. Nenhum valor bruto — apenas var(--token)
+   2. Verifique se um sd-* já resolve antes de criar um sda-*
+   3. Este arquivo pode ser editado. design-system.css NUNCA.
+   ============================================================ */
+
+/* ---- Utilitário de acessibilidade ---- */
+/* clip-path + overflow:hidden é o padrão moderno para sr-only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: var(--space-0);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ============================================================
+   1. SHELL & LAYOUT
+   ============================================================ */
+
+.sda-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+/* ---- Sidebar ---- */
+.sda-sidebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--grad-teal);
+  width: 260px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sda-sidebar__logo {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border-on-dark);
+  margin-bottom: var(--space-2);
+}
+
+.sda-sidebar__logo-text {
+  font-family:var(--font-display);
+  font-weight: var(--fw-display-bold);
+  font-style: normal;
+  font-size: var(--display-sm);
+  letter-spacing: var(--ls-display);
+  text-transform: uppercase;
+  color: var(--white);
+  line-height: var(--lh-tight);
+}
+
+.sda-sidebar__logo-sub {
+  display: block;
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--border-on-dark);
+  margin-top: var(--space-1);
+}
+
+.sda-sidebar__section-label {
+  display: block;
+  padding: var(--space-4) var(--space-6) var(--space-2);
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--border-on-dark);
+}
+
+.sda-sidebar__footer {
+  margin-top: auto;
+  padding: var(--space-4) var(--space-0);
+  border-top: 1px solid var(--border-on-dark);
+}
+
+/* ---- Item de menu ---- */
+.sda-navitem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-on-dark);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  width: 100%;
+  text-align: left;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-left-color var(--dur-fast) var(--ease-out);
+}
+
+.sda-navitem:hover {
+  color: var(--white);
+}
+
+.sda-navitem--active {
+  border-left-color: var(--orange-600);
+  background: var(--border-on-dark);
+  color: var(--white);
+  font-weight: var(--fw-bold);
+}
+
+.sda-navitem__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+}
+
+.sda-navitem--active .sda-navitem__icon { opacity: 1; }
+
+/* ---- Área principal ---- */
+.sda-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface-page);
+  overflow-x: hidden;
+}
+
+/* ---- Topbar ---- */
+.sda-topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: var(--space-8);
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  gap: var(--space-4);
+  box-shadow:var(--shadow-xs);
+  flex-shrink: 0;
+}
+
+.sda-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.sda-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sda-topbar__breadcrumb {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sda-topbar__breadcrumb span {
+  color: var(--text-heading);
+  font-weight: var(--fw-semibold);
+}
+
+.sda-topbar__menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.sda-topbar__menu-btn:hover {
+  background: var(--surface-sunken);
+  color: var(--text-heading);
+}
+
+/* ---- Content ---- */
+.sda-content {
+  flex: 1;
+  padding: var(--space-8);
+}
+
+/* ============================================================
+   2. CABEÇALHO DE PÁGINA
+   ============================================================ */
+
+.sda-pagehead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-6);
+  border-bottom: var(--border-hairline);
+  margin-bottom: var(--space-6);
+}
+
+.sda-pagehead__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ============================================================
+   3. TOOLBAR (busca + filtros)
+   ============================================================ */
+
+.sda-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.sda-toolbar__search { flex: 1 1 280px; }
+
+/* ============================================================
+   4. TABELA DE DADOS
+   ============================================================ */
+
+.sda-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+}
+
+.sda-table thead th {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sda-table tbody td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-body);
+  vertical-align: middle;
+}
+
+.sda-table tbody tr:last-child td { border-bottom: none; }
+
+.sda-table__row {
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.sda-table__row:hover { background: var(--teal-050); }
+
+.sda-table__person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: var(--fw-semibold);
+  color: var(--text-heading);
+}
+
+.sda-table__actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.sda-table__actions .sd-btn {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.sda-table__row:hover .sda-table__actions .sd-btn,
+.sda-table__actions .sd-btn:focus-visible { opacity: 1; }
+
+@media (hover: none) {
+  .sda-table__actions .sd-btn { opacity: 1; }
+}
+
+@media (max-width: 620px) {
+  .sda-table thead { display: none; }
+  .sda-table,
+  .sda-table tbody,
+  .sda-table tr,
+  .sda-table td { display: block; width: 100%; }
+  .sda-table tr {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-3);
+    padding: var(--space-3);
+  }
+  .sda-table tbody td { border: none; padding: var(--space-1) 0; }
+  .sda-table__actions { text-align: left; padding-top: var(--space-3); }
+}
+
+/* ============================================================
+   5. AVATAR DE INICIAIS
+   ============================================================ */
+
+.sda-avatar {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family:var(--font-text);
+  font-weight: var(--fw-bold);
+  font-size: var(--text-xs);
+  letter-spacing: var(--ls-label);
+  color: var(--white);
+  object-fit: cover;
+  overflow: hidden;
+}
+
+.sda-avatar--sm { width: 28px; height: 28px; }
+.sda-avatar--lg { width: 56px; height: 56px; font-size: var(--text-md); }
+
+/* ============================================================
+   6. ESTADO VAZIO
+   ============================================================ */
+
+.sda-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-20) var(--space-6);
+  background: var(--surface-card);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-xl);
+}
+
+/* ============================================================
+   7. SKELETON / SHIMMER
+   ============================================================ */
+
+.sda-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--gray-100) 25%,
+    var(--gray-200) 37%,
+    var(--gray-100) 63%
+  );
+  background-size: 400% 100%;
+  border-radius: var(--radius-sm);
+  animation: sda-shimmer var(--dur-slow) linear infinite;
+}
+
+@keyframes sda-shimmer {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sda-skeleton {
+    animation: none;
+    background: var(--gray-100);
+  }
+}
+
+/* ============================================================
+   8. MODAL
+   ============================================================ */
+
+.sda-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.sda-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-dark);
+  opacity: 0.72;
+}
+
+.sda-modal__panel {
+  position: relative;
+  z-index: 1;
+  background: var(--surface-card);
+  border-radius: var(--radius-xl);
+  box-shadow:var(--shadow-lg);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: sda-modal-in var(--dur-base) var(--ease-out) both;
+}
+
+@keyframes sda-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4)) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(var(--space-0)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sda-modal__panel { animation: none; }
+}
+
+.sda-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.sda-modal__head h2 {
+  margin: var(--space-0);
+  font-family:var(--font-text);
+  font-size: var(--text-lg);
+  font-weight: var(--fw-bold);
+  color: var(--text-heading);
+}
+
+.sda-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+.sda-modal__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface-sunken);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   9. TOAST
+   ============================================================ */
+
+.sda-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background: var(--surface-card);
+  border-radius: var(--radius-pill);
+  box-shadow:var(--shadow-md);
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-heading);
+  border: 1px solid var(--border-subtle);
+  animation: sda-toast-in var(--dur-base) var(--ease-out) both;
+  max-width: 420px;
+  z-index: 99999;
+}
+
+@keyframes sda-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-3) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(var(--space-0));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sda-toast { animation: none; }
+}
+
+.sda-toast--success { border-color: var(--success); }
+.sda-toast--success .sda-toast__icon { color: var(--success); }
+
+.sda-toast--error { border-color: var(--danger); }
+.sda-toast--error .sda-toast__icon { color: var(--danger); }
+
+.sda-toast__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   10. DROPDOWN MENU
+   ============================================================ */
+
+.sda-menu {
+  position: absolute;
+  z-index: 60;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow:var(--shadow-md);
+  padding: var(--space-1) var(--space-0);
+  min-width: 180px;
+  animation: sda-menu-in var(--dur-fast) var(--ease-out) both;
+}
+
+@keyframes sda-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-2) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(var(--space-0));
+  }
+}
+
+.sda-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-body);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.sda-menu__item:hover {
+  background: var(--surface-sunken);
+  color: var(--text-heading);
+}
+
+.sda-menu__item--danger { color: var(--danger); }
+
+.sda-menu__item--danger:hover {
+  background: var(--orange-100);
+  color: var(--danger);
+}
+
+.sda-menu__divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: var(--space-1) var(--space-0);
+  border: none;
+}
+
+/* ============================================================
+   11. PAGINAÇÃO
+   ============================================================ */
+
+.sda-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-top: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.sda-pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: var(--space-0) var(--space-3);
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-body);
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.sda-pagination__btn:hover {
+  background: var(--teal-050);
+  border-color: var(--teal-300);
+  color: var(--teal-700);
+}
+
+.sda-pagination__btn--active {
+  background: var(--surface-brand);
+  border-color: var(--surface-brand);
+  color: var(--white);
+}
+
+.sda-pagination__btn--active:hover {
+  background: var(--teal-700);
+  border-color: var(--teal-700);
+  color: var(--white);
+}
+
+.sda-pagination__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sda-pagination__info {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  padding: var(--space-0) var(--space-3);
+}
+
+/* ============================================================
+   12. UPLOADER
+   ============================================================ */
+
+.sda-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-page);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+
+.sda-upload:hover {
+  border-color: var(--teal-400);
+  background: var(--teal-050);
+}
+
+.sda-upload--dragging {
+  border-color: var(--focus-ring);
+  background: var(--teal-050);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sda-upload--error {
+  border-color: var(--danger);
+  background: var(--orange-100);
+}
+
+.sda-upload__icon { color: var(--teal-500); }
+.sda-upload__icon--error { color: var(--danger); }
+
+.sda-upload__label {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-heading);
+}
+
+.sda-upload__label--error { color: var(--danger); }
+
+.sda-upload__hint {
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   13. BARRA DE PROGRESSO
+   ============================================================ */
+
+.sda-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.sda-progress__fill {
+  height: 100%;
+  background: var(--grad-brand);
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-base) var(--ease-out);
+}
+
+/* ============================================================
+   14. PASSOS DO WIZARD
+   ============================================================ */
+
+.sda-steps {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-0);
+}
+
+.sda-steps__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  padding: var(--space-0);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.sda-steps__step:hover:not(:disabled) {
+  background: none;
+}
+
+.sda-steps__step:hover:not(:disabled) .sda-steps__number {
+  background: var(--teal-050);
+}
+
+.sda-steps__step--current:hover .sda-steps__number {
+  filter: brightness(1.06);
+}
+
+.sda-steps__step--done:hover .sda-steps__number {
+  filter: brightness(1.06);
+}
+
+.sda-steps__step + .sda-steps__step::before {
+  content: '';
+  display: block;
+  height: 1px;
+  width: var(--space-10);
+  background: var(--border-default);
+  margin-inline: var(--space-3);
+  flex: 0 0 auto;
+}
+
+.sda-steps__number {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--fw-bold);
+  font-size: var(--text-xs);
+  background: var(--surface-sunken);
+  border: 2px solid var(--border-default);
+  color: var(--text-muted);
+  flex: 0 0 auto;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.sda-steps__step--current {
+  color: var(--text-heading);
+  font-weight: var(--fw-semibold);
+}
+
+.sda-steps__step--current .sda-steps__number {
+  background: var(--surface-accent);
+  border-color: var(--surface-accent);
+  color: var(--white);
+}
+
+.sda-steps__step--done {
+  color: var(--text-heading);
+  font-weight: var(--fw-semibold);
+}
+
+.sda-steps__step--done .sda-steps__number {
+  background: var(--surface-brand);
+  border-color: var(--surface-brand);
+  color: var(--white);
+}
+
+/* ============================================================
+   15. SELETOR DE ÍCONES
+   ============================================================ */
+
+.sda-iconpicker {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sda-iconpicker__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--space-2);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.sda-iconpicker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: var(--space-2);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.sda-iconpicker__item:hover {
+  background: var(--teal-050);
+  color: var(--teal-700);
+  border-color: var(--teal-200);
+}
+
+.sda-iconpicker__item--selected {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  background: var(--teal-050);
+  color: var(--teal-700);
+}
+
+/* ============================================================
+   16. CAMPO DE COR
+   ============================================================ */
+
+.sda-colorfield {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.sda-colorfield:hover,
+.sda-colorfield:focus-within {
+  border-color: var(--focus-ring);
+}
+
+.sda-colorfield__swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.sda-colorfield__swatch input[type='color'] {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: var(--space-0);
+  cursor: pointer;
+  background: transparent;
+  display: block;
+}
+
+.sda-colorfield__value {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-heading);
+  flex: 1;
+}
+
+.sda-colorfield__label {
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   17. CARD DE SESSÃO (reordenável)
+   ============================================================ */
+
+.sda-sessioncard {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow:var(--shadow-xs);
+  overflow: hidden;
+  transition:
+    box-shadow var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.sda-sessioncard:hover {
+  box-shadow:var(--shadow-sm);
+  border-color: var(--border-default);
+}
+
+.sda-sessioncard--dragging {
+  box-shadow:var(--shadow-md);
+  border-color: var(--focus-ring);
+  opacity: 0.9;
+}
+
+.sda-sessioncard__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  background: var(--surface-sunken);
+  border-right: 1px solid var(--border-subtle);
+  cursor: grab;
+  color: var(--text-muted);
+  flex: 0 0 auto;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.sda-sessioncard__handle:hover {
+  background: var(--teal-050);
+  color: var(--teal-600);
+}
+
+.sda-sessioncard__handle:active { cursor: grabbing; }
+
+.sda-sessioncard__body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.sda-sessioncard__time {
+  font-family:var(--font-display);
+  font-weight: var(--fw-display-bold);
+  font-size: var(--text-xl);
+  letter-spacing: var(--ls-display);
+  color: var(--teal-600);
+}
+
+.sda-sessioncard__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sda-sessioncard__title {
+  font-family:var(--font-text);
+  font-weight: var(--fw-bold);
+  font-size: var(--text-md);
+  color: var(--text-heading);
+}
+
+.sda-sessioncard__speaker {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.sda-sessioncard__actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* ============================================================
+   18. PRÉVIA DE PALETA (seção 12.8 — escopo local --ev-*)
+   ============================================================ */
+
+.sda-palette-preview {
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  background: var(--ev-bg, var(--surface-card));
+  color: var(--ev-text, var(--text-body));
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sda-palette-preview__title {
+  font-family:var(--font-display);
+  font-weight: var(--fw-display-heavy);
+  font-style: italic;
+  font-size: var(--display-sm);
+  letter-spacing: var(--ls-display);
+  text-transform: uppercase;
+  line-height: var(--lh-tight);
+}
+
+.sda-palette-preview__body {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  line-height: var(--lh-body);
+  opacity: 0.8;
+}
+
+.sda-palette-preview__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-pill);
+  background: var(--ev-button, var(--surface-accent));
+  color: var(--white);
+  font-family:var(--font-text);
+  font-weight: var(--fw-bold);
+  font-size: var(--text-sm);
+  border: none;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.sda-palette-swatches {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.sda-palette-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  flex: 0 0 auto;
+}
+
+/* ============================================================
+   19. SIDEBAR BACKDROP + RESPONSIVO
+   ============================================================ */
+
+.sda-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  background: var(--surface-dark);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.sda-sidebar-backdrop--visible {
+  display: block;
+  opacity: 0.5;
+}
+
+@media (max-width: 900px) {
+  .sda-topbar__menu-btn { display: flex; }
+
+  .sda-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sda-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 80;
+    width: 260px;
+    min-height: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  .sda-sidebar--open {
+    transform: translateX(0);
+    box-shadow:var(--shadow-lg);
+  }
+
+  .sda-main { grid-column: 1; }
+
+  .sda-content { padding: var(--space-5) var(--space-4); }
+}
+
+/* ============================================================
+   20. TELAS DE AUTENTICAÇÃO
+   Layout fullscreen fora do AppShell (sem sidebar/topbar).
+   ============================================================ */
+
+.sda-auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
+  background: var(--grad-teal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Textura de pontos sutil no fundo */
+.sda-auth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--dot-motif);
+  background-size: var(--dot-motif-size);
+  opacity: .4;
+  pointer-events: none;
+}
+
+.sda-auth__card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface-card);
+  border-radius: var(--radius-xl);
+  box-shadow:var(--shadow-lg);
+  width: 100%;
+  max-width: 440px;
+  padding: var(--space-10) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  animation: sda-auth-in var(--dur-base) var(--ease-out) both;
+}
+
+@keyframes sda-auth-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4)) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(var(--space-0)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sda-auth__card { animation: none; }
+}
+
+.sda-auth__logo {
+  font-family:var(--font-display);
+  font-weight: var(--fw-display-heavy);
+  font-style: italic;
+  font-size: var(--display-sm);
+  letter-spacing: var(--ls-display);
+  text-transform: uppercase;
+  line-height: var(--lh-display);
+  text-align: center;
+  color: var(--teal-800);
+}
+
+.sda-auth__logo span {
+  color: var(--orange-600);
+}
+
+.sda-auth__header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sda-auth__title {
+  margin: var(--space-0);
+  font-family:var(--font-text);
+  font-size: var(--text-xl);
+  font-weight: var(--fw-bold);
+  color: var(--text-heading);
+}
+
+.sda-auth__subtitle {
+  margin: var(--space-0);
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.sda-auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.sda-auth__footer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.sda-auth__footer a {
+  color: var(--text-link);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.sda-auth__footer a:hover {
+  color: var(--text-link-hover);
+}
+
+/* ── Indicador de força da senha ── */
+
+.sda-strength {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sda-strength__bars {
+  display: flex;
+  gap: var(--space-1);
+  height: 4px;
+}
+
+.sda-strength__bar {
+  flex: 1;
+  border-radius: var(--radius-pill);
+  background: var(--gray-200);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.sda-strength--weak .sda-strength__bar:nth-child(1) {
+  background: var(--danger);
+}
+
+.sda-strength--medium .sda-strength__bar:nth-child(1),
+.sda-strength--medium .sda-strength__bar:nth-child(2) {
+  background: var(--warning);
+}
+
+.sda-strength--strong .sda-strength__bar:nth-child(1),
+.sda-strength--strong .sda-strength__bar:nth-child(2),
+.sda-strength--strong .sda-strength__bar:nth-child(3) {
+  background: var(--success);
+}
+
+.sda-strength__label {
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+}
+
+.sda-strength--weak .sda-strength__label { color: var(--danger); }
+.sda-strength--medium .sda-strength__label { color: var(--warning); }
+.sda-strength--strong .sda-strength__label { color: var(--success); }
+
+/* ── Estado de sucesso (tela de êxito do cadastro) ── */
+
+.sda-auth__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-4) var(--space-0);
+}
+
+.sda-auth__success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  background: var(--teal-050);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--success);
+}
+
+.sda-auth__success-title {
+  font-family:var(--font-text);
+  font-size: var(--text-lg);
+  font-weight: var(--fw-bold);
+  color: var(--text-heading);
+  margin: var(--space-0);
+}
+
+.sda-auth__success-body {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: var(--lh-body);
+  margin: var(--space-0);
+  max-width: 320px;
+}
+
+.sda-auth__countdown {
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ── Alert message (status pending/blocked) ── */
+
+.sda-auth__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--orange-100);
+  border: 1px solid var(--orange-300);
+}
+
+.sda-auth__alert-icon {
+  flex: 0 0 auto;
+  color: var(--orange-700);
+}
+
+.sda-auth__alert-text {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-body);
+  line-height: var(--lh-body);
+}
+
+/* ── Responsivo ── */
+
+@media (max-width: 520px) {
+  .sda-auth { padding: var(--space-4); }
+  .sda-auth__card { padding: var(--space-8) var(--space-5); }
+}
+
+/* ============================================================
+   SWITCH (toggle)
+   ============================================================
+
+   <label class="sda-switch">
+     <input type="checkbox" checked>
+     <span class="sda-switch__track"></span>
+     <span class="sda-switch__label">Evento atual</span>
+   </label>
+
+   O <input> real fica visualmente oculto, mas continua no fluxo de foco e
+   é o que o teclado e os leitores de tela operam — a pista e o botão são
+   só a representação visual, marcadas com aria-hidden no JSX.
+*/
+
+.sda-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-body);
+}
+
+.sda-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sda-switch__track {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--gray-300);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.sda-switch__track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  box-shadow:var(--shadow-xs);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.sda-switch input:checked + .sda-switch__track {
+  background: var(--teal-600);
+}
+
+.sda-switch input:checked + .sda-switch__track::after {
+  transform: translateX(18px);
+}
+
+.sda-switch input:focus-visible + .sda-switch__track {
+  outline: 2px solid var(--teal-600);
+  outline-offset: 2px;
+}
+
+/* Durante a gravação: o switch continua legível, mas não aceita novo clique. */
+.sda-switch input:disabled + .sda-switch__track {
+  opacity: 0.6;
+}
+
+.sda-switch:has(input:disabled) {
+  cursor: progress;
+}
+
+.sda-switch__label {
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sda-switch__track,
+  .sda-switch__track::after {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   21. UPLOAD DE IMAGEM — preview
+   O .sda-upload (seção 12) já cobre a área de drop, os estados de
+   arraste/erro e a barra de progresso. Aqui entra só o que o kit não
+   tem: a miniatura da imagem já enviada e o botão de remover.
+   ============================================================ */
+
+.sdaimg-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sdaimg-uploader__preview {
+  position: relative;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  /* Xadrez discreto: logo PNG/SVG com fundo transparente precisa de um
+     ground que mostre a transparência em vez de fingir fundo branco. */
+  background:
+    linear-gradient(45deg, var(--gray-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--gray-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--gray-100) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--gray-100) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.sdaimg-uploader__preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  object-fit: contain;
+}
+
+.sdaimg-uploader__remove {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: var(--space-0);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--danger);
+  cursor: pointer;
+  box-shadow:var(--shadow-sm);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.sdaimg-uploader__remove:hover {
+  background: var(--orange-100);
+}
+
+/* ---- Logo em card de listagem ----
+   Mesmo xadrez do preview do uploader, pelo mesmo motivo: logo com fundo
+   transparente precisa de um ground que mostre a transparência. */
+.sdaimg-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 120px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background:
+    linear-gradient(45deg, var(--gray-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--gray-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--gray-100) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--gray-100) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.sdaimg-logo__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.sdaimg-logo__empty {
+  font-family:var(--font-text);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* ---- Variante quadrada ----
+   Para foto de pessoa, onde o enquadramento é sempre 1:1 e recortar é o
+   comportamento desejado (object-fit: cover), ao contrário de logo e banner,
+   que usam `contain` para não perder nada da arte.
+   O tamanho fixo vale para os dois estados — com imagem e vazio — para a
+   caixa não pular ao enviar a primeira foto. */
+.sdaimg-uploader--square {
+  width: 200px;
+}
+
+.sdaimg-uploader--square .sdaimg-uploader__preview {
+  width: 200px;
+  height: 200px;
+}
+
+.sdaimg-uploader--square .sdaimg-uploader__preview img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+}
+
+.sdaimg-uploader--square .sda-upload {
+  width: 200px;
+  height: 200px;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+/* A caixa de 200px não comporta o corpo padrão do rótulo e da dica. */
+.sdaimg-uploader--square .sda-upload__label {
+  font-size: var(--text-xs);
+}
+
+.sdaimg-uploader--square .sda-upload__hint {
+  line-height: var(--lh-snug);
+}
+
+/* ============================================================
+   FIM — admin.css
+   ============================================================ */
