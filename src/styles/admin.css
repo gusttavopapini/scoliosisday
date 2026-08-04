@@ -1605,5 +1605,97 @@
 }
 
 /* ============================================================
+   22. RESPONSIVIDADE — AJUSTES ADICIONAIS
+   Sidebar-gaveta, tabela-em-cards e o hambúrguer já existem (seções 4 e
+   19). Aqui entra o que faltava numa auditoria em 375px: cabeçalho de
+   página, modal, passos do wizard, grade de 4 colunas e abas de dias.
+   ============================================================ */
+
+@media (max-width: 620px) {
+  /* Cabeçalho de página (todo módulo do painel usa) — título e botão de
+     criar podem não caber lado a lado num título longo ("Novo depoimento",
+     "Editar programação"); sem quebra, o botão empurra a tela para o lado. */
+  .sda-pagehead {
+    flex-wrap: wrap;
+  }
+
+  /* .sd-grid--4 é do kit (design-system.css) e vai a 1 coluna em 620px por
+     padrão — Dashboard e Patrocinadores pedem 2 nesta largura. Ancorado só
+     na classe (sem seletor extra) porque o cascade já resolve: admin.css é
+     importado depois do kit, então esta regra vence com a mesma
+     especificidade, sem precisar de um seletor mais específico. */
+  .sd-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Botões de ação da tabela sempre visíveis — a seção 4 já cobre telas
+     sem hover (touch), mas o teste em viewport estreito (375px) não
+     necessariamente reporta hover:none (ex.: DevTools sem emulação de
+     touch), então a largura garante o mesmo resultado. */
+  .sda-table__actions .sd-btn {
+    opacity: 1;
+  }
+
+  /* Passos do wizard (Eventos): 5 rótulos completos ("1 · Identidade"…)
+     não cabem numa linha de 375px e quebram de forma ilegível. Os números
+     sozinhos, ligados pelos conectores, já indicam a posição — o passo
+     atual continua destacado pela cor do próprio número (seção 14). */
+  .sda-steps__label {
+    display: none;
+  }
+
+  .sda-steps__step + .sda-steps__step::before {
+    width: var(--space-6);
+    margin-inline: var(--space-2);
+  }
+
+  /* Modal: em telas estreitas vira folha inferior — largura cheia, só o
+     topo arredondado — em vez de um cartão flutuante com margem nos
+     quatro lados, que sobra pouco espaço de leitura. */
+  .sda-modal {
+    align-items: flex-end;
+    padding: var(--space-0);
+  }
+
+  .sda-modal__panel {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  /* Abas de dias da Programação (ProgrammingForm): a quantidade de dias
+     não tem máximo, então a tira de abas pode passar da largura da tela.
+     Isola o scroll horizontal nela — o formulário em volta não se move. */
+  .sda-day-tabs-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sda-day-tabs-scroll .sd-tabs {
+    flex-wrap: nowrap;
+  }
+
+  /* Rodapé do wizard de eventos: com o botão "Salvar alterações" (item 4),
+     são 4 botões — Cancelar, Voltar, Salvar, Avançar/Publicar — que não
+     cabem numa linha de 375px sem cortar texto ou forçar scroll horizontal
+     na página inteira. Empilha os dois grupos, cada um ocupando a largura
+     cheia e distribuindo seus botões entre si. */
+  .sda-wizard-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sda-wizard-footer__group {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .sda-wizard-footer__group .sd-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ============================================================
    FIM — admin.css
    ============================================================ */

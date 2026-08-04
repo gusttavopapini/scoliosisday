@@ -5,7 +5,8 @@
 // discurso em toda edição); só os 3 cards mudam por evento.
 
 import { useLanguage } from '../../../../hooks/useLanguage.js';
-import { getPresentationIcon, hasValidPresentation } from '../../../../utils/presentationIcons.js';
+import { hasValidPresentation } from '../../../../utils/presentationIcons.js';
+import PresentationCard from './PresentationCard.jsx';
 
 /** @param {{ event: object }} props */
 export default function EditionPresentation({ event }) {
@@ -28,18 +29,9 @@ export default function EditionPresentation({ event }) {
         </header>
 
         <div className="sd-grid sd-grid--3 sdp-about__grid">
-          {cards.map((card, index) => {
-            const Icon = getPresentationIcon(card.icon);
-            return (
-              <article key={index} className="sd-card sd-card--accent">
-                <span className="sd-icon-badge" aria-hidden="true">
-                  <Icon size={26} />
-                </span>
-                <h3 className="sd-card__title">{card.title}</h3>
-                <p className="sd-card__body">{card.description}</p>
-              </article>
-            );
-          })}
+          {cards.map((card, index) => (
+            <PresentationCard key={index} card={card} />
+          ))}
         </div>
       </div>
     </section>

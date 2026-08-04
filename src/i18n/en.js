@@ -28,9 +28,9 @@ const t = {
     deleteConfirmBody: 'This action cannot be undone.',
 
     // ── Descartar alterações (todos os formulários do painel) ──
-    discardTitle: 'Discard changes?',
+    discardTitle: 'Are you sure you want to cancel editing?',
     discardBody: 'Unsaved changes will be lost. This action cannot be undone.',
-    discardConfirm: 'Discard',
+    discardConfirm: 'Confirm cancellation',
     discardCancel: 'Keep editing',
   },
 
@@ -40,6 +40,7 @@ const t = {
     collaborators: 'Collaborators',
     sponsors: 'Sponsors',
     schedules: 'Schedule',
+    testimonials: 'Testimonials',
     staff: 'Team',
     logout: 'Sign out',
   },
@@ -195,6 +196,36 @@ const t = {
     deleteConfirm: "Delete the schedule '{name}'? This action cannot be undone.",
   },
 
+  testimonials: {
+    title: 'Testimonials',
+    subtitle: 'Text and video testimonials shown on the site',
+    create: 'New testimonial',
+    tabText: 'Text',
+    tabVideo: 'Videos',
+    name: 'Name',
+    role: 'Role',
+    date: 'Date',
+    quote: 'Content',
+    quotePlaceholder: 'What the person said about Scoliosis Day…',
+    videoUrl: 'Video URL',
+    videoUrlHint: 'YouTube or Vimeo link, or upload an MP4 file below.',
+    videoUpload: 'Upload MP4 file',
+    videoUploadHint: 'MP4 · up to 100MB',
+    emptyTextTitle: 'No text testimonials',
+    emptyTextBody: 'Add the first text testimonial.',
+    emptyVideoTitle: 'No video testimonials',
+    emptyVideoBody: 'Add the first video testimonial.',
+    deleteConfirm: "Delete the testimonial from '{name}'? This action cannot be undone.",
+    createSuccess: 'Testimonial created successfully!',
+    updateSuccess: 'Testimonial updated successfully!',
+    deleteSuccess: 'Testimonial deleted successfully!',
+  },
+
+  testimonialType: {
+    text: 'Text',
+    video: 'Video',
+  },
+
   staff: {
     title: 'Team',
     subtitle: 'Admin panel users',
@@ -334,6 +365,28 @@ const t = {
     aboutPageRecifeTitle: 'Recife is where we were born',
     aboutPageRecifeText: 'Recife, the pulsing heart of the Brazilian Northeast, is much more than a destination: it is a hub of innovation, knowledge and human warmth. With top professionals and a unique culture of hospitality, the state offers a complete experience.',
     aboutPageRecifeImageAlt: 'Recife, Pernambuco',
+
+    // ── /hall-de-estrelas ──
+    hallOfStarsPageHeroTitle: 'Hall of Stars',
+    hallOfStarsPageHeroSubtitle: 'The biggest names in scoliosis treatment gathered at Scoliosis Day.',
+    hallOfStarsPageFeaturedTitle: 'Featured Speakers',
+    hallOfStarsPageFeaturedBadge: 'Featured',
+    hallOfStarsPageAllTitle: 'All Speakers',
+    hallOfStarsPageSearchPlaceholder: 'Search by name…',
+    hallOfStarsPageEmptyTitle: 'No speakers found',
+    hallOfStarsPageEmptyBody: 'There are no speakers registered in published editions yet.',
+
+    // ── /patrocinadores ──
+    sponsorsPageHeroTitle: 'Sponsors',
+    sponsorsPageHeroSubtitle: 'Companies and institutions that make Scoliosis Day possible.',
+    sponsorsPageEmptyTitle: 'No sponsors registered',
+    sponsorsPageEmptyBody: 'There are no sponsors in published editions yet.',
+
+    // ── /depoimentos ──
+    testimonialsPageHeroTitle: 'Testimonials',
+    testimonialsPageHeroSubtitle: 'What Scoliosis Day participants have to say.',
+    testimonialsPageTextTitle: 'Testimonials',
+    testimonialsPageVideoTitle: 'Video Testimonials',
 
     // Patrocinadores — CTA de captação (/sobre e /edicoes)
     sponsorCta: 'Become a Sponsor',

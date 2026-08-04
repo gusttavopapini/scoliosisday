@@ -201,21 +201,23 @@ export default function ProgrammingForm({ initialData, isEditMode = false, onSuc
 
       {/* ── Abas dos dias ── */}
       <div>
-        <div className="sd-tabs" role="tablist" aria-label="Dias da programação" style={{ marginBottom: 'var(--space-4)' }}>
-          {days.map((day, index) => (
-            <button
-              key={day.id}
-              type="button"
-              role="tab"
-              id={`day-tab-${day.id}`}
-              aria-selected={activeDayIndex === index}
-              aria-controls={`day-panel-${day.id}`}
-              className={`sd-tabs__tab${activeDayIndex === index ? ' sd-tabs__tab--active' : ''}`}
-              onClick={() => setActiveDayIndex(index)}
-            >
-              {day.label}
-            </button>
-          ))}
+        <div className="sda-day-tabs-scroll">
+          <div className="sd-tabs" role="tablist" aria-label="Dias da programação" style={{ marginBottom: 'var(--space-4)' }}>
+            {days.map((day, index) => (
+              <button
+                key={day.id}
+                type="button"
+                role="tab"
+                id={`day-tab-${day.id}`}
+                aria-selected={activeDayIndex === index}
+                aria-controls={`day-panel-${day.id}`}
+                className={`sd-tabs__tab${activeDayIndex === index ? ' sd-tabs__tab--active' : ''}`}
+                onClick={() => setActiveDayIndex(index)}
+              >
+                {day.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div

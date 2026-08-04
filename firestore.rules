@@ -72,6 +72,14 @@ service cloud.firestore {
       allow write: if isPanelUser();
     }
 
+    // ── Testimonials ──
+    // Coleção própria de depoimentos (/painel/depoimentos), independente do
+    // array embutido em events.testimonials. Público: exibidos em /depoimentos.
+    match /testimonials/{id} {
+      allow read:  if true;
+      allow write: if isPanelUser();
+    }
+
     // ── Mail (Trigger Email extension) ──
     match /mail/{id} {
       allow create: if isPanelUser();

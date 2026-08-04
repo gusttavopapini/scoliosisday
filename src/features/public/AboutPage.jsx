@@ -9,7 +9,7 @@ import { useCollaborators } from '../../hooks/useCollaborators.js';
 import { useSponsors } from '../../hooks/useSponsors.js';
 import { COLLABORATOR_TYPES } from '../../utils/constants.js';
 import { resolveCollaboratorsByType } from '../../utils/collaborators.js';
-import AboutHero from './components/about/AboutHero.jsx';
+import SimpleHero from '../../components/public/SimpleHero.jsx';
 import AboutIntro from './components/about/AboutIntro.jsx';
 import AboutRecife from './components/about/AboutRecife.jsx';
 import PeopleSection from './components/editions/PeopleSection.jsx';
@@ -42,7 +42,7 @@ export default function AboutPage() {
 
   return (
     <>
-      <AboutHero />
+      <SimpleHero title={t.site.aboutPageHeroTitle} subtitle={t.site.aboutPageHeroSubtitle} />
       <AboutIntro />
       <AboutRecife />
 

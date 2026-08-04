@@ -49,6 +49,12 @@ export const EVENT_MODALITY = {
   HYBRID: 'hybrid',
 };
 
+// ---- Tipo de depoimento ----
+export const TESTIMONIAL_TYPES = {
+  TEXT: 'text',
+  VIDEO: 'video',
+};
+
 // ---- Matriz de permissões (seção 9) ----
 // A UI esconde o que o usuário não pode fazer.
 // As Security Rules bloqueiam de verdade.
@@ -59,6 +65,7 @@ export const PERMISSIONS = {
     collaborator: ['view', 'create', 'update', 'delete', 'setType'],
     sponsor:      ['view', 'create', 'update', 'delete'],
     schedule:     ['view', 'create', 'update', 'delete', 'duplicate'],
+    testimonial:  ['view', 'create', 'update', 'delete'],
   },
   staff: {
     event:        ['view', 'create', 'update', 'delete', 'duplicate'],
@@ -66,6 +73,7 @@ export const PERMISSIONS = {
     collaborator: ['view', 'create', 'update', 'delete', 'setType'],
     sponsor:      ['view', 'create', 'update', 'delete'],
     schedule:     ['view', 'create', 'update', 'delete', 'duplicate'],
+    testimonial:  ['view', 'create', 'update', 'delete'],
   },
 };
 

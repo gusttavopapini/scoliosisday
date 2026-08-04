@@ -9,12 +9,7 @@ import { useState } from 'react';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
 import { useProgramming } from '../../../../hooks/useProgrammings.js';
 import { normalizeDays, flattenSessions, formatDayShort } from '../../../../utils/programmingDays.js';
-import AvatarInitials from '../../../../components/ui/AvatarInitials.jsx';
-
-/** "HH:mm" + "HH:mm"|null → "HH:mm–HH:mm" ou só "HH:mm". */
-function formatTimeRange(startTime, endTime) {
-  return endTime ? `${startTime}–${endTime}` : startTime;
-}
+import ScheduleSession from './ScheduleSession.jsx';
 
 /**
  * @param {{ event: object, collaboratorsById: Map<string, object> }} props
@@ -70,36 +65,7 @@ export default function EditionSchedule({ event, collaboratorsById }) {
               .map((id) => collaboratorsById.get(id))
               .filter(Boolean);
 
-            return (
-              <div className="sd-session" key={session.id}>
-                <span className="sd-session__time">
-                  {formatTimeRange(session.startTime, session.endTime)}
-                </span>
-
-                <div className="sd-session__what">
-                  <span className="sd-session__title">{session.title}</span>
-                  {session.theme && (
-                    <span className="sdp-session__theme">{session.theme}</span>
-                  )}
-                </div>
-
-                {speakers.length > 0 && (
-                  <div className="sdp-session__speakers">
-                    {speakers.map((speaker) => (
-                      <span className="sdp-session__speaker" key={speaker.id}>
-                        <AvatarInitials
-                          name={speaker.fullName}
-                          photoUrl={speaker.photoUrl}
-                          id={speaker.id}
-                          className="sdp-avatar sdp-avatar--sm"
-                        />
-                        <span className="sdp-session__speaker-name">{speaker.fullName}</span>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
+            return <ScheduleSession key={session.id} session={session} speakers={speakers} />;
           })}
         </div>
       </div>

@@ -13,16 +13,13 @@ import { useCollaborators } from '../../hooks/useCollaborators.js';
 import { useSponsors } from '../../hooks/useSponsors.js';
 import { COLLABORATOR_TYPES } from '../../utils/constants.js';
 import { ordinal } from '../../utils/ordinal.js';
-import { eventBannerUrl } from '../../utils/eventBanner.js';
 import { resolveCollaboratorsByType } from '../../utils/collaborators.js';
 import EditionHero from './components/editions/EditionHero.jsx';
 import PeopleSection from './components/editions/PeopleSection.jsx';
 import EditionPricing from './components/editions/EditionPricing.jsx';
 import EditionPresentation from './components/editions/EditionPresentation.jsx';
-import { hasValidPresentation } from '../../utils/presentationIcons.js';
 import EditionSchedule from './components/editions/EditionSchedule.jsx';
 import EditionSponsors from './components/editions/EditionSponsors.jsx';
-import EditionDebugBar from './components/editions/EditionDebugBar.jsx';
 import SponsorCta from './components/SponsorCta.jsx';
 
 export default function EditionsPage() {
@@ -91,22 +88,8 @@ export default function EditionsPage() {
     );
   }
 
-  const debugFields = [
-    { label: 'Banner', filled: Boolean(eventBannerUrl(activeEvent)) },
-    { label: 'starSpeakerIds', filled: (activeEvent.starSpeakerIds?.length ?? 0) > 0 },
-    { label: 'priceInPerson', filled: typeof activeEvent.priceInPerson === 'number' },
-    { label: 'priceOnline', filled: typeof activeEvent.priceOnline === 'number' },
-    { label: 'presentation', filled: hasValidPresentation(activeEvent.presentation) },
-    { label: 'programming', filled: Boolean(activeEvent.programming) },
-    { label: 'sponsors', filled: (activeEvent.sponsors?.length ?? 0) > 0 },
-    { label: 'organizerIds', filled: (activeEvent.organizerIds?.length ?? 0) > 0 },
-    { label: 'curatorIds', filled: (activeEvent.curatorIds?.length ?? 0) > 0 },
-  ];
-
   return (
     <>
-      <EditionDebugBar fields={debugFields} />
-
       {orderedEvents.length > 1 && (
         <nav className="sdp-edition-tabs" aria-label={t.site.editions}>
           <div className="sd-container sdp-edition-tabs__inner">

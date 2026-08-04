@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../../../hooks/useLanguage.js';
 import { usePublishedEvents } from '../../../hooks/useEvents.js';
+import { useTranslatedContent } from '../../../hooks/useTranslatedContent.js';
 
 /** Depoimento do evento ({text,name,surname,occupation}) → {text,author,role}. */
 function normalize(item) {
@@ -27,7 +28,8 @@ export default function HomeTestimonials() {
 
   const latest = publishedEvents[0];
   const fromEvent = (latest?.testimonials ?? []).filter((item) => item.text?.trim());
-  const items = fromEvent.length > 0
+  const isFromEvent = fromEvent.length > 0;
+  const items = isFromEvent
     ? fromEvent.map(normalize)
     : t.site.testimonialsFallback;
 
@@ -39,6 +41,15 @@ export default function HomeTestimonials() {
 
   const count = items.length;
   const current = items[index] ?? items[0];
+
+  // Só depoimentos reais (Firestore) passam pela API — o fallback já vem
+  // localizado por t.site.testimonialsFallback, retraduzi-lo o corromperia.
+  // `author` nunca entra: é nome próprio.
+  const { translated, isTranslating } = useTranslatedContent(
+    isFromEvent ? current : null,
+    ['text', 'role'],
+  );
+  const display = isFromEvent ? translated : current;
 
   function step(delta) {
     setIndex((prev) => (prev + delta + count) % count);
@@ -66,12 +77,15 @@ export default function HomeTestimonials() {
         {/* Coluna direita: carrossel — key={index} reinicia o fade a cada troca */}
         <div className="sdp-carousel">
           <figure key={index} className="sd-quote sdp-carousel__slide">
-            <blockquote>{current.text}</blockquote>
+            <blockquote>
+              <span className={isTranslating ? 'sdp-translating' : undefined}>{display.text}</span>
+            </blockquote>
             <figcaption>
               <span className="sd-quote__avatar" aria-hidden="true" />
               <span>
+                {/* author é nome próprio — nunca passa pela tradução */}
                 <b>{current.author}</b>
-                <small>{current.role}</small>
+                <small className={isTranslating ? 'sdp-translating' : undefined}>{display.role}</small>
               </span>
             </figcaption>
           </figure>

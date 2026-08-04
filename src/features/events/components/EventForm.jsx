@@ -47,9 +47,11 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   const [currentStep, setCurrentStep] = useState(1);
   const [visitedSteps, setVisitedSteps] = useState([1]);
 
-  // Instâncias separadas: o rascunho automático não deve marcar o submit como pendente.
+  // Instâncias separadas: o rascunho automático e o botão manual não devem
+  // marcar o submit final (nem um ao outro) como pendente.
   const saveMutation = useSaveEvent();
   const draftMutation = useSaveEvent();
+  const manualSaveMutation = useSaveEvent();
   const setCurrentMutation = useSetCurrentEvent();
   const clearCurrentMutation = useClearCurrentEvent();
   const { data: speakers = [] } = useCollaborators();
@@ -212,9 +214,31 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     }
   }
 
+  // Salva o estado atual sem exigir o passo 5 nem forçar 'published' — mesma
+  // gravação do rascunho automático, só que sob controle do usuário e com
+  // feedback (toast, loading). Não valida: um evento em progresso pode ter
+  // passos futuros incompletos, e travar o salvamento nisso frustraria
+  // justamente quem quer salvar e continuar depois.
+  async function handleManualSave() {
+    const values = getValues();
+    if (!draftIdRef.current) draftIdRef.current = newEventId();
+
+    try {
+      await manualSaveMutation.mutateAsync({ id: draftIdRef.current, data: values });
+      toast.success(isEditMode ? 'Alterações salvas com sucesso!' : 'Rascunho salvo com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar alterações:', error);
+      toast.error(error.message || 'Erro ao salvar alterações');
+    }
+  }
+
+  // Navegação livre: qualquer número de passo leva direto a ele. Antes só ia
+  // a passos já visitados — sem sentido agora que "Salvar alterações" permite
+  // guardar o progresso a qualquer momento, sem depender de avançar em ordem.
   function goToStep(step) {
-    if (visitedSteps.includes(step)) {
-      setCurrentStep(step);
+    setCurrentStep(step);
+    if (!visitedSteps.includes(step)) {
+      setVisitedSteps((prev) => [...prev, step]);
     }
   }
 
@@ -226,7 +250,6 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
         {STEPS.map((step) => {
           const isCurrent = currentStep === step.number;
           const isDone = visitedSteps.includes(step.number) && !isCurrent;
-          const canVisit = visitedSteps.includes(step.number) || isCurrent;
 
           return (
             <button
@@ -236,8 +259,6 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
                 isDone ? 'sda-steps__step--done' : ''
               }`}
               onClick={() => goToStep(step.number)}
-              disabled={!canVisit}
-              style={{ cursor: canVisit ? 'pointer' : 'not-allowed', opacity: canVisit ? 1 : 0.5 }}
             >
               <span className="sda-steps__number">
                 {isDone ? '✓' : step.number}
@@ -285,6 +306,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
 
       {/* ── Footer com navegação ── */}
       <div
+        className="sda-wizard-footer"
         style={{
           display: 'flex',
           gap: 'var(--space-3)',
@@ -297,7 +319,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
           zIndex: 10,
         }}
       >
-        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+        <div className="sda-wizard-footer__group" style={{ display: 'flex', gap: 'var(--space-3)' }}>
           <button
             type="button"
             className="sd-btn sd-btn--ghost"
@@ -318,24 +340,37 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
           </button>
         </div>
 
-        {currentStep < STEPS.length ? (
+        <div className="sda-wizard-footer__group" style={{ display: 'flex', gap: 'var(--space-3)' }}>
           <button
             type="button"
-            className="sd-btn sd-btn--primary"
-            onClick={handleNextStep}
+            className="sd-btn sd-btn--outline"
+            onClick={handleManualSave}
+            disabled={manualSaveMutation.isPending}
           >
-            Avançar
-            <ChevronRight size={16} aria-hidden="true" />
+            {manualSaveMutation.isPending
+              ? 'Salvando…'
+              : isEditMode ? 'Salvar alterações' : 'Salvar rascunho'}
           </button>
-        ) : (
-          <button
-            type="submit"
-            className="sd-btn sd-btn--primary"
-            disabled={isSubmitting || saveMutation.isPending}
-          >
-            {isEditMode ? 'Atualizar' : 'Publicar'} Evento
-          </button>
-        )}
+
+          {currentStep < STEPS.length ? (
+            <button
+              type="button"
+              className="sd-btn sd-btn--primary"
+              onClick={handleNextStep}
+            >
+              Avançar
+              <ChevronRight size={16} aria-hidden="true" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="sd-btn sd-btn--primary"
+              disabled={isSubmitting || saveMutation.isPending}
+            >
+              {isEditMode ? 'Atualizar' : 'Publicar'} Evento
+            </button>
+          )}
+        </div>
       </div>
     </form>
 

@@ -16,3 +16,22 @@ export function resolveCollaboratorsByType(ids, collaboratorsById, type) {
     .map((id) => collaboratorsById.get(id))
     .filter((person) => person && person.type === type);
 }
+
+/**
+ * IDs únicos de um campo-array (ex.: starSpeakerIds, speakers, sponsors),
+ * juntando todos os eventos publicados — usado pelas páginas que agregam
+ * gente/patrocinadores de todas as edições, não só a mais recente (Hall de
+ * Estrelas, Patrocinadores). A ordem é a de primeira aparição, evento mais
+ * recente primeiro (usePublishedEvents já entrega os eventos nessa ordem).
+ *
+ * @param {object[]} events
+ * @param {string} fieldName
+ * @returns {string[]}
+ */
+export function collectUniqueIds(events, fieldName) {
+  const ids = new Set();
+  for (const event of events) {
+    for (const id of event[fieldName] ?? []) ids.add(id);
+  }
+  return [...ids];
+}

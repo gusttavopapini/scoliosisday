@@ -31,6 +31,10 @@ export const UPLOAD_PRESETS = {
     maxSizeMB: 5,
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
   },
+  testimonialVideo: {
+    maxSizeMB: 100,
+    allowedTypes: ['video/mp4'],
+  },
 };
 
 /** Extensão canônica por MIME — não confia na extensão do nome original. */
@@ -39,6 +43,7 @@ const EXTENSION_BY_TYPE = {
   'image/png': 'png',
   'image/webp': 'webp',
   'image/svg+xml': 'svg',
+  'video/mp4': 'mp4',
 };
 
 /** Rótulo curto de um MIME, para a mensagem de erro ("JPG, PNG ou WEBP"). */

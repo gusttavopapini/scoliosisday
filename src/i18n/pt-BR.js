@@ -31,9 +31,9 @@ const t = {
     deleteConfirmBody: 'Esta ação não pode ser desfeita.',
 
     // ── Descartar alterações (todos os formulários do painel) ──
-    discardTitle: 'Descartar alterações?',
+    discardTitle: 'Deseja realmente cancelar a edição?',
     discardBody: 'As alterações não salvas serão perdidas. Esta ação não pode ser desfeita.',
-    discardConfirm: 'Descartar',
+    discardConfirm: 'Confirmar cancelamento',
     discardCancel: 'Continuar editando',
   },
 
@@ -43,6 +43,7 @@ const t = {
     collaborators: 'Colaboradores',
     sponsors: 'Patrocinadores',
     schedules: 'Programação',
+    testimonials: 'Depoimentos',
     staff: 'Equipe',
     logout: 'Sair',
   },
@@ -198,6 +199,36 @@ const t = {
     deleteConfirm: "Excluir a programação '{name}'? Esta ação não pode ser desfeita.",
   },
 
+  testimonials: {
+    title: 'Depoimentos',
+    subtitle: 'Depoimentos textuais e em vídeo exibidos no site',
+    create: 'Novo depoimento',
+    tabText: 'Textuais',
+    tabVideo: 'Vídeos',
+    name: 'Nome',
+    role: 'Cargo',
+    date: 'Data',
+    quote: 'Conteúdo',
+    quotePlaceholder: 'O que a pessoa disse sobre o Scoliosis Day…',
+    videoUrl: 'URL do vídeo',
+    videoUrlHint: 'Link do YouTube, Vimeo, ou envie um arquivo MP4 abaixo.',
+    videoUpload: 'Enviar arquivo MP4',
+    videoUploadHint: 'MP4 · até 100MB',
+    emptyTextTitle: 'Nenhum depoimento textual',
+    emptyTextBody: 'Adicione o primeiro depoimento em texto.',
+    emptyVideoTitle: 'Nenhum depoimento em vídeo',
+    emptyVideoBody: 'Adicione o primeiro depoimento em vídeo.',
+    deleteConfirm: "Excluir o depoimento de '{name}'? Esta ação não pode ser desfeita.",
+    createSuccess: 'Depoimento criado com sucesso!',
+    updateSuccess: 'Depoimento atualizado com sucesso!',
+    deleteSuccess: 'Depoimento excluído com sucesso!',
+  },
+
+  testimonialType: {
+    text: 'Texto',
+    video: 'Vídeo',
+  },
+
   staff: {
     title: 'Equipe',
     subtitle: 'Usuários do painel administrativo',
@@ -337,6 +368,28 @@ const t = {
     aboutPageRecifeTitle: 'Recife é onde nascemos',
     aboutPageRecifeText: 'Recife, coração pulsante do Nordeste, é muito mais que um destino: é um polo de inovação, conhecimento e calor humano. Com profissionais de excelência e uma cultura de hospitalidade única, o estado oferece uma experiência completa.',
     aboutPageRecifeImageAlt: 'Recife, Pernambuco',
+
+    // ── /hall-de-estrelas ──
+    hallOfStarsPageHeroTitle: 'Hall de Estrelas',
+    hallOfStarsPageHeroSubtitle: 'Os maiores nomes do tratamento da escoliose reunidos no Scoliosis Day.',
+    hallOfStarsPageFeaturedTitle: 'Palestrantes em Destaque',
+    hallOfStarsPageFeaturedBadge: 'Destaque',
+    hallOfStarsPageAllTitle: 'Todos os Palestrantes',
+    hallOfStarsPageSearchPlaceholder: 'Buscar por nome…',
+    hallOfStarsPageEmptyTitle: 'Nenhum palestrante encontrado',
+    hallOfStarsPageEmptyBody: 'Ainda não há palestrantes cadastrados nas edições publicadas.',
+
+    // ── /patrocinadores ──
+    sponsorsPageHeroTitle: 'Patrocinadores',
+    sponsorsPageHeroSubtitle: 'Empresas e instituições que tornam o Scoliosis Day possível.',
+    sponsorsPageEmptyTitle: 'Nenhum patrocinador cadastrado',
+    sponsorsPageEmptyBody: 'Ainda não há patrocinadores nas edições publicadas.',
+
+    // ── /depoimentos ──
+    testimonialsPageHeroTitle: 'Depoimentos',
+    testimonialsPageHeroSubtitle: 'O que dizem os participantes do Scoliosis Day.',
+    testimonialsPageTextTitle: 'Depoimentos',
+    testimonialsPageVideoTitle: 'Depoimentos em Vídeo',
 
     // Patrocinadores — CTA de captação (/sobre e /edicoes)
     sponsorCta: 'Seja um Patrocinador',

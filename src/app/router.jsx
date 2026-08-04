@@ -56,6 +56,9 @@ const ProgrammingsPage = lazy(() => import('../features/programmings/Programming
 const CreateProgrammingPage = lazy(() => import('../features/programmings/CreateProgrammingPage.jsx'));
 const EditProgrammingPage = lazy(() => import('../features/programmings/EditProgrammingPage.jsx'));
 const StaffPage = lazy(() => import('../features/staff/StaffPage.jsx'));
+const TestimonialsPanelPage = lazy(() => import('../features/testimonials/TestimonialsPage.jsx'));
+const CreateTestimonialPage = lazy(() => import('../features/testimonials/CreateTestimonialPage.jsx'));
+const EditTestimonialPage = lazy(() => import('../features/testimonials/EditTestimonialPage.jsx'));
 
 /** Envolve uma página no limite de Suspense usado por todas as rotas. */
 function suspended(Page) {
@@ -129,6 +132,9 @@ export const router = createBrowserRouter([
       { path: '/painel/programacoes', element: suspended(ProgrammingsPage) },
       { path: '/painel/programacoes/novo', element: suspended(CreateProgrammingPage) },
       { path: '/painel/programacoes/:id/editar', element: suspended(EditProgrammingPage) },
+      { path: '/painel/depoimentos', element: suspended(TestimonialsPanelPage) },
+      { path: '/painel/depoimentos/novo', element: suspended(CreateTestimonialPage) },
+      { path: '/painel/depoimentos/:id/editar', element: suspended(EditTestimonialPage) },
 
       // Desenvolvimento
       { path: '/painel/dev/ui', element: suspended(UIDevPage) },
