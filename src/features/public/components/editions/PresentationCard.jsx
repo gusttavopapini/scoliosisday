@@ -13,11 +13,11 @@ export default function PresentationCard({ card }) {
   const Icon = getPresentationIcon(card.icon);
 
   return (
-    <article className="sd-card sd-card--accent">
-      <span className="sd-icon-badge" aria-hidden="true">
-        <Icon size={26} />
+    <article className="sd-card sd-card--accent sdp-feature-card sdp-hover-card">
+      <span className="sd-icon-badge sd-icon-badge--lg" aria-hidden="true">
+        <Icon size={30} />
       </span>
-      <h3 className="sd-card__title">
+      <h3 className="sd-display sd-display--sm sd-display--upright">
         <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.title}</span>
       </h3>
       <p className="sd-card__body">

@@ -6,6 +6,7 @@
 
 import { useLanguage } from '../../../../hooks/useLanguage.js';
 import { hasValidPresentation } from '../../../../utils/presentationIcons.js';
+import BrandWordmark from '../../../../components/BrandWordmark.jsx';
 import PresentationCard from './PresentationCard.jsx';
 
 /** @param {{ event: object }} props */
@@ -20,7 +21,7 @@ export default function EditionPresentation({ event }) {
       <div className="sd-container">
         <header className="sd-section-header sdp-section-header">
           <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal">
-            {t.site.aboutTitle}
+            {t.site.aboutTitleMain} <BrandWordmark />
           </h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />

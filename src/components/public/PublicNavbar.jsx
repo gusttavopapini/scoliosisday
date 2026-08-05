@@ -10,6 +10,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage.js';
 import { useCurrentPublicEvent } from '../../hooks/useEvents.js';
+import logoWhite from '../../assets/logo-white.svg';
 
 /** Rótulo de cada link vem do dicionário: a chave é resolvida em render.
  * Esta lista alimenta tanto a barra do desktop quanto a gaveta mobile, que
@@ -107,7 +108,7 @@ export default function PublicNavbar() {
     <header className="sd-navbar sdp-navbar">
       <div className="sdp-navbar__inner">
         <Link to="/" className="sdp-wordmark">
-          Scoliosis <em>Day</em>
+          <img src={logoWhite} alt={t.site.brand} className="sdp-wordmark__logo" />
         </Link>
 
         <nav className="sd-navbar__nav" aria-label={t.site.brand}>

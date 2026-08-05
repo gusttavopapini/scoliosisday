@@ -7,6 +7,7 @@
 
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage.js';
+import logoColor from '../../assets/logo-color.svg';
 
 const FOOTER_LINKS = [
   { key: 'home', to: '/' },
@@ -28,7 +29,7 @@ export default function PublicFooter() {
         <div className="sd-footer__top">
           <div className="sd-footer__brand">
             <Link to="/" className="sdp-wordmark">
-              Scoliosis <em>Day</em>
+              <img src={logoColor} alt={t.site.brand} className="sdp-wordmark__logo" />
             </Link>
             <p>{t.site.footerTagline}</p>
             <p>{t.site.footerAbteText}</p>

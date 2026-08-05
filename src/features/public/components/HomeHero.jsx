@@ -45,44 +45,46 @@ export default function HomeHero() {
   const ctaLink = event?.ctaLink?.trim() || '';
 
   return (
-    <section className={`sdp-hero${hasBanner ? '' : ' sdp-hero--brand sd-dots'}`}>
-      {hasBanner && (
-        <div className="sdp-hero__media" aria-hidden="true">
-          <picture>
-            {mobileUrl && <source media={MOBILE_MEDIA} srcSet={mobileUrl} />}
-            {tabletUrl && <source media={TABLET_MEDIA} srcSet={tabletUrl} />}
-            <img src={desktopUrl} alt="" />
-          </picture>
-        </div>
-      )}
-
-      <div className="sdp-hero__content sd-container">
-        <h1 className="sd-display sd-display--lg sd-display--on-dark">
-          <span className={isTranslating ? 'sdp-translating' : undefined}>{headline}</span>
-        </h1>
-        <div className="sd-rule" aria-hidden="true">
-          <i /><i /><i /><i /><i />
-        </div>
-        {subtitle && (
-          <p className="sd-lead sd-on-dark">
-            <span className={isTranslating ? 'sdp-translating' : undefined}>{subtitle}</span>
-          </p>
+    <section className="sdp-hero">
+      <div className={`sdp-hero__frame${hasBanner ? '' : ' sdp-hero--brand sd-dots'}`}>
+        {hasBanner && (
+          <div className="sdp-hero__media" aria-hidden="true">
+            <picture>
+              {mobileUrl && <source media={MOBILE_MEDIA} srcSet={mobileUrl} />}
+              {tabletUrl && <source media={TABLET_MEDIA} srcSet={tabletUrl} />}
+              <img src={desktopUrl} alt="" />
+            </picture>
+          </div>
         )}
 
-        {ctaLink ? (
-          <a
-            className="sd-btn sd-btn--primary sd-btn--lg"
-            href={ctaLink}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span className={isTranslating ? 'sdp-translating' : undefined}>{ctaLabel}</span>
-          </a>
-        ) : (
-          <Link className="sd-btn sd-btn--primary sd-btn--lg" to="/edicoes">
-            <span className={isTranslating ? 'sdp-translating' : undefined}>{ctaLabel}</span>
-          </Link>
-        )}
+        <div className="sdp-hero__content">
+          <h1 className="sd-display sd-display--lg sd-display--on-dark">
+            <span className={isTranslating ? 'sdp-translating' : undefined}>{headline}</span>
+          </h1>
+          <div className="sd-rule" aria-hidden="true">
+            <i /><i /><i /><i /><i />
+          </div>
+          {subtitle && (
+            <p className="sd-lead sd-on-dark">
+              <span className={isTranslating ? 'sdp-translating' : undefined}>{subtitle}</span>
+            </p>
+          )}
+
+          {ctaLink ? (
+            <a
+              className="sd-btn sd-btn--primary sd-btn--lg"
+              href={ctaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className={isTranslating ? 'sdp-translating' : undefined}>{ctaLabel}</span>
+            </a>
+          ) : (
+            <Link className="sd-btn sd-btn--primary sd-btn--lg" to="/edicoes">
+              <span className={isTranslating ? 'sdp-translating' : undefined}>{ctaLabel}</span>
+            </Link>
+          )}
+        </div>
       </div>
     </section>
   );

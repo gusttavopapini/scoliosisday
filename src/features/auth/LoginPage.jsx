@@ -11,6 +11,8 @@ import { AlertCircle } from 'lucide-react';
 import t from '../../i18n/pt-BR.js';
 import { loginSchema } from '../../schemas/auth.js';
 import { useAuth } from '../../hooks/useAuth.js';
+import BrandWordmark from '../../components/BrandWordmark.jsx';
+import { splitOnBrand } from '../../utils/splitLastWord.js';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -61,18 +63,29 @@ export default function LoginPage() {
     }
   }
 
+  const subtitleBrand = splitOnBrand(t.auth.loginSubtitle);
+
   return (
     <div className="sda-auth">
       <div className="sda-auth__card">
         {/* Logo */}
         <div className="sda-auth__logo" aria-hidden="true">
-          Scoliosis <span>Day</span>
+          <BrandWordmark className="sda-brand-wordmark" />
         </div>
 
         {/* Header */}
         <div className="sda-auth__header">
           <h1 className="sda-auth__title">{t.auth.loginTitle}</h1>
-          <p className="sda-auth__subtitle">{t.auth.loginSubtitle}</p>
+          <p className="sda-auth__subtitle">
+            {subtitleBrand ? (
+              <>
+                <BrandWordmark className="sda-brand-wordmark" />
+                {subtitleBrand.after}
+              </>
+            ) : (
+              t.auth.loginSubtitle
+            )}
+          </p>
         </div>
 
         {/* Alert de status (pending/blocked) */}

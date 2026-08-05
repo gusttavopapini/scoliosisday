@@ -84,7 +84,9 @@ export default function EditionPricing({ event }) {
                   cardIndex === index ? ' sdp-pricing__card--active' : ''
                 }`}
               >
-                <span className="sd-tag sd-tag--solid">{card.badge}</span>
+                <span className={`sd-tag sd-tag--solid${card.modifier === 'brand' ? ' sd-tag--orange' : ''}`}>
+                  {card.badge}
+                </span>
                 <p className="sd-display sd-display--lg sd-display--on-dark sdp-pricing__price">
                   {card.price}
                 </p>

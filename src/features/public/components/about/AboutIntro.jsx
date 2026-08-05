@@ -4,6 +4,7 @@
 
 import { Stethoscope, MessageCircle, Users } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
+import BrandWordmark from '../../../../components/BrandWordmark.jsx';
 
 const CARDS = [
   { icon: Stethoscope, titleKey: 'aboutPageCard1Title', textKey: 'aboutPageCard1Text' },
@@ -19,7 +20,7 @@ export default function AboutIntro() {
       <div className="sd-container">
         <header className="sd-section-header sd-section-header--center sdp-section-header">
           <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal">
-            {t.site.aboutPageIntroTitle}
+            {t.site.aboutPageIntroTitleMain} <BrandWordmark />
           </h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />
@@ -30,9 +31,9 @@ export default function AboutIntro() {
 
         <div className="sd-grid sd-grid--3">
           {CARDS.map(({ icon: Icon, titleKey, textKey }) => (
-            <article key={titleKey} className="sd-card sd-card--accent sdp-hover-card">
-              <span className="sd-icon-badge" aria-hidden="true">
-                <Icon size={26} />
+            <article key={titleKey} className="sd-card sd-card--accent sdp-hover-card sdp-feature-card">
+              <span className="sd-icon-badge sd-icon-badge--lg" aria-hidden="true">
+                <Icon size={30} />
               </span>
               <h3 className="sd-card__title">{t.site[titleKey]}</h3>
               <p className="sd-card__body">{t.site[textKey]}</p>

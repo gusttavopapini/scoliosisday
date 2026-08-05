@@ -10,6 +10,7 @@ import { useSponsors } from '../../hooks/useSponsors.js';
 import { COLLABORATOR_TYPES } from '../../utils/constants.js';
 import { resolveCollaboratorsByType } from '../../utils/collaborators.js';
 import SimpleHero from '../../components/public/SimpleHero.jsx';
+import BrandWordmark from '../../components/BrandWordmark.jsx';
 import AboutIntro from './components/about/AboutIntro.jsx';
 import AboutRecife from './components/about/AboutRecife.jsx';
 import PeopleSection from './components/editions/PeopleSection.jsx';
@@ -46,7 +47,7 @@ export default function AboutPage() {
       <AboutIntro />
       <AboutRecife />
 
-      <PeopleSection title={t.site.organizersTitle} people={organizers} />
+      <PeopleSection title={<>{t.site.organizersTitleMain} <BrandWordmark /></>} people={organizers} />
 
       {latestEvent && <EditionSponsors event={latestEvent} sponsorsById={sponsorsById} />}
       <SponsorCta />

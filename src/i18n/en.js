@@ -297,7 +297,9 @@ const t = {
     heroSubtitle: 'Surgeons, physiotherapists and health professionals united at the forefront of scoliosis treatment.',
 
     // ── Home · O que é o Scoliosis Day ──
-    aboutTitle: 'What is Scoliosis Day',
+    // "Scoliosis Day" no heading é renderizado por <BrandWordmark />, não
+    // por este texto — aboutTitleMain é só o que vem antes da marca.
+    aboutTitleMain: 'What is',
     aboutSubtitle: 'A gathering that unites science, clinical practice and professional training around scoliosis.',
     aboutCard1Title: 'High-Level Education and Science',
     aboutCard1Text: 'Scoliosis Day is the global meeting point for the forefront of scoliosis treatment. With a philosophy grounded in education and high-quality science, the event brings together spine surgeons, physiotherapists, internationally renowned orthotists, residents and other professionals involved in scoliosis care.',
@@ -305,6 +307,12 @@ const t = {
     aboutCard2Text: 'Essentially educational, Scoliosis Day promotes scientific updating, knowledge exchange and multidisciplinary debate across different health fields. More than a congress, it is a space connecting clinical practice, science, industry, professionals in training and national and international reference specialists.',
     aboutCard3Title: 'Supported by ABTE',
     aboutCard3Text: 'Since its first edition, Scoliosis Day has been supported by the Brazilian Scoliosis Treatment Association (ABTE), reinforcing its commitment to the scientific community dedicated to scoliosis in Brazil.',
+    // Link no rodapé dos cards "O que é o Scoliosis Day" (Home e Edições).
+    learnMore: 'Learn more',
+    // Abre o modal de detalhes nos cards de pessoa (organizadores, curadoria, Hall de Estrelas).
+    viewMore: 'View more',
+    // Título da seção de currículo no modal "Ver mais" do PersonCard.
+    personModalCurriculumTitle: 'Curriculum',
 
     // ── Edições (/edicoes) ──
     editionsEmptyTitle: 'No editions published yet',
@@ -315,9 +323,9 @@ const t = {
 
     // Modalidades e valores
     pricingInPersonBadge: 'In Person',
-    pricingInPersonText: 'Join us live, network with peers and dive into the full Scoliosis Day experience.',
+    pricingInPersonText: 'Experience Scoliosis Day up close: networking with specialists and the full event experience.',
     pricingOnlineBadge: 'Online',
-    pricingOnlineText: 'Access every talk, live and recorded, from anywhere in the world.',
+    pricingOnlineText: 'Watch live or catch up later: every Scoliosis Day talk, available wherever you are.',
     pricingPrev: 'Previous plan',
     pricingNext: 'Next plan',
 
@@ -328,33 +336,25 @@ const t = {
     sponsorsTitle: 'Sponsors',
 
     // Quem faz o Scoliosis Day / Curadoria Científica
-    organizersTitle: 'Who Makes Scoliosis Day',
+    // "Scoliosis Day" no título é <BrandWordmark /> — ver AboutPage/EditionsPage.
+    organizersTitleMain: 'Who Makes',
     curatorsTitle: 'Scientific Curation',
 
     // ── Home · Depoimentos ──
     testimonialsTitle: 'Testimonials',
     testimonialsSubtitle: 'Those who experienced Scoliosis Day share its impact on their practice.',
-    editionsHeld: 'Editions held',
+    // Duas linhas do rótulo bicolor em .sd-stat (ver .sdp-stat__label) —
+    // "Editions held" quebrado em normal + itálico teal de destaque.
+    editionsHeldLine1: 'Editions',
+    editionsHeldLine2: 'held',
     testimonialPrev: 'Previous testimonial',
     testimonialNext: 'Next testimonial',
-    // Exibidos quando a edição mais recente ainda não tem depoimentos.
-    testimonialsFallback: [
-      {
-        text: 'A transformative experience for my clinical practice. The scientific level of the speakers is unmatched.',
-        author: 'Dr. Carlos Mendes',
-        role: 'Spine Surgeon',
-      },
-      {
-        text: 'Scoliosis Day changed the way I treat my patients. The exchange between specialists is unique.',
-        author: 'Dr. Ana Lima',
-        role: 'Physiotherapist',
-      },
-    ],
 
     // ── /sobre ──
     aboutPageHeroTitle: 'About Us',
     aboutPageHeroSubtitle: 'Brazil’s leading multidisciplinary scientific event, focused on knowledge, innovation and excellence.',
-    aboutPageIntroTitle: 'About Scoliosis Day',
+    // "Scoliosis Day" no heading é <BrandWordmark /> (ver aboutTitleMain).
+    aboutPageIntroTitleMain: 'About',
     aboutPageIntroText: 'Scoliosis Day has established itself as an international reference in the treatment of spinal deformities, bringing together great names in healthcare from around the world in favor of education. Scoliosis Day is the global meeting point for the forefront of scoliosis treatment. With a philosophy grounded in education and high-quality science, the event brings together spine surgeons, physiotherapists, internationally renowned orthotists, residents and other professionals involved in scoliosis care.',
     aboutPageCard1Title: 'Why participate?',
     aboutPageCard1Text: 'It is a unique experience with the biggest names in the field, building strategic networking and broadening your view of the challenges and advances in scoliosis care.',

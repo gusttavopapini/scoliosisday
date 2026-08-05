@@ -1198,19 +1198,21 @@
 }
 
 .sda-auth__logo {
-  font-family:var(--font-display);
-  font-weight: var(--fw-display-heavy);
-  font-style: italic;
   font-size: var(--display-sm);
-  letter-spacing: var(--ls-display);
-  text-transform: uppercase;
   line-height: var(--lh-display);
   text-align: center;
   color: var(--teal-800);
 }
 
-.sda-auth__logo span {
-  color: var(--orange-600);
+/* ---- Marca "Scoliosis Day" — mesmo tratamento do site público ----
+   .sda-brand-wordmark existe porque design-system.css é fixo e admin.css
+   é uma folha separada de public.css; a regra é a mesma que
+   .sdp-brand-wordmark, só com o prefixo da camada (ver public.css). */
+.sda-brand-wordmark {
+  font-family:var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  text-transform: none;
 }
 
 .sda-auth__header {

@@ -300,7 +300,9 @@ const t = {
     heroSubtitle: 'Cirurgiões, fisioterapeutas e profissionais da saúde reunidos pela vanguarda do tratamento da escoliose.',
 
     // ── Home · O que é o Scoliosis Day ──
-    aboutTitle: 'O que é o Scoliosis Day',
+    // "Scoliosis Day" no heading é renderizado por <BrandWordmark />, não
+    // por este texto — aboutTitleMain é só o que vem antes da marca.
+    aboutTitleMain: 'O que é o',
     aboutSubtitle: 'Um encontro que une ciência, prática clínica e formação profissional em torno da escoliose.',
     aboutCard1Title: 'Educação e Ciência de Alto Nível',
     aboutCard1Text: 'O Scoliosis Day é o ponto de encontro global para a vanguarda do tratamento da escoliose. Com uma filosofia pautada na educação e na ciência de alta qualidade, o evento reúne cirurgiões da coluna vertebral, fisioterapeutas, ortesistas de prestígio internacional, residentes e outros profissionais envolvidos no cuidado da escoliose.',
@@ -308,6 +310,12 @@ const t = {
     aboutCard2Text: 'Essencialmente educativo, o Scoliosis Day promove a atualização científica, a troca de conhecimento e o debate multidisciplinar entre diferentes áreas da saúde. Mais do que um congresso, é um espaço que conecta a prática clínica, a ciência, a indústria, profissionais em formação e especialistas de referência nacional e internacional.',
     aboutCard3Title: 'Apoio da ABTE',
     aboutCard3Text: 'Desde a primeira edição, o Scoliosis Day conta com o apoio da Associação Brasileira de Tratamento da Escoliose (ABTE), reforçando seu compromisso com a comunidade científica dedicada à escoliose no Brasil.',
+    // Link no rodapé dos cards "O que é o Scoliosis Day" (Home e Edições).
+    learnMore: 'Saiba mais',
+    // Abre o modal de detalhes nos cards de pessoa (organizadores, curadoria, Hall de Estrelas).
+    viewMore: 'Ver mais',
+    // Título da seção de currículo no modal "Ver mais" do PersonCard.
+    personModalCurriculumTitle: 'Currículo',
 
     // ── Edições (/edicoes) ──
     editionsEmptyTitle: 'Nenhuma edição publicada',
@@ -318,9 +326,9 @@ const t = {
 
     // Modalidades e valores
     pricingInPersonBadge: 'Presencial',
-    pricingInPersonText: 'Participe ao vivo, faça networking e mergulhe na experiência completa do Scoliosis Day.',
+    pricingInPersonText: 'Viva o Scoliosis Day de perto: networking com especialistas e a experiência completa do evento.',
     pricingOnlineBadge: 'Online',
-    pricingOnlineText: 'Acesse todas as palestras ao vivo e gravadas de qualquer lugar do mundo.',
+    pricingOnlineText: 'Acesse ao vivo ou revise depois: todas as palestras do Scoliosis Day, disponíveis onde você estiver.',
     pricingPrev: 'Modalidade anterior',
     pricingNext: 'Próxima modalidade',
 
@@ -331,33 +339,30 @@ const t = {
     sponsorsTitle: 'Patrocinadores',
 
     // Quem faz o Scoliosis Day / Curadoria Científica
-    organizersTitle: 'Quem faz o Scoliosis Day',
+    // "Scoliosis Day" no título é <BrandWordmark /> — ver AboutPage/EditionsPage.
+    organizersTitleMain: 'Quem faz o',
     curatorsTitle: 'Curadoria Científica',
 
     // ── Home · Depoimentos ──
     testimonialsTitle: 'Depoimentos',
     testimonialsSubtitle: 'Quem viveu o Scoliosis Day conta o impacto do encontro na sua prática.',
-    editionsHeld: 'Edições realizadas',
+    // Quebra de linha manual do heading, só em /depoimentos (largura cheia,
+    // ver TextTestimonials.jsx) — não existe em en.js de propósito: o ponto
+    // de quebra é específico desta frase em português, a inglesa quebra
+    // naturalmente com outra contagem de palavras.
+    testimonialsSubtitleBreakAfter: 'Quem viveu o Scoliosis Day conta o',
+    // Duas linhas do rótulo bicolor em .sd-stat (ver .sdp-stat__label) —
+    // "Edições realizadas" quebrado em normal + itálico teal de destaque.
+    editionsHeldLine1: 'Edições',
+    editionsHeldLine2: 'realizadas',
     testimonialPrev: 'Depoimento anterior',
     testimonialNext: 'Próximo depoimento',
-    // Exibidos quando a edição mais recente ainda não tem depoimentos.
-    testimonialsFallback: [
-      {
-        text: 'Uma experiência transformadora para minha prática clínica. O nível científico dos palestrantes é incomparável.',
-        author: 'Dr. Carlos Mendes',
-        role: 'Cirurgião de Coluna',
-      },
-      {
-        text: 'O Scoliosis Day mudou a forma como trato meus pacientes. A troca entre especialistas é única.',
-        author: 'Dra. Ana Lima',
-        role: 'Fisioterapeuta',
-      },
-    ],
 
     // ── /sobre ──
     aboutPageHeroTitle: 'Sobre Nós',
     aboutPageHeroSubtitle: 'O principal evento científico multidisciplinar do Brasil com foco em conhecimento, inovação e excelência.',
-    aboutPageIntroTitle: 'Sobre o Scoliosis Day',
+    // "Scoliosis Day" no heading é <BrandWordmark /> (ver aboutTitleMain).
+    aboutPageIntroTitleMain: 'Sobre o',
     aboutPageIntroText: 'O Scoliosis Day vem consolidando-se como referência internacional no tratamento das deformidades da coluna vertebral, reunindo grandes nomes da saúde do mundo a favor da educação. O Scoliosis Day é o ponto de encontro global para a vanguarda do tratamento da escoliose. Com uma filosofia pautada na educação e na ciência de alta qualidade, o evento reúne cirurgiões da coluna vertebral, fisioterapeutas, ortesistas de prestígio internacional, residentes e outros profissionais envolvidos no cuidado da escoliose.',
     aboutPageCard1Title: 'Por que participar?',
     aboutPageCard1Text: 'É uma experiência única com os maiores nomes da área, construir networking estratégico e ampliar sua visão sobre os desafios e avanços no cuidado com a escoliose.',
