@@ -6,16 +6,16 @@
 import PersonCard from './PersonCard.jsx';
 
 /**
- * @param {{ title: string, people: object[], showType?: boolean }} props
+ * @param {{ title: string, people: object[], showType?: boolean, headingClassName?: string }} props
  */
-export default function PeopleSection({ title, people, showType = false }) {
+export default function PeopleSection({ title, people, showType = false, headingClassName = '' }) {
   if (people.length === 0) return null;
 
   return (
     <section className="sd-section sd-section--tight">
       <div className="sd-container">
         <header className="sd-section-header sdp-section-header">
-          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal">{title}</h2>
+          <h2 className={`sd-display sd-display--md sd-display--upright sd-display--teal${headingClassName ? ` ${headingClassName}` : ''}`}>{title}</h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />
           </div>

@@ -1211,7 +1211,9 @@
 .sda-brand-wordmark {
   font-family:var(--font-accent);
   font-style: italic;
-  font-weight: 500;
+  /* Ver nota em .sdp-brand-wordmark (public.css): 400 é o peso real
+     disponível da Allrounder Antiqua Regular Italic, não 500. */
+  font-weight: 400;
   text-transform: none;
 }
 

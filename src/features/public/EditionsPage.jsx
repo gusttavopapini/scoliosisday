@@ -187,7 +187,11 @@ export default function EditionsPage() {
 
       <SponsorCta />
 
-      <PeopleSection title={<>{t.site.organizersTitleMain} <BrandWordmark /></>} people={organizers} />
+      <PeopleSection
+        title={<>{t.site.organizersTitleMain} <BrandWordmark /></>}
+        people={organizers}
+        headingClassName="sdp-heading--regular"
+      />
 
       <PeopleSection title={t.site.curatorsTitle} people={curators} />
     </>

@@ -5,6 +5,7 @@
 import { GraduationCap, Users, Award } from 'lucide-react';
 import { useLanguage } from '../../../hooks/useLanguage.js';
 import BrandWordmark from '../../../components/BrandWordmark.jsx';
+import AcronymSafeText from '../../../components/public/AcronymSafeText.jsx';
 
 const CARDS = [
   { icon: GraduationCap, titleKey: 'aboutCard1Title', textKey: 'aboutCard1Text' },
@@ -34,7 +35,9 @@ export default function HomeAbout() {
               <span className="sd-icon-badge sd-icon-badge--lg" aria-hidden="true">
                 <Icon size={30} />
               </span>
-              <h3 className="sd-display sd-display--sm sd-display--upright">{t.site[titleKey]}</h3>
+              <h3 className="sd-display sd-display--sm sd-display--upright sdp-feature-card__title">
+                <AcronymSafeText text={t.site[titleKey]} />
+              </h3>
               <p className="sd-card__body">{t.site[textKey]}</p>
             </article>
           ))}

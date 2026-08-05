@@ -5,6 +5,7 @@
 import { Stethoscope, MessageCircle, Users } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
 import BrandWordmark from '../../../../components/BrandWordmark.jsx';
+import AcronymSafeText from '../../../../components/public/AcronymSafeText.jsx';
 
 const CARDS = [
   { icon: Stethoscope, titleKey: 'aboutPageCard1Title', textKey: 'aboutPageCard1Text' },
@@ -35,7 +36,9 @@ export default function AboutIntro() {
               <span className="sd-icon-badge sd-icon-badge--lg" aria-hidden="true">
                 <Icon size={30} />
               </span>
-              <h3 className="sd-card__title">{t.site[titleKey]}</h3>
+              <h3 className="sd-card__title sdp-feature-card__title">
+                <AcronymSafeText text={t.site[titleKey]} />
+              </h3>
               <p className="sd-card__body">{t.site[textKey]}</p>
             </article>
           ))}

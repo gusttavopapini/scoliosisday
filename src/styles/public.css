@@ -12,13 +12,6 @@
    hambúrguer e o comportamento responsivo.
    ============================================================ */
 
-/* Fraunces — única exceção a Barlow Condensed/Open Sans, e só para o
-   acento pontual descrito na seção 0 (--font-accent): a citação dos
-   depoimentos e uma palavra por headline institucional. @import precisa
-   vir antes de qualquer regra (fora @charset) — por isso mora aqui,
-   antes até do :root. */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&display=swap');
-
 /* ============================================================
    0. TOKENS DA CAMADA PÚBLICA
    ============================================================ */
@@ -29,11 +22,10 @@
      base não cair abaixo da dobra — o navbar é sticky e ocupa fluxo. */
   --sdp-navbar-h: 64px;
 
-  /* Serif de acento — NUNCA usada em corpo de texto, botão, navbar ou
-     tag. Só em .sd-quote blockquote (citação de depoimento) e
-     .sdp-accent-word (a última palavra de uma headline institucional).
-     Todo o resto do site continua em Barlow Condensed + Open Sans. */
-  --font-accent: 'Fraunces', serif;
+  /* --font-display, --font-accent e --font-text (a família inteira de
+     fontes do site, incluindo o acento serifado) são definidos em
+     src/styles/tokens.css, não aqui — é um override global (também vale
+     pro painel admin), não algo específico da camada pública. */
 }
 
 /* ============================================================
@@ -137,7 +129,10 @@
 .sdp-brand-wordmark {
   font-family:var(--font-accent);
   font-style: italic;
-  font-weight: 500;
+  /* 400, não 500: é o peso real do único arquivo itálico da Allrounder
+     Antiqua (Regular Italic) — 500 não existe, cairia num meio-termo
+     sintetizado à toa quando o 400 exato já é o peso pretendido aqui. */
+  font-weight: 400;
   text-transform: none;
 }
 
@@ -429,7 +424,8 @@
 .sdp-accent-word {
   font-family:var(--font-accent);
   font-style: italic;
-  font-weight: 500;
+  /* Ver nota em .sdp-brand-wordmark: 400 é o peso real disponível. */
+  font-weight: 400;
 }
 
 /* ============================================================
@@ -470,9 +466,15 @@
    heading do site que deve continuar em caixa alta. */
 .sdp-testimonials-headline {
   text-transform: none;
-  /* Frase longa de várias linhas, não um título curto — folga a mais
-     que o --lh-display bem apertado do kit dá conta. */
-  line-height: var(--lh-snug);
+  /* Peso real Book (400) — mesmo ajuste do .sdp-about-heading/
+     .sdp-heading--regular. "Scoliosis Day" (<BrandWordmark />) e a
+     palavra de acento (<AccentWord />) têm peso próprio declarado,
+     não herdam daqui. */
+  font-weight: 400;
+  /* --lh-snug (1.35) ficou largo demais depois que o peso baixou —
+     --lh-tight (1.15) é o próximo degrau do kit, ainda mais folgado
+     que o --lh-display bem apertado da base. */
+  line-height: var(--lh-tight);
 }
 
 /* Quebra de linha manual (só /depoimentos, ver TextTestimonials.jsx) —
@@ -481,11 +483,45 @@
   display: block;
 }
 
-/* "O que é o Scoliosis Day" (Home, seção dos 3 cards) — só este
-   heading; os <h3> de título de cada card continuam em .sd-display
-   normal (uppercase), não usam esta classe. */
+/* "O que é o Scoliosis Day" (Home, seção dos 3 cards) — heading
+   completo (caixa de frase + peso), só esta instância. */
 .sdp-about-heading {
   text-transform: none;
+  /* Peso real Book (400) — o --fw-display-heavy do kit (que resolve pro
+     Heavy 900 real) ficava pesado demais aqui. Só o "O que é o"; a
+     marca "Scoliosis Day" dentro (<BrandWordmark />) tem peso próprio,
+     não herda daqui. */
+  font-weight: 400;
+}
+
+/* Mesmo peso 400 do .sdp-about-heading, mas SEM mexer em caixa alta —
+   pros headings "O que é" de Edições e "Quem faz" (Edições + Sobre):
+   pedido de paridade foi especificamente sobre peso, a mudança de caixa
+   de frase continua restrita ao heading original da Home. */
+.sdp-heading--regular {
+  font-weight: 400;
+}
+
+/* Título dos cards de 3 colunas — Home, Edições (PresentationCard.jsx,
+   conteúdo dinâmico traduzido) e Sobre Nós (AboutIntro.jsx, que usa
+   .sd-card__title por baixo; esta classe entra por cima e vence por
+   ordem de carregamento, sem precisar duplicar as outras propriedades).
+   Caixa de frase sem tocar no texto-fonte — lowercase geral + primeira
+   letra maiúscula via ::first-letter. */
+.sdp-feature-card__title {
+  text-transform: lowercase;
+  font-weight: 500;
+}
+
+.sdp-feature-card__title::first-letter {
+  text-transform: uppercase;
+}
+
+/* Preserva siglas (ex: "ABTE") dentro de um título em caixa de frase —
+   ver <AcronymSafeText />/preserveAcronyms.js. Sem isso "Apoio da ABTE"
+   viraria "Apoio da abte" junto com o resto do lowercase automático. */
+.sdp-keep-caps {
+  text-transform: uppercase;
 }
 
 /* ============================================================
@@ -967,6 +1003,12 @@
 
 .sdp-pricing__price {
   margin: var(--space-0);
+  /* "R$1,200.00" (formatação en-US do Intl, sem espaço nenhum) é uma
+     string sem ponto de quebra — em --display-lg (56px) na Luxora
+     Grotesk (mais larga que a Barlow Condensed anterior), vazava a
+     largura do card no mobile. overflow-wrap garante que quebre em vez
+     de vazar, sem mudar o tamanho da fonte. */
+  overflow-wrap: anywhere;
 }
 
 .sdp-pricing__nav {
@@ -1495,6 +1537,11 @@
 .sdp-feature-card {
   padding: var(--space-8);
   gap: var(--space-5);
+  /* Item de grid tem min-width:auto por padrão — sem isso, o card não
+     encolhe abaixo da palavra mais longa do título ("Multidisciplinary"
+     etc.), que ficou mais larga com a Luxora Grotesk (não condensada
+     como a Barlow Condensed era) e vazava a coluna no mobile. */
+  min-width: 0;
 }
 
 /* Linha fina separando o texto do link "saiba mais", empurrada pro fim

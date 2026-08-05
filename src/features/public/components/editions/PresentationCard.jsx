@@ -6,6 +6,7 @@
 
 import { useTranslatedContent } from '../../../../hooks/useTranslatedContent.js';
 import { getPresentationIcon } from '../../../../utils/presentationIcons.js';
+import AcronymSafeText from '../../../../components/public/AcronymSafeText.jsx';
 
 /** @param {{ card: { icon: string, title: string, description: string } }} props */
 export default function PresentationCard({ card }) {
@@ -17,8 +18,10 @@ export default function PresentationCard({ card }) {
       <span className="sd-icon-badge sd-icon-badge--lg" aria-hidden="true">
         <Icon size={30} />
       </span>
-      <h3 className="sd-display sd-display--sm sd-display--upright">
-        <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.title}</span>
+      <h3 className="sd-display sd-display--sm sd-display--upright sdp-feature-card__title">
+        <span className={isTranslating ? 'sdp-translating' : undefined}>
+          <AcronymSafeText text={translated.title} />
+        </span>
       </h3>
       <p className="sd-card__body">
         <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.description}</span>

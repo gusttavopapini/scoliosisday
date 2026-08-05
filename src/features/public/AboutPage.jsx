@@ -47,7 +47,11 @@ export default function AboutPage() {
       <AboutIntro />
       <AboutRecife />
 
-      <PeopleSection title={<>{t.site.organizersTitleMain} <BrandWordmark /></>} people={organizers} />
+      <PeopleSection
+        title={<>{t.site.organizersTitleMain} <BrandWordmark /></>}
+        people={organizers}
+        headingClassName="sdp-heading--regular"
+      />
 
       {latestEvent && <EditionSponsors event={latestEvent} sponsorsById={sponsorsById} />}
       <SponsorCta />

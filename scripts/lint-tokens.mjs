@@ -6,6 +6,10 @@ import { join, extname } from 'node:path';
 const ROOT = 'src';
 const ALLOWLIST = [
   'src/styles/design-system.css',
+  // @font-face precisa de font-family literal (é a definição do nome da
+  // fonte, não pode ser var(--token) — seria circular). Mesmo motivo de
+  // design-system.css acima.
+  'src/styles/tokens.css',
   // Paleta padrão do evento: hex são dados de conteúdo gravados no Firestore
   // (validados por regex hex no eventSchema), não estilo do painel.
   'src/features/events/constants/defaultPalette.js',

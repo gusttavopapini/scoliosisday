@@ -20,7 +20,7 @@ export default function EditionPresentation({ event }) {
     <section className="sd-section">
       <div className="sd-container">
         <header className="sd-section-header sdp-section-header">
-          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal">
+          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
             {t.site.aboutTitleMain} <BrandWordmark />
           </h2>
           <div className="sd-rule" aria-hidden="true">

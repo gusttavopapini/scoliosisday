@@ -1,0 +1,176 @@
+/* ============================================================
+   tokens.css — Fontes licenciadas do Scoliosis Day
+   Override global de --font-display / --font-accent / --font-text,
+   definidos originalmente em design-system.css (arquivo imutável — ver
+   regra no topo de public.css/admin.css). Como propriedade custom do
+   CSS resolve pelo :root efetivo no momento do uso, não pela folha onde
+   foi declarada, redeclarar aqui (carregado depois de design-system.css,
+   antes de admin.css/public.css — ver main.jsx) é suficiente pra
+   substituir a fonte em TODO o site, público e painel, sem tocar no
+   arquivo original.
+
+   Cada família agora tem vários pesos/estilos reais (rodada anterior só
+   tinha um arquivo cada, causando negrito/itálico sintético — ver
+   histórico). font-weight/font-style abaixo são declarados manualmente
+   por arquivo, sem confiar no metadado interno do .woff2 (o da Giuconda
+   está errado — todo arquivo, incluindo Bold/SemiBold, vem marcado como
+   400 por dentro; @font-face sempre vence esse metadado pra fins de
+   casamento de estilo do CSS, então isso é inofensivo desde que a gente
+   declare o peso certo aqui, nunca deixando o navegador adivinhar).
+
+   Luxora Grotesk (display) tem um buraco: os tokens do kit pedem peso
+   800 (--fw-display-heavy, base de .sd-display) e só existem arquivos
+   reais em 400/500/700/900 — sem Semibold/Heavy "de verdade" nesse
+   valor exato. Em vez de forçar um range artificial no @font-face,
+   deixei cada peso com seu valor exato e confiei no algoritmo padrão de
+   casamento de fonte do CSS (Fonts Module Level 4): pedido de peso sem
+   correspondência exata usa o mais próximo disponível entre as faces
+   declaradas — e em empate (800 fica a 100 de distância tanto do 700
+   quanto do 900), a especificação desempata pro mais pesado quando o
+   peso pedido é ≥ 400, ou seja, cai no Heavy (900) automaticamente, sem
+   sintetizar. Confirmado visualmente (ver relatório desta rodada) antes
+   de fechar essa escolha em vez de um range manual. */
+
+@font-face {
+  font-family: 'Luxora Grotesk';
+  src: url('../assets/fonts/luxora-grotesk/LuxoraGrotesk-Book.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Luxora Grotesk';
+  src: url('../assets/fonts/luxora-grotesk/LuxoraGrotesk-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Luxora Grotesk';
+  src: url('../assets/fonts/luxora-grotesk/LuxoraGrotesk-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Luxora Grotesk';
+  src: url('../assets/fonts/luxora-grotesk/LuxoraGrotesk-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Luxora Grotesk';
+  src: url('../assets/fonts/luxora-grotesk/LuxoraGrotesk-Heavy.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Luxora Grotesk';
+  src: url('../assets/fonts/luxora-grotesk/LuxoraGrotesk-HeavyItalic.woff2') format('woff2');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Allrounder Antiqua';
+  src: url('../assets/fonts/allrounder-antiqua/AllrounderAntiqua-RegularItalic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Allrounder Antiqua';
+  src: url('../assets/fonts/allrounder-antiqua/AllrounderAntiqua-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Allrounder Antiqua';
+  src: url('../assets/fonts/allrounder-antiqua/AllrounderAntiqua-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Giuconda';
+  src: url('../assets/fonts/giuconda/Giuconda-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Giuconda';
+  src: url('../assets/fonts/giuconda/Giuconda-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Giuconda';
+  src: url('../assets/fonts/giuconda/Giuconda-SemiBoldItalic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Giuconda';
+  src: url('../assets/fonts/giuconda/Giuconda-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Giuconda';
+  src: url('../assets/fonts/giuconda/Giuconda-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* Antes: "Barlow Condensed", "Oswald", "Arial Narrow", sans-serif. */
+  --font-display: 'Luxora Grotesk', sans-serif;
+
+  /* Antes: 'Fraunces', serif (Google Fonts). */
+  --font-accent: 'Allrounder Antiqua', serif;
+
+  /* Antes: "Open Sans", "Segoe UI", system-ui, sans-serif. */
+  --font-text: 'Giuconda', sans-serif;
+}
+
+/* .sd-display do kit vem com font-style:italic incondicional — decisão
+   revertida após revisão: heading reto por padrão em todo o site (admin
+   incluído, já que essa classe é global), itálico só como acento pontual
+   explícito. Override aqui, não em design-system.css (imutável), pelo
+   mesmo motivo dos tokens de fonte acima: cascade global, carrega antes
+   de admin.css/public.css.
+
+   .sd-display--upright (que já zerava o itálico como modificador) fica
+   redundante onde ainda é usado, mas inofensivo — não removido dos
+   componentes, não vale o churn só por estar duplicado agora.
+
+   Os únicos lugares que devem continuar itálicos (marca "Scoliosis Day"
+   e a palavra de acento em headlines, ex. "prática" em Depoimentos) já
+   declaram font-style:italic na própria classe (.sdp-brand-wordmark,
+   .sda-brand-wordmark, .sdp-accent-word — conferido antes desta mudança,
+   nenhum dependia de herdar o italic do .sd-display), então continuam
+   itálicos normalmente. */
+.sd-display {
+  font-style: normal;
+}
