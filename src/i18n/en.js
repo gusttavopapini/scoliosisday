@@ -41,6 +41,7 @@ const t = {
     sponsors: 'Sponsors',
     schedules: 'Schedule',
     testimonials: 'Testimonials',
+    banners: 'Banners',
     staff: 'Team',
     logout: 'Sign out',
   },
@@ -183,6 +184,21 @@ const t = {
     deleteConfirm: "Delete the sponsor '{name}'? This action cannot be undone.",
   },
 
+  banners: {
+    title: 'Banners',
+    subtitle: 'Manual banners for the Home carousel',
+    create: 'New banner',
+    name: 'Title',
+    order: 'Order',
+    status: 'Status',
+    active: 'Active',
+    inactive: 'Inactive',
+    emptyTitle: 'No banners registered',
+    emptyBody: 'Add banners to display in the Home carousel.',
+    deleteConfirm: "Delete the banner '{name}'? This action cannot be undone.",
+    limitReached: 'Limit of 5 active banners reached (including the current event banner). Deactivate another banner before activating this one.',
+  },
+
   schedules: {
     title: 'Schedule',
     subtitle: 'Event sessions and talks',
@@ -291,10 +307,6 @@ const t = {
     // Placeholders das páginas ainda por construir.
     comingSoonTitle: 'Coming soon',
     comingSoonBody: 'This page is under construction.',
-
-    // ── Home · Hero (fallback sem evento atual) ──
-    heroTitle: 'Brazil’s largest gathering on scoliosis',
-    heroSubtitle: 'Surgeons, physiotherapists and health professionals united at the forefront of scoliosis treatment.',
 
     // ── Home · O que é o Scoliosis Day ──
     // "Scoliosis Day" no heading é renderizado por <BrandWordmark />, não

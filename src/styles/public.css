@@ -416,6 +416,62 @@
   .sdp-hero .sd-display--lg { font-size: var(--display-md); }
 }
 
+/* ---- Carrossel do hero: evento atual + banners manuais ----
+   .sdp-hero__slide é estático (não absolute) de propósito: só um slide
+   fica montado por vez (key={slide.id} remonta e reinicia o fade de
+   .sdp-carousel__slide), então não há pilha para empurrar com position.
+   .sdp-hero__media, absolute, ainda assim ancora em .sdp-hero__frame —
+   um pai estático no meio da árvore não muda o ancestral posicionado. */
+.sdp-hero__slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sdp-hero__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--overlay-light);
+  border-color: var(--border-on-dark);
+  color: var(--text-inverse);
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.sdp-hero__nav:hover {
+  opacity: 0.8;
+}
+
+.sdp-hero__nav--prev { left: var(--space-4); }
+.sdp-hero__nav--next { right: var(--space-4); }
+
+.sdp-hero__dots {
+  position: absolute;
+  bottom: var(--space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: var(--space-0);
+}
+
+.sdp-hero__dots .sdp-carousel__dot {
+  background: var(--border-on-dark);
+  transition: opacity var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+
+.sdp-hero__dots .sdp-carousel__dot:hover {
+  opacity: 0.8;
+}
+
+.sdp-hero__dots .sdp-carousel__dot--active {
+  background: var(--text-inverse);
+}
+
+@media (max-width: 640px) {
+  .sdp-hero__nav { width: 34px; height: 34px; }
+}
+
 /* ---- Palavra de acento em headline institucional ----
    A última palavra de um título como "O que é o Scoliosis Day" — o resto
    do texto continua em .sd-display (Barlow Condensed); só esta palavra
@@ -466,10 +522,9 @@
    heading do site que deve continuar em caixa alta. */
 .sdp-testimonials-headline {
   text-transform: none;
-  /* Peso real Book (400) — mesmo ajuste do .sdp-about-heading/
-     .sdp-heading--regular. "Scoliosis Day" (<BrandWordmark />) e a
-     palavra de acento (<AccentWord />) têm peso próprio declarado,
-     não herdam daqui. */
+  /* Peso real Book (400) — mesmo ajuste de .sdp-heading--regular abaixo.
+     "Scoliosis Day" (<BrandWordmark />) e a palavra de acento
+     (<AccentWord />) têm peso próprio declarado, não herdam daqui. */
   font-weight: 400;
   /* --lh-snug (1.35) ficou largo demais depois que o peso baixou —
      --lh-tight (1.15) é o próximo degrau do kit, ainda mais folgado
@@ -483,22 +538,25 @@
   display: block;
 }
 
-/* "O que é o Scoliosis Day" (Home, seção dos 3 cards) — heading
-   completo (caixa de frase + peso), só esta instância. */
-.sdp-about-heading {
-  text-transform: none;
-  /* Peso real Book (400) — o --fw-display-heavy do kit (que resolve pro
-     Heavy 900 real) ficava pesado demais aqui. Só o "O que é o"; a
-     marca "Scoliosis Day" dentro (<BrandWordmark />) tem peso próprio,
-     não herda daqui. */
-  font-weight: 400;
-}
+/* Heading de seção com a marca "Scoliosis Day" embutida (via
+   <BrandWordmark />) — caixa de frase + peso Book (400) real, no lugar
+   do --fw-display-heavy do kit (que resolve pro Heavy 900 real e ficava
+   pesado demais aqui). O texto-fonte de cada um desses (aboutTitleMain,
+   organizersTitleMain, aboutPageIntroTitleMain — ver i18n) já vem em
+   caixa de frase certa no dicionário; só o text-transform:uppercase
+   incondicional do .sd-display do kit escondia isso.
 
-/* Mesmo peso 400 do .sdp-about-heading, mas SEM mexer em caixa alta —
-   pros headings "O que é" de Edições e "Quem faz" (Edições + Sobre):
-   pedido de paridade foi especificamente sobre peso, a mudança de caixa
-   de frase continua restrita ao heading original da Home. */
+   Consolidada aqui — antes eram duas classes quase idênticas
+   (.sdp-about-heading só na Home, .sdp-heading--regular sem o
+   text-transform nos outros 3 lugares) por causa de um pedido anterior
+   que tratou só o peso como "paridade". Unificada porque o padrão se
+   repete: Home e Edições ("O que é o Scoliosis Day"), Edições e Sobre
+   Nós ("Quem faz o Scoliosis Day", via PeopleSection.jsx compartilhado),
+   e Sobre Nós ("Sobre o Scoliosis Day"). A marca "Scoliosis Day" dentro
+   de cada um tem peso e itálico próprios (<BrandWordmark />), não herda
+   nada daqui. */
 .sdp-heading--regular {
+  text-transform: none;
   font-weight: 400;
 }
 
@@ -1452,14 +1510,17 @@
   color: var(--orange-400);
 }
 
-/* Citação em Fraunces itálico (--font-accent) em vez do itálico padrão
-   de Open Sans do kit — .sd-quote só existe nos cards de depoimento
-   (Home e /depoimentos), então não precisa de escopo extra. font-style
-   já vem italic de design-system.css; só fonte, tamanho e peso mudam. */
+/* Citação em --font-text (Giuconda) reto, igual a qualquer parágrafo do
+   site — antes era --font-accent (Allrounder) itálico. .sd-quote só
+   existe nos cards de depoimento (Home e /depoimentos, via
+   TestimonialQuoteCard.jsx compartilhado), então não precisa de escopo
+   extra. font-style:italic vem incondicional de design-system.css;
+   precisa do override explícito pra normal aqui. */
 .sd-quote blockquote {
-  font-family:var(--font-accent);
+  font-family:var(--font-text);
   font-size: var(--text-xl);
   font-weight: 400;
+  font-style: normal;
 }
 
 .sdp-carousel__dots {

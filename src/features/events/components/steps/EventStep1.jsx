@@ -47,6 +47,38 @@ export default function EventStep1({ register, control, errors, eventId }) {
         </div>
       ))}
 
+      {/* Posição no carrossel da Home (quando este é o evento atual) */}
+      <label className="sd-field" style={{ maxWidth: '260px' }}>
+        <span className="sd-label">
+          Posição no carrossel <span className="sd-muted">(opcional)</span>
+        </span>
+        <Controller
+          name="bannerOrder"
+          control={control}
+          render={({ field }) => (
+            <input
+              className="sd-input"
+              type="number"
+              min={1}
+              step={1}
+              placeholder="Ex: 1"
+              value={field.value ?? ''}
+              onChange={(event) => {
+                const raw = event.target.value;
+                field.onChange(raw === '' ? null : Number(raw));
+              }}
+            />
+          )}
+        />
+        {errors.bannerOrder && (
+          <span className="sd-error">{errors.bannerOrder.message}</span>
+        )}
+        <span className="sd-note">
+          Posição deste banner entre os banners manuais no carrossel da Home,
+          quando este evento é o atual. Sem valor, aparece primeiro.
+        </span>
+      </label>
+
       {/* Número da edição */}
       <label className="sd-field" style={{ maxWidth: '260px' }}>
         <span className="sd-label">

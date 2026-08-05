@@ -80,6 +80,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
       bannerDesktopUrl: '',
       bannerTabletUrl: '',
       bannerMobileUrl: '',
+      bannerOrder: null,
       cta: '',
       ctaLink: '',
       modality: 'hybrid',

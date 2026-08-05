@@ -44,6 +44,7 @@ const t = {
     sponsors: 'Patrocinadores',
     schedules: 'Programação',
     testimonials: 'Depoimentos',
+    banners: 'Banners',
     staff: 'Equipe',
     logout: 'Sair',
   },
@@ -186,6 +187,21 @@ const t = {
     deleteConfirm: "Excluir o patrocinador '{name}'? Esta ação não pode ser desfeita.",
   },
 
+  banners: {
+    title: 'Banners',
+    subtitle: 'Banners manuais do carrossel da Home',
+    create: 'Novo banner',
+    name: 'Título',
+    order: 'Ordem',
+    status: 'Status',
+    active: 'Ativo',
+    inactive: 'Inativo',
+    emptyTitle: 'Nenhum banner cadastrado',
+    emptyBody: 'Adicione banners para exibir no carrossel da Home.',
+    deleteConfirm: "Excluir o banner '{name}'? Esta ação não pode ser desfeita.",
+    limitReached: 'Limite de 5 banners ativos atingido (incluindo o banner do evento atual). Desative outro banner antes de ativar este.',
+  },
+
   schedules: {
     title: 'Programação',
     subtitle: 'Sessões e palestras do evento',
@@ -294,10 +310,6 @@ const t = {
     // Placeholders das páginas ainda por construir.
     comingSoonTitle: 'Em breve',
     comingSoonBody: 'Esta página está sendo construída.',
-
-    // ── Home · Hero (fallback sem evento atual) ──
-    heroTitle: 'O maior encontro sobre escoliose do Brasil',
-    heroSubtitle: 'Cirurgiões, fisioterapeutas e profissionais da saúde reunidos pela vanguarda do tratamento da escoliose.',
 
     // ── Home · O que é o Scoliosis Day ──
     // "Scoliosis Day" no heading é renderizado por <BrandWordmark />, não

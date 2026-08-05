@@ -80,6 +80,14 @@ service cloud.firestore {
       allow write: if isPanelUser();
     }
 
+    // ── Banners ──
+    // Banners manuais do carrossel da Home, ao lado do banner do evento atual.
+    // Público: é o carrossel exibido para todo visitante, sem autenticação.
+    match /banners/{id} {
+      allow read:  if true;
+      allow write: if isPanelUser();
+    }
+
     // ── Mail (Trigger Email extension) ──
     match /mail/{id} {
       allow create: if isPanelUser();

@@ -70,5 +70,11 @@ service firebase.storage {
       allow read:  if true;
       allow write: if isPanelUser() && underMB(5) && isImage('jpeg|png|webp');
     }
+
+    // ── Banners manuais do carrossel da Home (desktop/tablet/mobile) ──
+    match /banners/{bannerId}/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser() && underMB(5) && isImage('jpeg|png|webp');
+    }
   }
 }

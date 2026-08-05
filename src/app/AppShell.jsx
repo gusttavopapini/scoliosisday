@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, Users, Building2, Star,
-  FileText, Quote, Menu, X, LogOut,
+  FileText, Quote, Image, Menu, X, LogOut,
 } from 'lucide-react';
 import t from '../i18n/pt-BR.js';
 import { useAuth } from '../hooks/useAuth.js';
@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { key: 'sponsors',      icon: Building2,       label: t.nav.sponsors,        href: '/painel/patrocinadores' },
   { key: 'schedules',     icon: FileText,        label: t.nav.schedules,       href: '/painel/programacoes' },
   { key: 'testimonials',  icon: Quote,           label: t.nav.testimonials,    href: '/painel/depoimentos' },
+  { key: 'banners',       icon: Image,           label: t.nav.banners,         href: '/painel/banners' },
   { key: 'staff',         icon: Star,            label: t.nav.staff,           href: '/painel/staff', module: 'staff' },
 ];
 

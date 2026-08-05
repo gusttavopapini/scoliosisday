@@ -13,6 +13,15 @@ export const eventSchema = z.object({
   bannerDesktopUrl: z.string().optional(),
   bannerTabletUrl: z.string().optional(),
   bannerMobileUrl: z.string().optional(),
+  // Posição do banner deste evento no carrossel da Home, quando isCurrent.
+  // nullable/optional porque eventos anteriores ao carrossel não têm posição
+  // — o merge do carrossel trata a ausência como "primeiro" (ver HomeHero).
+  bannerOrder: z
+    .number({ invalid_type_error: 'Informe um número' })
+    .int('Use um número inteiro')
+    .min(1, 'Mínimo 1')
+    .nullable()
+    .optional(),
   cta: z.string().min(1, 'CTA obrigatório').max(40, 'Máximo 40 caracteres'),
   ctaLink: z.string().url('URL válida obrigatória'),
   modality: z.literal('hybrid').default('hybrid'),
@@ -73,6 +82,7 @@ export const eventStepSchema = {
     bannerDesktopUrl: true,
     bannerTabletUrl: true,
     bannerMobileUrl: true,
+    bannerOrder: true,
     cta: true,
     ctaLink: true,
     isCurrent: true,
