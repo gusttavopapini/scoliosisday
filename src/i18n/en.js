@@ -403,8 +403,9 @@ const t = {
     testimonialsPageTextTitle: 'Testimonials',
     testimonialsPageVideoTitle: 'Video Testimonials',
 
-    // Patrocinadores — CTA de captação (/sobre e /edicoes)
+    // Patrocinadores — CTA de captação (/sobre, /edicoes e /patrocinadores)
     sponsorCta: 'Become a Sponsor',
+    sponsorCtaEmail: 'scoliosisday@gmail.com',
 
     // Rodapé
     footerTagline: 'Brazil’s largest gathering on scoliosis, bringing together surgeons, physiotherapists and health professionals.',

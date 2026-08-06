@@ -411,8 +411,11 @@ const t = {
     testimonialsPageTextTitle: 'Depoimentos',
     testimonialsPageVideoTitle: 'Depoimentos em Vídeo',
 
-    // Patrocinadores — CTA de captação (/sobre e /edicoes)
+    // Patrocinadores — CTA de captação (/sobre, /edicoes e /patrocinadores)
     sponsorCta: 'Seja um Patrocinador',
+    // Endereço próprio, não t.site.contactEmail — esse é o do rodapé, e não
+    // pode mudar junto só porque o CTA de patrocínio mudou de destino.
+    sponsorCtaEmail: 'scoliosisday@gmail.com',
 
     // Rodapé
     footerTagline: 'O maior encontro sobre escoliose do Brasil, reunindo cirurgiões, fisioterapeutas e profissionais da saúde.',
