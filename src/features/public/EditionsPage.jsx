@@ -21,7 +21,6 @@ import { useSponsors } from '../../hooks/useSponsors.js';
 import { COLLABORATOR_TYPES } from '../../utils/constants.js';
 import { ordinal } from '../../utils/ordinal.js';
 import { resolveCollaboratorsByType } from '../../utils/collaborators.js';
-import BrandWordmark from '../../components/BrandWordmark.jsx';
 import EditionHero from './components/editions/EditionHero.jsx';
 import PeopleSection from './components/editions/PeopleSection.jsx';
 import EditionPricing from './components/editions/EditionPricing.jsx';
@@ -106,13 +105,13 @@ export default function EditionsPage() {
       .filter(Boolean);
   }, [activeEvent, collaboratorsById]);
 
-  const organizers = useMemo(() => {
-    if (!activeEvent) return [];
-    return resolveCollaboratorsByType(activeEvent.organizerIds, collaboratorsById, COLLABORATOR_TYPES.ORGANIZER);
-  }, [activeEvent, collaboratorsById]);
-
+  // Curadoria científica: mesma fonte de todo o resto da página
+  // (activeEvent, a edição da aba selecionada) — só exibe quando ESSA
+  // edição específica é a atual. Uma edição passada pode ter curatorIds
+  // salvo (dado histórico preservado), mas a seção some mesmo assim; só
+  // reaparece na aba que de fato for isCurrent:true.
   const curators = useMemo(() => {
-    if (!activeEvent) return [];
+    if (!activeEvent?.isCurrent) return [];
     return resolveCollaboratorsByType(activeEvent.curatorIds, collaboratorsById, COLLABORATOR_TYPES.SCIENTIFIC_CURATOR);
   }, [activeEvent, collaboratorsById]);
 
@@ -186,12 +185,6 @@ export default function EditionsPage() {
       <EditionSponsors event={activeEvent} sponsorsById={sponsorsById} />
 
       <SponsorCta />
-
-      <PeopleSection
-        title={<>{t.site.organizersTitleMain} <BrandWordmark /></>}
-        people={organizers}
-        headingClassName="sdp-heading--regular"
-      />
 
       <PeopleSection title={t.site.curatorsTitle} people={curators} />
     </>

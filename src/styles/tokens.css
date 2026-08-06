@@ -174,3 +174,18 @@
 .sd-display {
   font-style: normal;
 }
+
+/* ============================================================
+   Outros tokens globais que precisam de valor bruto
+   Nada a ver com tipografia — mora aqui só porque este é o arquivo
+   liberado pelo lint-tokens pra declarar literais (mesmo motivo do
+   @font-face acima: design-system.css é imutável, e um token não pode
+   referenciar var(--ele-mesmo) pra se definir).
+   ============================================================ */
+
+:root {
+  /* Duração de uma volta completa da esteira de Apoiadores da Home (ver
+     .sdp-marquee__track em public.css). Fixa, não depende da quantidade
+     de logos — só da lista repetida no JSX. */
+  --sdp-marquee-duration: 32s;
+}

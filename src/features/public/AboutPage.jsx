@@ -1,6 +1,12 @@
 // src/features/public/AboutPage.jsx
-// Página institucional /sobre: hero fixo + texto/cards + seção Recife +
-// organizadores e patrocinadores da edição mais recente publicada.
+// Página institucional /sobre: hero fixo + texto/cards + seção Recife,
+// patrocinadores da edição mais recente publicada, e duas listas 100%
+// globais e automáticas — organizadores (type organizer) e curadoria
+// científica (type scientific_curator) — nenhuma das duas depende de
+// evento. "Quem faz o Scoliosis Day" só existe aqui: removida de
+// /edicoes, que tinha uma seleção por evento (ver histórico em
+// EventStep4.jsx/EditionsPage.jsx — curadoria ainda mantém esse modelo
+// de duas camadas lá, organizadores não mais).
 
 import { useMemo } from 'react';
 import { useLanguage } from '../../hooks/useLanguage.js';
@@ -8,7 +14,6 @@ import { usePublishedEvents } from '../../hooks/useEvents.js';
 import { useCollaborators } from '../../hooks/useCollaborators.js';
 import { useSponsors } from '../../hooks/useSponsors.js';
 import { COLLABORATOR_TYPES } from '../../utils/constants.js';
-import { resolveCollaboratorsByType } from '../../utils/collaborators.js';
 import SimpleHero from '../../components/public/SimpleHero.jsx';
 import BrandWordmark from '../../components/BrandWordmark.jsx';
 import AboutIntro from './components/about/AboutIntro.jsx';
@@ -20,26 +25,31 @@ import SponsorCta from './components/SponsorCta.jsx';
 export default function AboutPage() {
   const { t } = useLanguage();
   // usePublishedEvents entrega mais recentes primeiro — o [0] é a edição
-  // mais recentemente publicada, a mesma fonte usada pelas seções 4 e 5.
+  // mais recentemente publicada, usada só pela seção de patrocinadores.
   const { data: publishedEvents = [] } = usePublishedEvents();
   const { data: allCollaborators = [] } = useCollaborators();
   const { data: allSponsors = [] } = useSponsors();
 
   const latestEvent = publishedEvents[0] ?? null;
 
-  const collaboratorsById = useMemo(
-    () => new Map(allCollaborators.map((c) => [c.id, c])),
-    [allCollaborators],
-  );
   const sponsorsById = useMemo(
     () => new Map(allSponsors.map((s) => [s.id, s])),
     [allSponsors],
   );
 
-  const organizers = useMemo(() => {
-    if (!latestEvent) return [];
-    return resolveCollaboratorsByType(latestEvent.organizerIds, collaboratorsById, COLLABORATOR_TYPES.ORGANIZER);
-  }, [latestEvent, collaboratorsById]);
+  const organizers = useMemo(
+    () => allCollaborators.filter((c) => c.type === COLLABORATOR_TYPES.ORGANIZER),
+    [allCollaborators],
+  );
+
+  // Curadoria do Sobre: automática, todo colaborador com type
+  // scientific_curator — sem seleção adicional e sem relação com qual
+  // evento é o atual, diferente da seção equivalente em /edicoes (que
+  // segue o evento isCurrent).
+  const aboutCurators = useMemo(
+    () => allCollaborators.filter((c) => c.type === COLLABORATOR_TYPES.SCIENTIFIC_CURATOR),
+    [allCollaborators],
+  );
 
   return (
     <>
@@ -52,6 +62,8 @@ export default function AboutPage() {
         people={organizers}
         headingClassName="sdp-heading--regular"
       />
+
+      <PeopleSection title={t.site.curatorsTitle} people={aboutCurators} />
 
       {latestEvent && <EditionSponsors event={latestEvent} sponsorsById={sponsorsById} />}
       <SponsorCta />

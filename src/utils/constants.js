@@ -35,6 +35,14 @@ export const COLLABORATOR_TYPES = {
   ORGANIZER: 'organizer',
 };
 
+// ---- Tipo de patrocinador ----
+// Patrocinadores antigos não têm este campo no Firestore — toda leitura
+// trata a ausência como SPONSOR (fallback seguro, sem migração de dado).
+export const SPONSOR_TYPES = {
+  SPONSOR: 'patrocinador',
+  SUPPORTER: 'apoiador',
+};
+
 // ---- Status de evento (seção 5.5) ----
 export const EVENT_STATUS = {
   DRAFT: 'draft',

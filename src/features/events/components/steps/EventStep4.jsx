@@ -7,7 +7,7 @@ import { Star, X } from 'lucide-react';
 import { flattenSessions } from '../../../../utils/programmingDays.js';
 import CollaboratorMultiSelect from '../CollaboratorMultiSelect.jsx';
 
-export default function EventStep4({ control, errors, speakers, organizers, curators, programmings, sponsors, watch }) {
+export default function EventStep4({ control, errors, speakers, curators, programmings, sponsors, watch }) {
   const [speakersSearchTerm, setSpeakersSearchTerm] = useState('');
   const [sponsorsSearchTerm, setSponsorsSearchTerm] = useState('');
   const speakersValue = watch('speakers') || [];
@@ -197,19 +197,6 @@ export default function EventStep4({ control, errors, speakers, organizers, cura
           )}
         />
         {errors.speakers && <span className="sd-error">{errors.speakers.message}</span>}
-      </div>
-
-      {/* Organizadores */}
-      <div className="sd-field">
-        <span className="sd-label">Organizadores (opcional)</span>
-        <CollaboratorMultiSelect
-          fieldName="organizerIds"
-          control={control}
-          errors={errors}
-          collaborators={organizers}
-          searchPlaceholder="Buscar organizador..."
-          emptyMessage="Nenhum colaborador cadastrado como organizador."
-        />
       </div>
 
       {/* Curadoria Científica */}

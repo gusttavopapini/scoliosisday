@@ -59,8 +59,48 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   const { data: sponsors = [] } = useSponsors();
 
   const speakersData = speakers.filter((c) => c.type === 'speaker');
-  const organizersData = speakers.filter((c) => c.type === 'organizer');
   const curatorsData = speakers.filter((c) => c.type === 'scientific_curator');
+
+  // Mesclado, não `initialData || {...}`: um evento salvo antes de um campo
+  // opcional existir (ex.: bannerOrder) não tem essa chave no Firestore, e
+  // com `||` o fallback inteiro seria descartado — o campo nasceria
+  // undefined em vez de null, e undefined nunca sobrevive a um setDoc() (ver
+  // sanitizeWrite em services/events.js, que hoje protege o payload mas não
+  // evita o valor errado de nascer aqui). Com spread, cada chave ausente em
+  // initialData cai no default seguro; o que existe em initialData vence.
+  const DEFAULT_VALUES = {
+    headline: '',
+    editionNumber: null,
+    subtitle: '',
+    // '' e não null: o schema espera string e o input é controlado.
+    bannerDesktopUrl: '',
+    bannerTabletUrl: '',
+    bannerMobileUrl: '',
+    bannerOrder: null,
+    cta: '',
+    ctaLink: '',
+    modality: 'hybrid',
+    priceInPerson: null,
+    priceOnline: null,
+    presentation: [
+      { icon: '', title: '', description: '' },
+      { icon: '', title: '', description: '' },
+      { icon: '', title: '', description: '' },
+    ],
+    speakers: [],
+    starSpeakerIds: [],
+    organizerIds: [],
+    curatorIds: [],
+    // '' e não null: <select> controlado com null dispara warning do React.
+    programming: '',
+    sponsors: [],
+    testimonials: [],
+    videos: [],
+    gallery: [],
+    // O schema valida /^#[0-9A-F]{6}$/i — var(--token) nunca passaria.
+    colors: { ...DEFAULT_EVENT_COLORS },
+    isCurrent: false,
+  };
 
   const {
     register,
@@ -72,39 +112,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     formState: { errors, isSubmitting, isDirty },
   } = useForm({
     resolver: zodResolver(eventSchema),
-    defaultValues: initialData || {
-      headline: '',
-      editionNumber: null,
-      subtitle: '',
-      // '' e não null: o schema espera string e o input é controlado.
-      bannerDesktopUrl: '',
-      bannerTabletUrl: '',
-      bannerMobileUrl: '',
-      bannerOrder: null,
-      cta: '',
-      ctaLink: '',
-      modality: 'hybrid',
-      priceInPerson: null,
-      priceOnline: null,
-      presentation: [
-        { icon: '', title: '', description: '' },
-        { icon: '', title: '', description: '' },
-        { icon: '', title: '', description: '' },
-      ],
-      speakers: [],
-      starSpeakerIds: [],
-      organizerIds: [],
-      curatorIds: [],
-      // '' e não null: <select> controlado com null dispara warning do React.
-      programming: '',
-      sponsors: [],
-      testimonials: [],
-      videos: [],
-      gallery: [],
-      // O schema valida /^#[0-9A-F]{6}$/i — var(--token) nunca passaria.
-      colors: { ...DEFAULT_EVENT_COLORS },
-      isCurrent: false,
-    },
+    defaultValues: { ...DEFAULT_VALUES, ...initialData },
   });
 
   // ID do documento: o existente em edição, ou um novo sorteado já na montagem.
@@ -293,7 +301,6 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
             control={control}
             errors={errors}
             speakers={speakersData}
-            organizers={organizersData}
             curators={curatorsData}
             programmings={programmings}
             sponsors={sponsors}

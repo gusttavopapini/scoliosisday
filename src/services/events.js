@@ -61,9 +61,24 @@ function withoutIdField(data) {
   return rest;
 }
 
-/** As duas limpezas que todo payload de escrita precisa. */
+/**
+ * Undefined nunca pode ir para setDoc()/updateDoc() — o Firestore rejeita a
+ * escrita inteira ("Unsupported field value: undefined"). Vira null, não é
+ * omitido: como saveEvent grava com merge:true, omitir a chave manteria um
+ * valor antigo no Firestore em vez de limpar o campo que o formulário
+ * deixou vazio. Defesa de segunda linha — a causa raiz (defaultValues do
+ * form nunca deveria produzir undefined) é corrigida em EventForm.jsx, mas
+ * isto protege qualquer campo opcional futuro que caia no mesmo problema.
+ */
+function nullifyUndefined(data) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [key, value === undefined ? null : value]),
+  );
+}
+
+/** As três limpezas que todo payload de escrita precisa. */
 function sanitizeWrite(data) {
-  return withoutIdField(withoutCurrentFlag(data));
+  return nullifyUndefined(withoutIdField(withoutCurrentFlag(data)));
 }
 
 /** Gera um ID de documento no cliente, sem gravar nada ainda. */

@@ -3,8 +3,18 @@
 
 import { Pencil, Trash2 } from 'lucide-react';
 import t from '../../../i18n/pt-BR.js';
+import { SPONSOR_TYPES } from '../../../utils/constants.js';
+
+const SPONSOR_TYPE_LABEL = {
+  [SPONSOR_TYPES.SPONSOR]: 'Patrocinador',
+  [SPONSOR_TYPES.SUPPORTER]: 'Apoiador',
+};
 
 export default function SponsorCard({ sponsor, onEdit, onDelete }) {
+  // Ausente em cadastros anteriores a este campo — mesmo fallback usado na
+  // leitura pública (ver constants.js).
+  const sponsorType = sponsor.type ?? SPONSOR_TYPES.SPONSOR;
+
   return (
     <div className="sd-card" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       {/* Logo. object-fit: contain porque logo não pode ser recortada, e o
@@ -18,11 +28,21 @@ export default function SponsorCard({ sponsor, onEdit, onDelete }) {
         )}
       </div>
 
-      {/* Nome e link */}
+      {/* Nome, tipo e link */}
       <div>
-        <h3 style={{ fontWeight: 'var(--fw-semibold)', color: 'var(--text-heading)', margin: 0, marginBottom: 'var(--space-2)' }}>
-          {sponsor.name}
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+          <h3 style={{ fontWeight: 'var(--fw-semibold)', color: 'var(--text-heading)', margin: 0 }}>
+            {sponsor.name}
+          </h3>
+          <span
+            className="sd-badge"
+            style={{
+              backgroundColor: sponsorType === SPONSOR_TYPES.SUPPORTER ? 'var(--teal-600)' : 'var(--gray-500)',
+            }}
+          >
+            {SPONSOR_TYPE_LABEL[sponsorType]}
+          </span>
+        </div>
         <a
           href={sponsor.website}
           target="_blank"

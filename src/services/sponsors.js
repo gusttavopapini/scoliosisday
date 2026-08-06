@@ -27,6 +27,17 @@ export const SPONSORS_PAGE_SIZE = 20;
 const mapDocs = (snapshot) => snapshot.docs.map((snap) => ({ ...snap.data(), id: snap.id }));
 
 /**
+ * Undefined nunca pode ir para setDoc()/updateDoc() — mesma proteção de
+ * services/events.js. Vira null, não é omitido, pra realmente limpar o
+ * campo que o formulário deixou vazio.
+ */
+function nullifyUndefined(data) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [key, value === undefined ? null : value]),
+  );
+}
+
+/**
  * Todos os patrocinadores, ordenados. Usado pelo seletor do wizard de eventos.
  * A tela de listagem usa fetchSponsorsPage.
  */
@@ -88,7 +99,7 @@ export function newSponsorId() {
  * @returns {Promise<string>} ID do novo documento
  */
 export async function createSponsor(data, explicitId) {
-  const payload = { ...data, createdAt: new Date() };
+  const payload = { ...nullifyUndefined(data), createdAt: new Date() };
 
   if (explicitId) {
     await setDoc(doc(db, SPONSORS_COLLECTION, explicitId), payload);
@@ -102,7 +113,7 @@ export async function createSponsor(data, explicitId) {
 export async function updateSponsor(id, data) {
   const docRef = doc(db, SPONSORS_COLLECTION, id);
   await updateDoc(docRef, {
-    ...data,
+    ...nullifyUndefined(data),
     updatedAt: new Date(),
   });
 }

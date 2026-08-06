@@ -355,6 +355,9 @@ const t = {
     organizersTitleMain: 'Quem faz o',
     curatorsTitle: 'Curadoria Científica',
 
+    // ── Home · Apoiadores (esteira) ──
+    supportersTitle: 'Apoiadores',
+
     // ── Home · Depoimentos ──
     testimonialsTitle: 'Depoimentos',
     testimonialsSubtitle: 'Quem viveu o Scoliosis Day conta o impacto do encontro na sua prática.',
@@ -398,7 +401,7 @@ const t = {
 
     // ── /patrocinadores ──
     sponsorsPageHeroTitle: 'Patrocinadores',
-    sponsorsPageHeroSubtitle: 'Empresas e instituições que tornam o Scoliosis Day possível.',
+    sponsorsPageHeroSubtitle: 'Grandes marcas que fazem parte da nossa história',
     sponsorsPageEmptyTitle: 'Nenhum patrocinador cadastrado',
     sponsorsPageEmptyBody: 'Ainda não há patrocinadores nas edições publicadas.',
 

@@ -22,6 +22,10 @@
      base não cair abaixo da dobra — o navbar é sticky e ocupa fluxo. */
   --sdp-navbar-h: 64px;
 
+  /* --sdp-marquee-duration (esteira de Apoiadores) está em tokens.css,
+     não aqui — precisa de valor bruto (32s), e só tokens.css/
+     design-system.css têm permissão do lint-tokens pra isso. */
+
   /* --font-display, --font-accent e --font-text (a família inteira de
      fontes do site, incluindo o acento serifado) são definidos em
      src/styles/tokens.css, não aqui — é um override global (também vale
@@ -86,14 +90,30 @@
   padding-inline: var(--gutter);
 }
 
-/* Mesmo problema do .sd-body a, agora nos links de navegação (0,1,0). */
+/* Mesmo problema do .sd-body a, agora nos links de navegação (0,1,0).
+   font-size +5% sobre o 15px do kit (.sd-navbar__link, design-system.css) —
+   calc() em cima do valor de origem, não um número novo, pra ficar claro que
+   é um ajuste relativo e isolado a este componente. Cobre tanto a barra
+   desktop quanto a gaveta mobile: as duas reaproveitam .sd-navbar__link. */
 .sdp-navbar .sd-navbar__link {
   color: var(--text-on-dark);
+  font-size: calc(15px * 1.05);
 }
 
 .sdp-navbar .sd-navbar__link:hover,
 .sdp-navbar .sd-navbar__link--active {
   color: var(--text-inverse);
+}
+
+/* "Inscreva-se": +5% sobre o 13px de .sd-btn--sm (design-system.css), do
+   mesmo jeito que os links acima — calc() sobre o valor de origem. Não dá
+   pra editar .sd-btn--sm direto: é a classe de qualquer botão pequeno do
+   kit, dentro e fora do navbar (ex.: ações "Editar"/"Excluir" do painel).
+   Duas instâncias do CTA no navbar (barra desktop + rodapé da gaveta
+   mobile), cada uma com seu próprio seletor escopado. */
+.sdp-navbar__cta,
+.sdp-navbar__drawer-foot .sd-btn {
+  font-size: calc(13px * 1.05);
 }
 
 /* ---- Wordmark (logo) ----
@@ -1254,6 +1274,60 @@
   width: auto;
   object-fit: contain;
   opacity: 1;
+}
+
+/* ============================================================
+   17. HOME · APOIADORES (esteira de logos)
+   HomeSupporters.jsx repete a lista real N vezes (--sdp-marquee-repeats,
+   inline no track) — N cresce quando há poucos apoiadores, pra nunca
+   deixar buraco visual em telas largas (testado até 2560px com 1 logo só;
+   5 repetições fixas não bastavam). translateX(-100%/N) desloca sempre
+   exatamente uma cópia da lista, então o reset do loop cai num frame
+   idêntico ao inicial — sem salto visível, qualquer N.
+   ============================================================ */
+
+.sdp-supporters {
+  padding-block: var(--space-20);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.sdp-marquee {
+  margin-top: var(--space-10);
+  overflow: hidden;
+}
+
+.sdp-marquee__track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  width: max-content;
+  animation: sdp-marquee-scroll var(--sdp-marquee-duration) linear infinite;
+}
+
+.sdp-marquee:hover .sdp-marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes sdp-marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% / var(--sdp-marquee-repeats, 5))); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdp-marquee__track { animation: none; }
+}
+
+.sdp-marquee__item {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+.sdp-supporters .sdp-supporters__logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* ============================================================

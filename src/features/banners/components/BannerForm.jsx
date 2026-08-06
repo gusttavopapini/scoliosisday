@@ -49,6 +49,23 @@ export default function BannerForm({ initialData, isEditMode = false, onSuccess 
   const { data: allBanners = [] } = useBanners();
   const { data: currentEvent } = useCurrentEvent();
 
+  // Mesclado, não `initialData || {...}` — mesmo bug corrigido em
+  // EventForm.jsx: um banner editado sem tocar num campo ausente de
+  // initialData nasceria undefined (não o default seguro), e undefined
+  // nunca sobrevive a um setDoc(). Nenhum campo aqui é opcional hoje, mas o
+  // padrão fica protegido contra o mesmo problema em campos futuros.
+  const DEFAULT_VALUES = {
+    headline: '',
+    subtitle: '',
+    cta: '',
+    ctaLink: '',
+    bannerDesktopUrl: '',
+    bannerTabletUrl: '',
+    bannerMobileUrl: '',
+    order: 1,
+    active: false,
+  };
+
   const {
     register,
     control,
@@ -56,17 +73,7 @@ export default function BannerForm({ initialData, isEditMode = false, onSuccess 
     formState: { errors, isSubmitting, isDirty },
   } = useForm({
     resolver: zodResolver(bannerSchema),
-    defaultValues: initialData || {
-      headline: '',
-      subtitle: '',
-      cta: '',
-      ctaLink: '',
-      bannerDesktopUrl: '',
-      bannerTabletUrl: '',
-      bannerMobileUrl: '',
-      order: 1,
-      active: false,
-    },
+    defaultValues: { ...DEFAULT_VALUES, ...initialData },
   });
 
   const discard = useDiscardGuard({

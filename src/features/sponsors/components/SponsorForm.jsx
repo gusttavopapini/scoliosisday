@@ -16,6 +16,12 @@ import { sponsorSchema } from '../schemas/sponsorSchema.js';
 import { newSponsorId } from '../../../services/sponsors.js';
 import { UPLOAD_PRESETS } from '../../../services/storageService.js';
 import ImageUploader from '../../../components/form/ImageUploader.jsx';
+import { SPONSOR_TYPES } from '../../../utils/constants.js';
+
+const SPONSOR_TYPE_OPTIONS = [
+  { value: SPONSOR_TYPES.SPONSOR, label: 'Patrocinador' },
+  { value: SPONSOR_TYPES.SUPPORTER, label: 'Apoiador' },
+];
 
 export default function SponsorForm({ initialData, isEditMode = false, onSuccess }) {
   const navigate = useNavigate();
@@ -32,6 +38,17 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
   const deleteMutation = useDeleteSponsor();
   const { cascadeSponsor } = useCascades();
 
+  // Mesclado, não `initialData || {...}` — mesmo bug corrigido em
+  // EventForm.jsx/BannerForm.jsx: um patrocinador antigo, sem a chave
+  // `type` no Firestore, nasceria com o campo undefined em vez do default
+  // seguro, e undefined nunca sobrevive a um setDoc()/updateDoc().
+  const DEFAULT_VALUES = {
+    name: '',
+    website: '',
+    logoUrl: null,
+    type: SPONSOR_TYPES.SPONSOR,
+  };
+
   const {
     register,
     control,
@@ -39,11 +56,7 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
     formState: { errors, isSubmitting, isDirty },
   } = useForm({
     resolver: zodResolver(sponsorSchema),
-    defaultValues: initialData || {
-      name: '',
-      website: '',
-      logoUrl: null,
-    },
+    defaultValues: { ...DEFAULT_VALUES, ...initialData },
   });
 
   // Cancelar sai direto quando nada mudou; com alteração, confirma antes.
@@ -152,6 +165,27 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
           />
           <span className="sd-note">Sem logo, o nome do patrocinador é exibido no lugar.</span>
         </div>
+
+        {/* ── Tipo ── */}
+        <label className="sd-field">
+          <span className="sd-label">Tipo</span>
+          <span className="sd-select-wrap">
+            <select {...register('type')} className="sd-select">
+              {SPONSOR_TYPE_OPTIONS.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </span>
+          <span className="sd-note">
+            Apoiadores também entram na esteira de logos da Home, além da
+            grade de /patrocinadores.
+          </span>
+          {errors.type && (
+            <span className="sd-error">{errors.type.message}</span>
+          )}
+        </label>
 
         {/* ── Botões de ação ── */}
         <div
