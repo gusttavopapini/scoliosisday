@@ -63,7 +63,11 @@ export default function AboutPage() {
         headingClassName="sdp-heading--regular"
       />
 
-      <PeopleSection title={t.site.curatorsTitle} people={aboutCurators} />
+      <PeopleSection
+        title={t.site.curatorsTitle}
+        people={aboutCurators}
+        headingClassName="sdp-heading--regular"
+      />
 
       {latestEvent && <EditionSponsors event={latestEvent} sponsorsById={sponsorsById} />}
       <SponsorCta />

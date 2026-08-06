@@ -17,7 +17,7 @@ export default function EditionSponsors({ event, sponsorsById }) {
     <section className="sd-section sd-section--tight sdp-sponsors">
       <div className="sd-container">
         <header className="sd-section-header sd-section-header--center sdp-section-header">
-          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal">
+          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
             {t.site.sponsorsTitle}
           </h2>
         </header>

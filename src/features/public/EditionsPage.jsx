@@ -170,7 +170,12 @@ export default function EditionsPage() {
         />
       </div>
 
-      <PeopleSection title={t.site.starsTitle} people={starCollaborators} showType />
+      <PeopleSection
+        title={t.site.starsTitle}
+        people={starCollaborators}
+        showType
+        headingClassName="sdp-heading--regular"
+      />
 
       <EditionPricing key={`pricing-${activeEvent.id}`} event={activeEvent} />
 
@@ -186,7 +191,11 @@ export default function EditionsPage() {
 
       <SponsorCta />
 
-      <PeopleSection title={t.site.curatorsTitle} people={curators} />
+      <PeopleSection
+        title={t.site.curatorsTitle}
+        people={curators}
+        headingClassName="sdp-heading--regular"
+      />
     </>
   );
 }

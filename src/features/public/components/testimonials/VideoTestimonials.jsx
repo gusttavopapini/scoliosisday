@@ -36,7 +36,7 @@ export default function VideoTestimonials({ title }) {
       <div className="sd-container">
         <header className="sd-section-header sd-section-header--center sdp-section-header">
           <span className="sdp-section-tag">{t.site.testimonialsTitle}</span>
-          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal">
+          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-testimonials-headline">
             {headline.main} <AccentWord>{headline.accent}</AccentWord>
           </h2>
           <div className="sd-rule" aria-hidden="true">

@@ -38,7 +38,7 @@ export default function HomeSupporters() {
     <section className="sd-section sd-section--tight sdp-supporters">
       <div className="sd-container">
         <header className="sd-section-header sd-section-header--center sdp-section-header">
-          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal">
+          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
             {t.site.supportersTitle}
           </h2>
         </header>

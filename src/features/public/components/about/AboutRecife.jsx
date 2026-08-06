@@ -3,6 +3,7 @@
 // foto da cidade à direita. Empilha no mobile.
 
 import { useLanguage } from '../../../../hooks/useLanguage.js';
+import AccentWord from '../../../../components/public/AccentWord.jsx';
 
 const RECIFE_IMAGE_URL =
   'https://www2.recife.pe.gov.br/sites/default/files/styles/imagem_slide_home/public/sol.jpg?itok=idpCkSTN';
@@ -14,7 +15,9 @@ export default function AboutRecife() {
     <section className="sdp-about-recife">
       <div className="sd-container sdp-about-recife__grid">
         <div className="sdp-about-recife__text">
-          <h2 className="sd-display sd-display--md sd-display--on-dark">{t.site.aboutPageRecifeTitle}</h2>
+          <h2 className="sd-display sd-display--md sd-display--on-dark sdp-heading--regular">
+            <AccentWord>{t.site.aboutPageRecifeTitleAccent}</AccentWord>{t.site.aboutPageRecifeTitleRest}
+          </h2>
           <p className="sd-lead sd-on-dark">{t.site.aboutPageRecifeText}</p>
         </div>
         <div className="sdp-about-recife__media">

@@ -332,7 +332,7 @@ const t = {
     // ── Edições (/edicoes) ──
     editionsEmptyTitle: 'Nenhuma edição publicada',
     editionsEmptyBody: 'Ainda não há edições publicadas. Volte em breve.',
-    starsTitle: 'Presenças Confirmadas',
+    starsTitle: 'Presenças confirmadas',
     // {ordinal} vem de utils/ordinal.js — "1ª", "2ª"...
     editionBadge: '{ordinal} Edição',
 
@@ -353,7 +353,7 @@ const t = {
     // Quem faz o Scoliosis Day / Curadoria Científica
     // "Scoliosis Day" no título é <BrandWordmark /> — ver AboutPage/EditionsPage.
     organizersTitleMain: 'Quem faz o',
-    curatorsTitle: 'Curadoria Científica',
+    curatorsTitle: 'Curadoria científica',
 
     // ── Home · Apoiadores (esteira) ──
     supportersTitle: 'Apoiadores',
@@ -385,16 +385,18 @@ const t = {
     aboutPageCard2Text: 'Diferente de um congresso, o Scoliosis Day sempre nos dá a oportunidade de vivência com palestrantes de relevância em toda sua duração. Horas juntos trocando conhecimento de alta qualidade sobre as deformidades da coluna vertebral.',
     aboutPageCard3Title: 'Equipe multidisciplinar',
     aboutPageCard3Text: 'Médicos, Fisioterapeutas, Ortesistas e Psicólogos juntos traçando o futuro do tratamento cirúrgico e conservador das deformidades da coluna vertebral.',
-    aboutPageRecifeTitle: 'Recife é onde nascemos',
+    // "Recife" é <AccentWord/> (--font-accent itálico) — ver AboutRecife.jsx.
+    aboutPageRecifeTitleAccent: 'Recife',
+    aboutPageRecifeTitleRest: ' é onde nascemos',
     aboutPageRecifeText: 'Recife, coração pulsante do Nordeste, é muito mais que um destino: é um polo de inovação, conhecimento e calor humano. Com profissionais de excelência e uma cultura de hospitalidade única, o estado oferece uma experiência completa.',
     aboutPageRecifeImageAlt: 'Recife, Pernambuco',
 
     // ── /hall-de-estrelas ──
     hallOfStarsPageHeroTitle: 'Hall de Estrelas',
     hallOfStarsPageHeroSubtitle: 'Os maiores nomes do tratamento da escoliose reunidos no Scoliosis Day.',
-    hallOfStarsPageFeaturedTitle: 'Palestrantes em Destaque',
+    hallOfStarsPageFeaturedTitle: 'Palestrantes em destaque',
     hallOfStarsPageFeaturedBadge: 'Destaque',
-    hallOfStarsPageAllTitle: 'Todos os Palestrantes',
+    hallOfStarsPageAllTitle: 'Todos os palestrantes',
     hallOfStarsPageSearchPlaceholder: 'Buscar por nome…',
     hallOfStarsPageEmptyTitle: 'Nenhum palestrante encontrado',
     hallOfStarsPageEmptyBody: 'Ainda não há palestrantes cadastrados nas edições publicadas.',
@@ -409,7 +411,7 @@ const t = {
     testimonialsPageHeroTitle: 'Depoimentos',
     testimonialsPageHeroSubtitle: 'O que dizem os participantes do Scoliosis Day.',
     testimonialsPageTextTitle: 'Depoimentos',
-    testimonialsPageVideoTitle: 'Depoimentos em Vídeo',
+    testimonialsPageVideoTitle: 'Depoimentos em vídeo',
 
     // Patrocinadores — CTA de captação (/sobre, /edicoes e /patrocinadores)
     sponsorCta: 'Seja um Patrocinador',
@@ -423,7 +425,9 @@ const t = {
     footerNavLabel: 'Navegação do rodapé',
     footerSiteMap: 'Navegue',
     footerContactTitle: 'Contato',
-    contactEmail: 'contato@scoliosisday.com.br',
+    contactEmail: 'scoliosisday@gmail.com',
+    // Não é mais exibido como texto — vira aria-label do link-ícone do
+    // Instagram no rodapé (ver PublicFooter.jsx).
     contactInstagram: '@scoliosisday',
     footerCopyright: '© {year} Scoliosis Day. Todos os direitos reservados.',
 

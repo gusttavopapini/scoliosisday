@@ -188,4 +188,10 @@
      .sdp-marquee__track em public.css). Fixa, não depende da quantidade
      de logos — só da lista repetida no JSX. */
   --sdp-marquee-duration: 32s;
+
+  /* Duração zero, só pra dar nome a "sem transição" — usado no truque de
+     visibility com delay do cross-fade dos cards de modalidade (ver
+     .sdp-pricing__card em public.css): visibility muda em 0s, mas com
+     atraso pra sincronizar com o fim do fade de opacity. */
+  --dur-instant: 0s;
 }

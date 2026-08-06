@@ -329,7 +329,7 @@ const t = {
     // ── Edições (/edicoes) ──
     editionsEmptyTitle: 'No editions published yet',
     editionsEmptyBody: 'There are no published editions yet. Check back soon.',
-    starsTitle: 'Confirmed Speakers',
+    starsTitle: 'Confirmed speakers',
     // {ordinal} comes from utils/ordinal.js — "1st", "2nd"...
     editionBadge: '{ordinal} Edition',
 
@@ -350,7 +350,7 @@ const t = {
     // Quem faz o Scoliosis Day / Curadoria Científica
     // "Scoliosis Day" no título é <BrandWordmark /> — ver AboutPage/EditionsPage.
     organizersTitleMain: 'Who Makes',
-    curatorsTitle: 'Scientific Curation',
+    curatorsTitle: 'Scientific curation',
 
     // ── Home · Apoiadores (esteira) ──
     supportersTitle: 'Supporters',
@@ -377,16 +377,17 @@ const t = {
     aboutPageCard2Text: 'Unlike a congress, Scoliosis Day always gives us the opportunity to spend time with prominent speakers throughout its entire duration. Hours together exchanging high-quality knowledge about spinal deformities.',
     aboutPageCard3Title: 'Multidisciplinary team',
     aboutPageCard3Text: 'Doctors, physiotherapists, orthotists and psychologists together shaping the future of surgical and conservative treatment of spinal deformities.',
-    aboutPageRecifeTitle: 'Recife is where we were born',
+    aboutPageRecifeTitleAccent: 'Recife',
+    aboutPageRecifeTitleRest: ' is where we were born',
     aboutPageRecifeText: 'Recife, the pulsing heart of the Brazilian Northeast, is much more than a destination: it is a hub of innovation, knowledge and human warmth. With top professionals and a unique culture of hospitality, the state offers a complete experience.',
     aboutPageRecifeImageAlt: 'Recife, Pernambuco',
 
     // ── /hall-de-estrelas ──
     hallOfStarsPageHeroTitle: 'Hall of Stars',
     hallOfStarsPageHeroSubtitle: 'The biggest names in scoliosis treatment gathered at Scoliosis Day.',
-    hallOfStarsPageFeaturedTitle: 'Featured Speakers',
+    hallOfStarsPageFeaturedTitle: 'Featured speakers',
     hallOfStarsPageFeaturedBadge: 'Featured',
-    hallOfStarsPageAllTitle: 'All Speakers',
+    hallOfStarsPageAllTitle: 'All speakers',
     hallOfStarsPageSearchPlaceholder: 'Search by name…',
     hallOfStarsPageEmptyTitle: 'No speakers found',
     hallOfStarsPageEmptyBody: 'There are no speakers registered in published editions yet.',
@@ -401,7 +402,7 @@ const t = {
     testimonialsPageHeroTitle: 'Testimonials',
     testimonialsPageHeroSubtitle: 'What Scoliosis Day participants have to say.',
     testimonialsPageTextTitle: 'Testimonials',
-    testimonialsPageVideoTitle: 'Video Testimonials',
+    testimonialsPageVideoTitle: 'Video testimonials',
 
     // Patrocinadores — CTA de captação (/sobre, /edicoes e /patrocinadores)
     sponsorCta: 'Become a Sponsor',
@@ -413,7 +414,7 @@ const t = {
     footerNavLabel: 'Footer navigation',
     footerSiteMap: 'Browse',
     footerContactTitle: 'Contact',
-    contactEmail: 'contato@scoliosisday.com.br',
+    contactEmail: 'scoliosisday@gmail.com',
     contactInstagram: '@scoliosisday',
     footerCopyright: '© {year} Scoliosis Day. All rights reserved.',
 

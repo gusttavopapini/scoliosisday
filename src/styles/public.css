@@ -183,10 +183,21 @@
 .sdp-page .sd-footer__col a,
 .sdp-page .sd-footer__col span {
   color: var(--text-body);
+  /* O kit só transiciona opacity (design-system.css) — aqui a mudança é de
+     color, então precisa entrar na lista pra não trocar de cor sem suavizar. */
+  transition: color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
 
 .sdp-page .sd-footer__col a:hover {
   color: var(--teal-700);
+}
+
+/* Ícone do Instagram: mesmo link-hover acima (currentColor no SVG do
+   lucide-react já segue o color do <a>), só alinhado com a altura do texto
+   ao lado dele na coluna. */
+.sdp-footer__instagram {
+  display: inline-flex;
+  align-items: center;
 }
 
 .sdp-page .sd-footer__bottom {
@@ -1078,7 +1089,8 @@
 .sdp-pricing__card {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
   gap: var(--space-4);
   padding: var(--space-8);
   border-radius: var(--radius-xl);
@@ -1109,13 +1121,39 @@
 }
 
 @media (min-width: 901px) {
+  .sdp-pricing__track {
+    position: relative;
+    /* Fixa a altura no card mais alto entre os dois textos reais
+       (Presencial ~264px, Online ~293px — duas linhas) pra trocar de
+       slide não fazer a seção pular. Medido com o conteúdo real, não um
+       espaço-token — não há token semântico pra "altura de conteúdo". */
+    min-height: 300px;
+  }
+
+  /* Os dois cards ocupam o mesmo espaço, empilhados por position, e a
+     troca anima opacity — um cross-fade de verdade (o que sai e o que
+     entra ficam sobrepostos durante a transição), diferente do
+     display:none anterior, que cortava o card antigo na hora e só
+     animava a entrada do novo.
+     visibility (não pointer-events/aria-hidden no JSX) tira o card
+     inativo da navegação por teclado e do leitor de tela: some só depois
+     do fade terminar (delay = duração do fade) e volta a ficar alcançável
+     na hora, sem esperar a transição de entrada. Como isso só existe
+     dentro deste breakpoint, o mobile (os dois cards sempre visíveis,
+     empilhados) nunca é afetado. */
   .sdp-pricing__card {
-    display: none;
+    position: absolute;
+    inset: 0;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--dur-base) var(--ease-out), visibility var(--dur-instant) linear var(--dur-base);
   }
 
   .sdp-pricing__card--active {
-    display: flex;
-    animation: sdp-carousel-fade var(--dur-slow) var(--ease-out);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--dur-base) var(--ease-out), visibility var(--dur-instant) linear;
   }
 
   .sdp-pricing__nav {
@@ -1127,8 +1165,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sdp-pricing__card--active {
-    animation: none;
+  .sdp-pricing__card {
+    transition: none;
   }
 }
 
