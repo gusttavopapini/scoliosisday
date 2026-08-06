@@ -12,7 +12,7 @@ export default function FeaturedSpeakers({ title, badge, people }) {
   return (
     <section className="sd-section sd-section--tight">
       <div className="sd-container">
-        <header className="sd-section-header sdp-section-header">
+        <header className="sd-section-header sd-section-header--center sdp-section-header">
           <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">{title}</h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />

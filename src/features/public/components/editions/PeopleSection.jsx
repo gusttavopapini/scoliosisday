@@ -14,7 +14,7 @@ export default function PeopleSection({ title, people, showType = false, heading
   return (
     <section className="sd-section sd-section--tight">
       <div className="sd-container">
-        <header className="sd-section-header sdp-section-header">
+        <header className="sd-section-header sd-section-header--center sdp-section-header">
           <h2 className={`sd-display sd-display--md sd-display--upright sd-display--teal${headingClassName ? ` ${headingClassName}` : ''}`}>{title}</h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />

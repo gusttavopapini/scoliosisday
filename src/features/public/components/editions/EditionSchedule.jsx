@@ -57,7 +57,7 @@ export default function EditionSchedule({ event, collaboratorsById }) {
   return (
     <section className="sd-section sd-section--tight">
       <div className="sd-container">
-        <header className="sd-section-header sdp-section-header">
+        <header className="sd-section-header sd-section-header--center sdp-section-header">
           <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
             {t.site.scheduleTitle}
           </h2>

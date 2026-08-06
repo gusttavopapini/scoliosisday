@@ -384,9 +384,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 85vh (~15% menor que a tela cheia) menos o navbar sticky e o padding
-     vertical do .sdp-hero (2× --space-10 = --space-20). */
-  min-height: calc(85vh - var(--sdp-navbar-h) - var(--space-20));
+  /* 95vh — reequilíbrio pra cima da redução de ~15% de uma rodada
+     anterior (85vh), que tinha ficado curta demais; não é uma reversão
+     total, só ~12% a mais do que estava. Menos o navbar sticky e o
+     padding vertical do .sdp-hero (2× --space-10 = --space-20). */
+  min-height: calc(95vh - var(--sdp-navbar-h) - var(--space-20));
   max-width: var(--content-max);
   margin-inline: auto;
   overflow: hidden;
@@ -440,15 +442,15 @@
 }
 
 /* Abaixo do desktop o hero não é full-bleed, então o navbar não entra
-   na conta — 60vh/50vh diretos (~15% menor que os 70vh/60vh originais). */
+   na conta — 67vh/56vh diretos, mesmo reequilíbrio (~12%) do desktop. */
 @media (max-width: 1024px) {
-  .sdp-hero__frame { min-height: 60vh; }
+  .sdp-hero__frame { min-height: 67vh; }
 }
 
 @media (max-width: 640px) {
   .sdp-hero { padding: var(--space-6) var(--space-4); }
 
-  .sdp-hero__frame { min-height: 50vh; border-radius: var(--radius-lg); }
+  .sdp-hero__frame { min-height: 56vh; border-radius: var(--radius-lg); }
 
   .sdp-hero__content { padding: var(--space-10) var(--space-5); }
 
