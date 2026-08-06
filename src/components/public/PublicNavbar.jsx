@@ -16,21 +16,15 @@ import logoWhite from '../../assets/logo-white.svg';
  * Esta lista alimenta tanto a barra do desktop quanto a gaveta mobile, que
  * renderizam o mesmo array — tirar um item daqui o remove dos dois.
  * Academy não entra: a rota /academy segue existindo (redireciona para a
- * home), mas sem link visível no menu. */
+ * home), mas sem link visível no menu. Depoimentos também não entra: a
+ * página /depoimentos foi removida, os depoimentos vivem só na Home agora
+ * (ver #depoimentos em HomePage.jsx) — sem link próprio no menu. */
 const NAV_LINKS = [
   { key: 'home',        to: '/',                 end: true },
-  { key: 'editions',    to: '/edicoes' },
   { key: 'about',       to: '/sobre' },
+  { key: 'editions',    to: '/edicoes' },
   { key: 'hallOfStars', to: '/hall-de-estrelas' },
   { key: 'sponsors',    to: '/patrocinadores' },
-  // Âncora, não rota própria — /depoimentos foi removida, os depoimentos
-  // vivem na Home agora (ver #depoimentos em HomePage.jsx). `anchor: true`
-  // vira um <Link> comum no map abaixo, não <NavLink>: o matching de
-  // isActive do NavLink é por pathname, e "/" já pertence ao item Início —
-  // os dois ficariam "ativos" ao mesmo tempo na Home. Sem scroll-spy (fora
-  // do escopo desta rodada), este item simplesmente nunca fica marcado
-  // como ativo.
-  { key: 'testimonials', to: '/#depoimentos', anchor: true },
 ];
 
 const LANG_LABELS = { 'pt-BR': 'PT', en: 'EN' };
@@ -98,28 +92,18 @@ export default function PublicNavbar() {
     );
   }
 
-  const links = NAV_LINKS.map(({ key, to, end, anchor }) =>
-    anchor ? (
-      // <Link> comum: sem isActive de NavLink pra não conflitar com Início
-      // (ver comentário em NAV_LINKS). onClick fecha a gaveta mobile — o
-      // efeito que faz isso pros outros links dispara por troca de
-      // pathname, que não muda aqui (a âncora não sai da Home).
-      <Link key={key} to={to} className="sd-navbar__link" onClick={() => setMenuOpen(false)}>
-        {t.site[key]}
-      </Link>
-    ) : (
-      <NavLink
-        key={key}
-        to={to}
-        end={end}
-        className={({ isActive }) =>
-          `sd-navbar__link${isActive ? ' sd-navbar__link--active' : ''}`
-        }
-      >
-        {t.site[key]}
-      </NavLink>
-    ),
-  );
+  const links = NAV_LINKS.map(({ key, to, end }) => (
+    <NavLink
+      key={key}
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        `sd-navbar__link${isActive ? ' sd-navbar__link--active' : ''}`
+      }
+    >
+      {t.site[key]}
+    </NavLink>
+  ));
 
   return (
     <header className="sd-navbar sdp-navbar">

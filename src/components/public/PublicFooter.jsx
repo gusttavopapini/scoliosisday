@@ -35,16 +35,15 @@ function InstagramIcon(props) {
   );
 }
 
+// Mesma ordem do navbar (ver NAV_LINKS em PublicNavbar.jsx) — Depoimentos
+// também não entra aqui pelo mesmo motivo: /depoimentos foi removida, sem
+// link próprio no menu (nem no header, nem no rodapé).
 const FOOTER_LINKS = [
   { key: 'home', to: '/' },
-  { key: 'editions', to: '/edicoes' },
   { key: 'about', to: '/sobre' },
+  { key: 'editions', to: '/edicoes' },
   { key: 'hallOfStars', to: '/hall-de-estrelas' },
   { key: 'sponsors', to: '/patrocinadores' },
-  // /depoimentos foi removida — âncora pra Home (ver PublicNavbar.jsx e
-  // #depoimentos em HomePage.jsx). Aqui já é <Link> comum, sem NavLink
-  // pra se preocupar com isActive.
-  { key: 'testimonials', to: '/#depoimentos' },
 ];
 
 const INSTAGRAM_URL = 'https://www.instagram.com/scoliosisday';

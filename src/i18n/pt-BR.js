@@ -305,7 +305,6 @@ const t = {
     about: 'Sobre',
     hallOfStars: 'Hall de Estrelas',
     sponsors: 'Patrocinadores',
-    testimonials: 'Depoimentos',
     academy: 'Academy',
     // Placeholders das páginas ainda por construir.
     comingSoonTitle: 'Em breve',
