@@ -1,5 +1,11 @@
 // src/features/events/components/steps/EventStep4.jsx
-// Passo 4: Pessoas e Programação — Palestrantes, Programação, Patrocinadores
+// Passo 4: Pessoas e Programação — Palestrantes, Curadoria, Programação
+//
+// Patrocinadores não tem mais seleção por evento (campo `sponsors` sai do
+// wizard): a coleção é cadastrada e exibida só em /patrocinadores, sem
+// filtro. O campo `sponsors` permanece no schema/DEFAULT_VALUES de
+// EventForm.jsx só para não apagar o dado histórico de eventos antigos que
+// já tinham patrocinadores vinculados.
 
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
@@ -7,26 +13,20 @@ import { Star, X } from 'lucide-react';
 import { flattenSessions } from '../../../../utils/programmingDays.js';
 import CollaboratorMultiSelect from '../CollaboratorMultiSelect.jsx';
 
-export default function EventStep4({ control, errors, speakers, curators, programmings, sponsors, watch }) {
+export default function EventStep4({ control, errors, speakers, curators, programmings, watch }) {
   const [speakersSearchTerm, setSpeakersSearchTerm] = useState('');
-  const [sponsorsSearchTerm, setSponsorsSearchTerm] = useState('');
   const speakersValue = watch('speakers') || [];
   const starSpeakersValue = watch('starSpeakerIds') || [];
-  const sponsorsValue = watch('sponsors') || [];
 
   const filteredSpeakers = speakers.filter((speaker) =>
     speaker.fullName?.toLowerCase().includes(speakersSearchTerm.toLowerCase())
-  );
-
-  const filteredSponsors = sponsors.filter((sponsor) =>
-    sponsor.name?.toLowerCase().includes(sponsorsSearchTerm.toLowerCase())
   );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div>
         <h2 className="sd-subtitle">Pessoas e Programação</h2>
-        <p className="sd-muted">Adicione palestrantes, programação e patrocinadores</p>
+        <p className="sd-muted">Adicione palestrantes, curadoria e programação</p>
       </div>
 
       {/* Palestrantes */}
@@ -238,131 +238,10 @@ export default function EventStep4({ control, errors, speakers, curators, progra
         <span className="sd-note">Um evento pode ter apenas uma programação vinculada</span>
       </label>
 
-      {/* Patrocinadores */}
-      <div className="sd-field">
-        <span className="sd-label">Patrocinadores (opcional)</span>
-        <Controller
-          name="sponsors"
-          control={control}
-          render={({ field: sponsorsField }) => (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              {/* Barra de busca */}
-              <input
-                type="text"
-                className="sd-input"
-                placeholder="Buscar patrocinador..."
-                value={sponsorsSearchTerm}
-                onChange={(e) => setSponsorsSearchTerm(e.target.value)}
-              />
-
-              {/* Lista de patrocinadores */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                {filteredSponsors.map((sponsor) => {
-                  const isSelected = sponsorsValue.includes(sponsor.id);
-
-                  return (
-                    <div
-                      key={sponsor.id}
-                      onClick={() => {
-                        const newValue = isSelected
-                          ? sponsorsValue.filter((id) => id !== sponsor.id)
-                          : [...sponsorsValue, sponsor.id];
-                        sponsorsField.onChange(newValue);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 'var(--space-3)',
-                        padding: 'var(--space-3)',
-                        border: `2px solid ${isSelected ? 'var(--teal-600)' : 'var(--border-default)'}`,
-                        borderRadius: 'var(--radius-md)',
-                        backgroundColor: isSelected ? 'var(--teal-050)' : 'transparent',
-                        cursor: 'pointer',
-                        transition: 'all var(--dur-fast) var(--ease-out)',
-                      }}
-                    >
-                      {/* Logo ou placeholder */}
-                      <div
-                        style={{
-                          width: '44px',
-                          height: '44px',
-                          borderRadius: 'var(--radius-md)',
-                          backgroundColor: 'var(--surface-brand)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'var(--white)',
-                          fontWeight: '600',
-                          flexShrink: 0,
-                          fontSize: '14px',
-                        }}
-                      >
-                        {sponsor.name?.charAt(0).toUpperCase()}
-                      </div>
-
-                      {/* Nome */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: 'var(--text-body)' }}>
-                          {sponsor.name}
-                        </h4>
-                      </div>
-
-                      {/* Checkmark */}
-                      {isSelected && (
-                        <span style={{ color: 'var(--teal-600)', fontSize: '12px', flexShrink: 0 }}>✓</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Chips dos selecionados */}
-              {sponsorsValue.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border-default)' }}>
-                  {sponsorsValue.map((sponsorId) => {
-                    const sponsor = sponsors.find((s) => s.id === sponsorId);
-                    if (!sponsor) return null;
-
-                    return (
-                      <div
-                        key={sponsorId}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--space-2)',
-                          padding: 'var(--space-2) var(--space-3)',
-                          backgroundColor: 'var(--surface-sunken)',
-                          borderRadius: 'var(--radius-full)',
-                          fontSize: '12px',
-                          color: 'var(--text-body)',
-                        }}
-                      >
-                        {sponsor.name}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newValue = sponsorsValue.filter((id) => id !== sponsorId);
-                            sponsorsField.onChange(newValue);
-                          }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        />
-        {errors.sponsors && <span className="sd-error">{errors.sponsors.message}</span>}
-      </div>
-
       {/* Info */}
       <div style={{ padding: 'var(--space-4)', backgroundColor: 'var(--teal-050)', borderRadius: 'var(--radius-md)' }}>
         <p className="sd-small" style={{ color: 'var(--teal-600)' }}>
-          👥 Todos os campos deste passo são opcionais. Clique em um palestrante ou patrocinador para selecioná-lo. Clique novamente para desselecionar.
+          👥 Todos os campos deste passo são opcionais. Clique em um palestrante ou curador para selecioná-lo. Clique novamente para desselecionar.
         </p>
       </div>
     </div>

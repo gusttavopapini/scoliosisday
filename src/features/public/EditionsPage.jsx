@@ -17,7 +17,6 @@ import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage.js';
 import { usePublishedEvents } from '../../hooks/useEvents.js';
 import { useCollaborators } from '../../hooks/useCollaborators.js';
-import { useSponsors } from '../../hooks/useSponsors.js';
 import { COLLABORATOR_TYPES } from '../../utils/constants.js';
 import { ordinal } from '../../utils/ordinal.js';
 import { resolveCollaboratorsByType } from '../../utils/collaborators.js';
@@ -26,14 +25,11 @@ import PeopleSection from './components/editions/PeopleSection.jsx';
 import EditionPricing from './components/editions/EditionPricing.jsx';
 import EditionPresentation from './components/editions/EditionPresentation.jsx';
 import EditionSchedule from './components/editions/EditionSchedule.jsx';
-import EditionSponsors from './components/editions/EditionSponsors.jsx';
-import SponsorCta from './components/SponsorCta.jsx';
 
 export default function EditionsPage() {
   const { t, lang } = useLanguage();
   const { data: publishedEvents = [] } = usePublishedEvents();
   const { data: allCollaborators = [] } = useCollaborators();
-  const { data: allSponsors = [] } = useSponsors();
 
   // Abas em ordem decrescente de editionNumber — a edição mais recente
   // (maior número) primeiro. O número é definido pelo admin no passo 1 do
@@ -92,10 +88,6 @@ export default function EditionsPage() {
   const collaboratorsById = useMemo(
     () => new Map(allCollaborators.map((c) => [c.id, c])),
     [allCollaborators],
-  );
-  const sponsorsById = useMemo(
-    () => new Map(allSponsors.map((s) => [s.id, s])),
-    [allSponsors],
   );
 
   const starCollaborators = useMemo(() => {
@@ -189,10 +181,6 @@ export default function EditionsPage() {
         event={activeEvent}
         collaboratorsById={collaboratorsById}
       />
-
-      <EditionSponsors event={activeEvent} sponsorsById={sponsorsById} />
-
-      <SponsorCta />
 
       <PeopleSection
         title={t.site.curatorsTitle}

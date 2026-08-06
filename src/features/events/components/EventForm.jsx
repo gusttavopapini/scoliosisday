@@ -17,7 +17,6 @@ import { newEventId } from '../../../services/events.js';
 import { DEFAULT_EVENT_COLORS } from '../constants/defaultPalette.js';
 import { useCollaborators } from '../../../hooks/useCollaborators.js';
 import { useProgrammings } from '../../../hooks/useProgrammings.js';
-import { useSponsors } from '../../../hooks/useSponsors.js';
 import EventStep1 from './steps/EventStep1.jsx';
 import EventStep2 from './steps/EventStep2.jsx';
 import EventStep3 from './steps/EventStep3.jsx';
@@ -56,7 +55,6 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   const clearCurrentMutation = useClearCurrentEvent();
   const { data: speakers = [] } = useCollaborators();
   const { data: programmings = [] } = useProgrammings();
-  const { data: sponsors = [] } = useSponsors();
 
   const speakersData = speakers.filter((c) => c.type === 'speaker');
   const curatorsData = speakers.filter((c) => c.type === 'scientific_curator');
@@ -303,7 +301,6 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
             speakers={speakersData}
             curators={curatorsData}
             programmings={programmings}
-            sponsors={sponsors}
             watch={watch}
           />
         )}
