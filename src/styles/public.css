@@ -740,9 +740,24 @@
 
 .sdp-edition-tabs__inner {
   display: flex;
+  justify-content: center;
   gap: var(--space-2);
   overflow-x: auto;
-  padding-block: var(--space-4);
+  /* Assimétrico de propósito: o respiro abaixo das pills soma com o
+     padding-top do banner logo em seguida (.sdp-edition-hero, seção 13) —
+     esse ali também foi reduzido pra fechar a conta simétrica com este
+     aqui (32px dos dois lados: 32 acima, 16+16 abaixo). */
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-4);
+}
+
+/* Quando as abas não cabem na largura disponível (ver tabsOverflow em
+   EditionsPage.jsx), volta pro alinhamento à esquerda — centralizar um
+   flex que já transborda deixa o início do conteúdo fora do alcance do
+   scroll em vários navegadores (o scroll nunca chega no que ficou "antes"
+   do centro calculado). */
+.sdp-edition-tabs__inner--scroll {
+  justify-content: flex-start;
 }
 
 .sdp-edition-tabs__tab {
@@ -826,7 +841,14 @@
    ============================================================ */
 
 .sdp-edition-hero {
-  padding: var(--space-10) var(--gutter);
+  /* Topo reduzido (não var(--space-10) dos dois lados) — soma com o
+     padding-bottom das pills logo acima (.sdp-edition-tabs__inner, seção
+     12) pra fechar em 32px de respiro abaixo das pills, simétrico com o
+     que sobra acima delas. Embaixo mantém --space-10: esse lado não tem
+     relação com as pills, é o respiro do hero até a seção seguinte. */
+  padding-inline: var(--gutter);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-10);
 }
 
 .sdp-edition-hero__frame {
@@ -888,8 +910,10 @@
 
 @media (max-width: 640px) {
   /* Margens menores mas visíveis, como pedido — sobrepõe o var(--gutter)
-     do desktop/tablet, que nesta largura já converge para perto disso. */
-  .sdp-edition-hero { padding: var(--space-6) var(--space-4); }
+     do desktop/tablet, que nesta largura já converge para perto disso.
+     Topo continua reduzido (ver .sdp-edition-hero fora do media query,
+     seção 13) pra manter a simetria com o respiro das pills acima. */
+  .sdp-edition-hero { padding-inline: var(--space-4); padding-bottom: var(--space-6); }
 
   .sdp-edition-hero__frame { min-height: 40vh; }
 
@@ -1183,6 +1207,12 @@
    depoimentos (ver public.css, seção 29).
    ============================================================ */
 
+/* .sd-schedule (design-system.css, congelado) vem com box-shadow por
+   padrão — sem sombra aqui. */
+.sdp-schedule {
+  box-shadow:none;
+}
+
 .sdp-schedule-days {
   display: flex;
   flex-direction: column;
@@ -1256,6 +1286,11 @@
 }
 
 .sdp-schedule .sd-session__time {
+  /* .sd-session__time (design-system.css) vem em 22px — maior que o
+     próprio título da sessão (.sd-session__title, --text-lg=18px) ao
+     lado, desproporcional. Cor/peso/nowrap continuam do kit — só o
+     tamanho muda. */
+  font-size: var(--text-md);
   white-space: nowrap;
 }
 
@@ -1850,8 +1885,7 @@
 .sdp-quote-stack__card {
   transition:
     transform var(--dur-slower) ease-in-out,
-    opacity var(--dur-slower) ease-in-out,
-    box-shadow var(--dur-slower) ease-in-out;
+    opacity var(--dur-slower) ease-in-out;
 }
 
 .sdp-quote-stack__card--active {
@@ -1859,7 +1893,6 @@
   z-index: 4;
   opacity: 1;
   transform: translateY(0) scale(1);
-  box-shadow:var(--shadow-lg);
 }
 
 .sdp-quote-stack__card--depth-1,
@@ -1869,6 +1902,12 @@
   top: 0;
   left: 50%;
   width: 100%;
+  /* Sem isto, um card de trás sem conteúdo real (ver .sdp-quote-ghost)
+     encolheria pro tamanho do próprio padding, bem mais baixo que o card
+     ativo — 100% aqui resolve contra a altura de .sdp-quote-stack (o
+     ancestral posicionado), que por sua vez é definida só pelo ativo (o
+     único em fluxo normal). */
+  height: 100%;
   pointer-events: none;
 }
 
@@ -1898,31 +1937,42 @@
    ancorado numa borda fixa do container, não centralizado nela — é o
    ancoramento fixo que deixa o deslocamento "vazar" pra fora do
    container e virar espiada visível) só que girada 90°: ancora em
-   left:0 (em vez do top:0 da vertical) e centraliza no eixo vertical
-   (top:50% + translateY(-50%) — esse eixo é quem fica "espiando
-   simetricamente dos dois lados", em cima e embaixo, do mesmo jeito que
-   o eixo horizontal já fazia sozinho na pilha de texto). O deslocamento
-   em si (translateX) é bem maior que o da vertical (14/26/34px) porque
-   o card de vídeo é bem mais largo (~860px vs ~640px) — com a mesma
-   pilha de valores pequenos, o encolhimento do scale sozinho já
-   "engolia" o deslocamento inteiro e a espiada não aparecia. */
+   left:0 (em vez do top:0 da vertical). O deslocamento em si
+   (translateX) é bem maior que o da vertical (14/26/34px) porque o card
+   de vídeo é bem mais largo (~860px vs ~640px) — com a mesma pilha de
+   valores pequenos, o encolhimento do scale sozinho já "engolia" o
+   deslocamento inteiro e a espiada não aparecia.
+
+   top:0 aqui (não top:50% + translateY(-50%) pra centralizar
+   verticalmente, como uma versão anterior fazia) é proposital: o card
+   --active não tem top nem translateY próprios (fica só na posição
+   normal do fluxo, position:relative) — se os de trás usassem um top
+   diferente de 0, no instante em que um card de depth-1 vira ativo,
+   `top`/`position` trocam IMEDIATAMENTE (não são propriedades da
+   transition), mas o `transform` continua de onde estava, incluindo o
+   translateY(-50%) antigo — sem o top:50% de antes pra cancelar esse
+   deslocamento, o card literalmente pulava pra fora da tela por um
+   instante (bug real, visto e confirmado via getBoundingClientRect
+   durante a transição). Com os dois estados ancorados em top:0, `top`
+   nunca muda entre depth-1 e ativo — só translateX/scale animam, sem
+   descontinuidade. */
 .sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-1,
 .sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-2,
 .sdp-quote-stack--horizontal .sdp-quote-stack__card--hidden {
-  top: 50%;
+  top: 0;
   left: 0;
 }
 
 .sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-1 {
-  transform: translateY(-50%) translateX(36px) scale(0.96);
+  transform: translateX(36px) scale(0.96);
 }
 
 .sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-2 {
-  transform: translateY(-50%) translateX(64px) scale(0.92);
+  transform: translateX(64px) scale(0.92);
 }
 
 .sdp-quote-stack--horizontal .sdp-quote-stack__card--hidden {
-  transform: translateY(-50%) translateX(92px) scale(0.88);
+  transform: translateX(92px) scale(0.88);
 }
 
 /* Setas verticais à direita da pilha — cima = anterior, baixo = próximo.
@@ -1947,10 +1997,25 @@
   flex-direction: row;
 }
 
+/* ---- Depoimentos em texto: placeholder dos cards de trás ----
+   Sem conteúdo real (ver TestimonialQuoteCardGhost em
+   TestimonialQuoteCard.jsx) — antes cada card de trás renderizava a
+   citação de verdade o tempo todo, e como fica parcialmente transparente
+   espiando por baixo do ativo, durante a troca de slide dava pra ver o
+   texto de dois depoimentos diferentes sobrepostos e se misturando. */
+.sdp-quote-ghost {
+  height: 100%;
+}
+
 /* ---- Depoimentos em vídeo: placeholder dos cards de trás ----
-   Só o card ativo carrega o <iframe>/<video> de verdade — os de trás são
-   uma casca decorativa (sem player), pra não tocar vários embeds ao
-   mesmo tempo só por causa do efeito visual de pilha. Borda própria
+   Só os cards a até 1 nível do ativo (distance <= 1, ver
+   VideoTestimonials.jsx) carregam o <iframe>/<video> de verdade — os
+   demais (depth-2 e além) são uma casca decorativa, pra não tocar vários
+   embeds ao mesmo tempo só por causa do efeito visual de pilha. Pré-
+   montar o vizinho mais próximo (não só o ativo) dá tempo dele carregar
+   a thumbnail ENQUANTO ainda está fora de vista, em vez de nascer no
+   instante exato em que a troca começa — sem isso o <iframe> novo mostra
+   um flash escuro até carregar, bem no meio da transição. Borda própria
    (não só a cor de fundo) porque --surface-sunken é bem próximo de
    --surface-page — sem contorno, a espiada da pilha horizontal (mais
    larga, com menos altura de página ao redor pra contrastar) quase
@@ -1964,9 +2029,8 @@
 
 /* Cartão branco ao redor do player + legenda — mesmo tratamento de
    superfície do .sd-quote do kit (fundo, borda, cantos), pra o card de
-   vídeo combinar com o de texto na mesma pilha. A sombra em si já vem
-   de .sdp-quote-stack__card--active (o wrapper que embrulha isto),
-   então não duplica aqui. */
+   vídeo combinar com o de texto na mesma pilha. Sem sombra própria — o
+   card ativo (.sdp-quote-stack__card--active) também não tem mais. */
 .sdp-video-testimonial-card {
   background: var(--surface-card);
   border: var(--border-width) solid var(--border-subtle);

@@ -11,7 +11,12 @@
 // Quem chama decide o que cada card renderiza via `renderCard`, porque
 // texto e vídeo precisam de conteúdo bem diferente (um <blockquote>, um
 // player) — este componente só cuida do empilhamento, do autoplay e da
-// navegação.
+// navegação. `renderCard` recebe `{ isActive, distance }`: além do ativo,
+// `distance` deixa quem chama decidir até onde "pré-montar" conteúdo real
+// em vez de um placeholder — o vídeo usa isso pra já ter o <iframe> do
+// próximo carregando enquanto ele ainda está em depth-1, fora da posição
+// ativa (ver VideoTestimonials.jsx), sem isso o <iframe> só nasce no
+// instante em que a troca começa e passa por um flash preto até carregar.
 
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -37,7 +42,7 @@ function depthClass(distance) {
  *   index: number,
  *   onPrev: () => void,
  *   onNext: () => void,
- *   renderCard: (item: object, isActive: boolean) => React.ReactNode,
+ *   renderCard: (item: object, state: { isActive: boolean, distance: number }) => React.ReactNode,
  *   getKey?: (item: object) => string,
  *   ariaLabel: string,
  *   centered?: boolean,
@@ -106,7 +111,7 @@ export default function TestimonialStack({
               className={`sdp-quote-stack__card ${depthClass(distance)}`}
               aria-hidden={isActive ? undefined : true}
             >
-              {renderCard(item, isActive)}
+              {renderCard(item, { isActive, distance })}
             </div>
           );
         })}

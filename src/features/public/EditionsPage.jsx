@@ -134,7 +134,10 @@ export default function EditionsPage() {
         {orderedEvents.length > 1 && (
           <nav className="sdp-edition-tabs" aria-label={t.site.editions}>
             <div className="sd-container sdp-edition-tabs__outer">
-              <div className="sdp-edition-tabs__inner" ref={tabsScrollRef}>
+              <div
+                className={`sdp-edition-tabs__inner${tabsOverflow ? ' sdp-edition-tabs__inner--scroll' : ''}`}
+                ref={tabsScrollRef}
+              >
                 {orderedEvents.map((event) => (
                   <button
                     key={event.id}

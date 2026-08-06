@@ -17,7 +17,7 @@ import { splitLastWord, splitOnBrand } from '../../../utils/splitLastWord.js';
 import AccentWord from '../../../components/public/AccentWord.jsx';
 import BrandWordmark from '../../../components/BrandWordmark.jsx';
 import TestimonialStack from './testimonials/TestimonialStack.jsx';
-import TestimonialQuoteCard from './testimonials/TestimonialQuoteCard.jsx';
+import TestimonialQuoteCard, { TestimonialQuoteCardGhost } from './testimonials/TestimonialQuoteCard.jsx';
 
 export default function HomeTestimonials() {
   const { t } = useLanguage();
@@ -73,7 +73,9 @@ export default function HomeTestimonials() {
           onPrev={() => step(-1)}
           onNext={() => step(1)}
           ariaLabel={t.site.testimonialsTitle}
-          renderCard={(item) => <TestimonialQuoteCard item={item} />}
+          renderCard={(item, { isActive }) => (
+            isActive ? <TestimonialQuoteCard item={item} /> : <TestimonialQuoteCardGhost />
+          )}
         />
       </div>
     </section>

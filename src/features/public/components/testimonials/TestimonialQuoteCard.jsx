@@ -27,3 +27,13 @@ export default function TestimonialQuoteCard({ item }) {
     </figure>
   );
 }
+
+// Placeholder pros cards de trás da pilha (ver TestimonialStack.jsx) — sem
+// nenhum texto real. Antes, todo card renderizava a citação de verdade o
+// tempo todo, ativo ou não; como os de trás ficam parcialmente
+// transparentes e espiando por baixo do ativo, durante a troca de slide
+// dava pra ver o texto de dois depoimentos diferentes sobrepostos e se
+// misturando. Só o card ativo mostra citação de verdade agora.
+export function TestimonialQuoteCardGhost() {
+  return <div className="sd-quote sdp-quote-ghost" aria-hidden="true" />;
+}

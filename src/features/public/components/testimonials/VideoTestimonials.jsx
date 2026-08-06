@@ -56,12 +56,17 @@ export default function VideoTestimonials({ title }) {
           centered
           orientation="horizontal"
           pause={isPlaying}
-          renderCard={(item, isActive) => {
-            // Só o card ativo carrega o player de verdade — os de trás,
-            // que ficam por baixo na pilha, são só uma casca decorativa
-            // (ver .sdp-video-stack-ghost), pra não tocar vários embeds
-            // ao mesmo tempo só por causa do efeito visual de pilha.
-            if (!isActive) {
+          renderCard={(item, { isActive, distance }) => {
+            // Cards a partir de depth-2 são só uma casca decorativa (ver
+            // .sdp-video-stack-ghost) — mas o vizinho mais próximo
+            // (distance <= 1, isto é, também o depth-1) já monta o player
+            // de verdade, mesmo sem estar ativo ainda. Ele chega a essa
+            // posição pouco antes de virar ativo (um passo de cada vez —
+            // ver TestimonialStack.jsx), o que dá tempo do <iframe>
+            // carregar a thumbnail enquanto ainda está fora de vista, em
+            // vez de nascer do zero bem no meio da troca de slide e
+            // mostrar um flash escuro até carregar.
+            if (distance > 1) {
               return <div className="sdp-video-stack-ghost" aria-hidden="true" />;
             }
 
@@ -75,9 +80,9 @@ export default function VideoTestimonials({ title }) {
                     <video
                       src={embed.embedUrl}
                       controls
-                      onPlay={() => setIsPlaying(true)}
-                      onPause={() => setIsPlaying(false)}
-                      onEnded={() => setIsPlaying(false)}
+                      onPlay={() => isActive && setIsPlaying(true)}
+                      onPause={() => isActive && setIsPlaying(false)}
+                      onEnded={() => isActive && setIsPlaying(false)}
                     />
                   ) : (
                     <iframe
