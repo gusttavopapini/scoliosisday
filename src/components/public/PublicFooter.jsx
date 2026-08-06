@@ -41,7 +41,10 @@ const FOOTER_LINKS = [
   { key: 'about', to: '/sobre' },
   { key: 'hallOfStars', to: '/hall-de-estrelas' },
   { key: 'sponsors', to: '/patrocinadores' },
-  { key: 'testimonials', to: '/depoimentos' },
+  // /depoimentos foi removida — âncora pra Home (ver PublicNavbar.jsx e
+  // #depoimentos em HomePage.jsx). Aqui já é <Link> comum, sem NavLink
+  // pra se preocupar com isActive.
+  { key: 'testimonials', to: '/#depoimentos' },
 ];
 
 const INSTAGRAM_URL = 'https://www.instagram.com/scoliosisday';

@@ -32,7 +32,6 @@ const EditionsPage = lazy(() => import('../features/public/EditionsPage.jsx'));
 const AboutPage = lazy(() => import('../features/public/AboutPage.jsx'));
 const HallOfStarsPage = lazy(() => import('../features/public/HallOfStarsPage.jsx'));
 const PublicSponsorsPage = lazy(() => import('../features/public/PublicSponsorsPage.jsx'));
-const TestimonialsPage = lazy(() => import('../features/public/TestimonialsPage.jsx'));
 const NotFoundPublicPage = lazy(() => import('../features/public/NotFoundPublicPage.jsx'));
 
 // ── Páginas do painel (carregadas sob demanda) ──
@@ -83,7 +82,11 @@ export const router = createBrowserRouter([
       { path: '/sobre', element: suspended(AboutPage) },
       { path: '/hall-de-estrelas', element: suspended(HallOfStarsPage) },
       { path: '/patrocinadores', element: suspended(PublicSponsorsPage) },
-      { path: '/depoimentos', element: suspended(TestimonialsPage) },
+
+      // /depoimentos foi removida — texto e vídeo vivem só na Home agora
+      // (ver #depoimentos em HomePage.jsx). Sem redirect: cai no 404
+      // público (rota * abaixo), decisão explícita — reportada ao pedir
+      // este ajuste.
 
       // Academy ainda não tem página. A rota fica de pé para não quebrar
       // links já divulgados, mas não aparece mais no menu (ver NAV_LINKS

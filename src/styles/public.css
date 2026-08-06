@@ -540,9 +540,9 @@
   margin-bottom: var(--space-10);
 }
 
-/* Rótulo pequeno acima da headline (ex.: "DEPOIMENTOS") — hoje só nos
-   depoimentos (Home e /depoimentos), mas genérico o bastante pra
-   qualquer cabeçalho de seção que precise do mesmo selo. */
+/* Rótulo pequeno acima da headline (ex.: "DEPOIMENTOS") — hoje só nas
+   duas seções de depoimento da Home (texto e vídeo), mas genérico o
+   bastante pra qualquer cabeçalho de seção que precise do mesmo selo. */
 .sdp-section-tag {
   display: inline-block;
   margin-bottom: var(--space-3);
@@ -572,12 +572,6 @@
      --lh-tight (1.15) é o próximo degrau do kit, ainda mais folgado
      que o --lh-display bem apertado da base. */
   line-height: var(--lh-tight);
-}
-
-/* Quebra de linha manual (só /depoimentos, ver TextTestimonials.jsx) —
-   cada metade da frase vira um bloco próprio. */
-.sdp-testimonials-headline__line {
-  display: block;
 }
 
 /* Heading de seção com a marca "Scoliosis Day" embutida (via
@@ -1629,22 +1623,14 @@
 }
 
 /* ============================================================
-   26. DEPOIMENTOS (/depoimentos)
+   26. DEPOIMENTOS (Home — texto e vídeo, /depoimentos foi removida)
    ============================================================ */
-
-/* .sd-quote::before (as aspas decorativas) nasce --orange-600 no kit —
-   design-system.css não pode ser editado, então a cor mais clara pedida
-   entra aqui, escopada nesta página. (0,2,0) vence o (0,1,1) do kit. */
-.sdp-testimonials-page .sd-quote::before {
-  color: var(--orange-400);
-}
 
 /* Citação em --font-text (Giuconda) reto, igual a qualquer parágrafo do
    site — antes era --font-accent (Allrounder) itálico. .sd-quote só
-   existe nos cards de depoimento (Home e /depoimentos, via
-   TestimonialQuoteCard.jsx compartilhado), então não precisa de escopo
-   extra. font-style:italic vem incondicional de design-system.css;
-   precisa do override explícito pra normal aqui. */
+   existe no card de depoimento em texto (TestimonialQuoteCard.jsx),
+   então não precisa de escopo extra. font-style:italic vem incondicional
+   de design-system.css; precisa do override explícito pra normal aqui. */
 .sd-quote blockquote {
   font-family:var(--font-text);
   font-size: var(--text-xl);
@@ -1679,12 +1665,14 @@
 }
 
 /* Player 16:9 — vale tanto para o <iframe> do YouTube/Vimeo quanto para o
-   <video> do upload direto, mesmo wrapper para os dois. */
+   <video> do upload direto, mesmo wrapper para os dois. Sem max-width
+   próprio: preenche 100% do .sdp-video-testimonial-card que o embrulha,
+   que por sua vez já é limitado pela largura da pilha
+   (.sdp-quote-stack--horizontal, em torno de 860px) — duplicar o limite
+   aqui só deixaria uma faixa vazia sobrando dos lados do player. */
 .sdp-video-embed {
   position: relative;
   width: 100%;
-  max-width: 720px;
-  margin-inline: auto;
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -1772,15 +1760,22 @@
 
 /* ============================================================
    29. DEPOIMENTOS EM PILHA (.sdp-quote-stack)
-   Substitui o carrossel horizontal — usado por Home (seção 3) e pelas
-   duas seções de /depoimentos (texto e vídeo).
+   Usado por Home (texto, seção 3, e vídeo, seção 4 — as duas trocadas
+   por embaralhamento). O card ativo fica em position:relative — é ele
+   quem define a altura e a largura do container (.sdp-quote-stack), em
+   fluxo normal. Os de trás são position:absolute DENTRO desse mesmo
+   container, com width:100% (a mesma largura do ativo) e centralizados
+   com left:50% + translateX(-50%).
 
-   O card ativo fica em position:relative — é ele quem define a altura e
-   a largura do container (.sdp-quote-stack), em fluxo normal. Os de trás
-   são position:absolute DENTRO desse mesmo container, com width:100%
-   (a mesma largura do ativo) e centralizados com left:50% +
-   translateX(-50%). overflow:hidden + border-radius aqui garante que a
-   sombra/borda do card de trás nunca vaze quadrada por cima do de cima.
+   SEM overflow:hidden aqui de propósito — o container só é tão alto
+   quanto o card ativo (só ele está em fluxo normal), e os cards de trás
+   são deslocados pra BAIXO dele (translateY). Com overflow:hidden, essa
+   parte deslocada — que é exatamente a "espiada" que faz a pilha parecer
+   uma pilha — ficava cortada fora, e em repouso (fora de uma transição)
+   a pilha parecia só um card sozinho, sem nada atrás. Cada card já tem
+   seu próprio border-radius (.sd-quote, .sdp-video-testimonial-card),
+   então não sobra canto quadrado vazando por cima do de cima mesmo sem o
+   clip do container.
 
    ATENÇÃO — já tentamos deixar os 3 cards permanentemente
    position:absolute (pra evitar o "pulo" do position no card ativo ao
@@ -1790,7 +1785,32 @@
    à altura do container), a medida em JS lia sempre 0 — colapso
    circular, pilha invisível. Não repetir essa abordagem sem resolver o
    bootstrap da altura primeiro (ex.: elemento fantasma em fluxo normal
-   só pra medir, nunca o próprio card ativo). */
+   só pra medir, nunca o próprio card ativo).
+
+   O EMBARALHAMENTO: TestimonialStack.jsx renderiza um <div> por ITEM
+   (key=item.id, sempre montado, nunca por slot de profundidade) e
+   calcula a classe de profundidade de cada um a partir de (posição do
+   item − índice ativo) mod total. Trocar de slide então muda a CLASSE
+   de um nó que já existe — é isso que faz a transition abaixo animar
+   de verdade: se cada posição da pilha fosse um slot fixo que só troca
+   o conteúdo por dentro (nunca a classe), a transition nunca dispara.
+   Itens além da profundidade 2 caem todos na mesma classe --hidden
+   (mesmo estado de descanso), pra sair da pilha e entrar nela pelo
+   mesmo trajeto ao contrário, sem salto.
+
+   ORIENTAÇÃO: por padrão a pilha é vertical (texto, Home) — os cards de
+   trás descem (translateY) e a navegação é cima/baixo. O modificador
+   --horizontal (pilha de vídeo, ver .sdp-quote-stack--horizontal mais
+   abaixo) troca isso pra um deslocamento lateral (translateX) com
+   navegação esquerda/direita — TestimonialStack.jsx decide qual
+   aplicar via prop `orientation`.
+
+   SEM ROTAÇÃO nos cards de trás: a primeira versão deste efeito girava
+   cada profundidade em um ângulo diferente (-4deg/3deg/-6deg), o que
+   ficava com aparência desorganizada. Como o de trás já é centralizado
+   (left:50% + translateX(-50%)) e só encolhe (scale), a borda sobra
+   igual dos dois lados sozinha — a "espiada" simétrica não precisa de
+   rotação nenhuma pra existir. */
 
 .sdp-quote-stack-wrap {
   display: flex;
@@ -1803,35 +1823,48 @@
   position: relative;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
 }
 
-/* Modificador das duas seções de /depoimentos: a pilha ali é uma coluna
-   central única (sem texto ao lado, diferente da Home), então a LARGURA
-   do card ativo — e por tabela, dos de trás — vem daqui, do container,
-   em vez de um max-width solto na citação. */
+/* Modificador das seções de depoimento em coluna central única (sem
+   texto ao lado, diferente da Home-texto) — a LARGURA do card ativo — e
+   por tabela, dos de trás — vem daqui, do container, em vez de um
+   max-width solto na citação. */
 .sdp-quote-stack--centered {
   flex: 0 1 640px;
   max-width: 640px;
 }
 
+/* Pilha de vídeo: mais espaço lateral disponível que a de texto (não
+   tem coluna de header ao lado), então o card ativo pode ser mais
+   largo. Mesma especificidade de --centered acima e escrita depois —
+   ganha no cascade quando as duas classes estão juntas (ver
+   TestimonialStack.jsx). `flex: none` porque, com a pilha em coluna
+   (.sdp-quote-stack-wrap--horizontal abaixo), flex-basis passaria a
+   valer no eixo vertical — aqui a largura só deve vir do max-width. */
+.sdp-quote-stack--horizontal {
+  flex: none;
+  width: 100%;
+  max-width: 860px;
+}
+
 .sdp-quote-stack__card {
   transition:
-    transform var(--dur-base) var(--ease-out),
-    opacity var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out);
+    transform var(--dur-slower) ease-in-out,
+    opacity var(--dur-slower) ease-in-out,
+    box-shadow var(--dur-slower) ease-in-out;
 }
 
 .sdp-quote-stack__card--active {
   position: relative;
-  z-index: 3;
+  z-index: 4;
   opacity: 1;
+  transform: translateY(0) scale(1);
   box-shadow:var(--shadow-lg);
 }
 
 .sdp-quote-stack__card--depth-1,
-.sdp-quote-stack__card--depth-2 {
+.sdp-quote-stack__card--depth-2,
+.sdp-quote-stack__card--hidden {
   position: absolute;
   top: 0;
   left: 50%;
@@ -1840,18 +1873,61 @@
 }
 
 .sdp-quote-stack__card--depth-1 {
-  z-index: 2;
-  opacity: 0.5;
-  transform: translateX(-50%) translateY(12px) scale(0.96);
+  z-index: 3;
+  opacity: 0.6;
+  transform: translateX(-50%) translateY(14px) scale(0.96);
 }
 
 .sdp-quote-stack__card--depth-2 {
-  z-index: 1;
-  opacity: 0.25;
-  transform: translateX(-50%) translateY(24px) scale(0.92);
+  z-index: 2;
+  opacity: 0.35;
+  transform: translateX(-50%) translateY(26px) scale(0.92);
 }
 
-/* Setas verticais à direita da pilha — cima = anterior, baixo = próximo. */
+/* Estado de descanso de "fora da pilha visível" — é de/para onde o card
+   que sai (era --active) e o card que entra (era invisível, vira
+   --depth-2) animam. Mesmo valor pros dois sentidos, então a transition
+   sempre parte/chega no mesmo lugar visual, sem salto. */
+.sdp-quote-stack__card--hidden {
+  z-index: 1;
+  opacity: 0;
+  transform: translateX(-50%) translateY(34px) scale(0.88);
+}
+
+/* Pilha horizontal (vídeo): mesma ideia da vertical (card de trás
+   ancorado numa borda fixa do container, não centralizado nela — é o
+   ancoramento fixo que deixa o deslocamento "vazar" pra fora do
+   container e virar espiada visível) só que girada 90°: ancora em
+   left:0 (em vez do top:0 da vertical) e centraliza no eixo vertical
+   (top:50% + translateY(-50%) — esse eixo é quem fica "espiando
+   simetricamente dos dois lados", em cima e embaixo, do mesmo jeito que
+   o eixo horizontal já fazia sozinho na pilha de texto). O deslocamento
+   em si (translateX) é bem maior que o da vertical (14/26/34px) porque
+   o card de vídeo é bem mais largo (~860px vs ~640px) — com a mesma
+   pilha de valores pequenos, o encolhimento do scale sozinho já
+   "engolia" o deslocamento inteiro e a espiada não aparecia. */
+.sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-1,
+.sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-2,
+.sdp-quote-stack--horizontal .sdp-quote-stack__card--hidden {
+  top: 50%;
+  left: 0;
+}
+
+.sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-1 {
+  transform: translateY(-50%) translateX(36px) scale(0.96);
+}
+
+.sdp-quote-stack--horizontal .sdp-quote-stack__card--depth-2 {
+  transform: translateY(-50%) translateX(64px) scale(0.92);
+}
+
+.sdp-quote-stack--horizontal .sdp-quote-stack__card--hidden {
+  transform: translateY(-50%) translateX(92px) scale(0.88);
+}
+
+/* Setas verticais à direita da pilha — cima = anterior, baixo = próximo.
+   Na variante --horizontal (ver .sdp-quote-stack-wrap--horizontal
+   abaixo) essas mesmas setas passam pra baixo da pilha, lado a lado. */
 .sdp-quote-stack__nav {
   display: flex;
   flex-direction: column;
@@ -1859,14 +1935,49 @@
   flex: 0 0 auto;
 }
 
+/* Vídeo: com a "espiada" saindo nas laterais, setas ao lado da pilha
+   (layout padrão em linha) disputariam o mesmo espaço visual dos cards
+   de trás. Em vez disso a pilha ocupa a largura toda e a navegação desce
+   pra baixo dela, com as duas setas lado a lado (esquerda/direita). */
+.sdp-quote-stack-wrap--horizontal {
+  flex-direction: column;
+}
+
+.sdp-quote-stack-wrap--horizontal .sdp-quote-stack__nav {
+  flex-direction: row;
+}
+
 /* ---- Depoimentos em vídeo: placeholder dos cards de trás ----
    Só o card ativo carrega o <iframe>/<video> de verdade — os de trás são
-   uma casca decorativa (sem player), pra não tocar 2-3 embeds ao mesmo
-   tempo por causa de uma pilha visual. */
+   uma casca decorativa (sem player), pra não tocar vários embeds ao
+   mesmo tempo só por causa do efeito visual de pilha. Borda própria
+   (não só a cor de fundo) porque --surface-sunken é bem próximo de
+   --surface-page — sem contorno, a espiada da pilha horizontal (mais
+   larga, com menos altura de página ao redor pra contrastar) quase
+   desaparecia contra o fundo da seção. */
 .sdp-video-stack-ghost {
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-lg);
   background: var(--surface-sunken);
+  border: var(--border-width) solid var(--border-subtle);
+}
+
+/* Cartão branco ao redor do player + legenda — mesmo tratamento de
+   superfície do .sd-quote do kit (fundo, borda, cantos), pra o card de
+   vídeo combinar com o de texto na mesma pilha. A sombra em si já vem
+   de .sdp-quote-stack__card--active (o wrapper que embrulha isto),
+   então não duplica aqui. */
+.sdp-video-testimonial-card {
+  background: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdp-quote-stack__card {
+    transition: none;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1877,7 +1988,8 @@
   }
 
   .sdp-quote-stack__card--depth-1,
-  .sdp-quote-stack__card--depth-2 {
+  .sdp-quote-stack__card--depth-2,
+  .sdp-quote-stack__card--hidden {
     display: none;
   }
 

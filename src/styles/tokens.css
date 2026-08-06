@@ -194,4 +194,10 @@
      .sdp-pricing__card em public.css): visibility muda em 0s, mas com
      atraso pra sincronizar com o fim do fade de opacity. */
   --dur-instant: 0s;
+
+  /* Mais lenta que --dur-slow (420ms) do design-system.css — usada só no
+     slide da pilha de depoimentos (.sdp-quote-stack__card em public.css),
+     que pediu uma transição visivelmente mais suave/lenta que qualquer
+     token já existente no kit. */
+  --dur-slower: 600ms;
 }

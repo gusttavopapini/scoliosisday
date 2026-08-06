@@ -398,10 +398,8 @@ const t = {
     sponsorsPageEmptyTitle: 'No sponsors registered',
     sponsorsPageEmptyBody: 'There are no sponsors in published editions yet.',
 
-    // ── /depoimentos ──
-    testimonialsPageHeroTitle: 'Testimonials',
-    testimonialsPageHeroSubtitle: 'What Scoliosis Day participants have to say.',
-    testimonialsPageTextTitle: 'Testimonials',
+    // ── Home · Depoimentos em vídeo (/depoimentos foi removida, ver
+    // HomePage.jsx) ──
     testimonialsPageVideoTitle: 'Video testimonials',
 
     // Patrocinadores — CTA de captação (/sobre, /edicoes e /patrocinadores)

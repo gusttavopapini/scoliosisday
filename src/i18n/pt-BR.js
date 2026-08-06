@@ -361,11 +361,6 @@ const t = {
     // ── Home · Depoimentos ──
     testimonialsTitle: 'Depoimentos',
     testimonialsSubtitle: 'Quem viveu o Scoliosis Day conta o impacto do encontro na sua prática.',
-    // Quebra de linha manual do heading, só em /depoimentos (largura cheia,
-    // ver TextTestimonials.jsx) — não existe em en.js de propósito: o ponto
-    // de quebra é específico desta frase em português, a inglesa quebra
-    // naturalmente com outra contagem de palavras.
-    testimonialsSubtitleBreakAfter: 'Quem viveu o Scoliosis Day conta o',
     // Duas linhas do rótulo bicolor em .sd-stat (ver .sdp-stat__label) —
     // "Edições realizadas" quebrado em normal + itálico teal de destaque.
     editionsHeldLine1: 'Edições',
@@ -407,10 +402,8 @@ const t = {
     sponsorsPageEmptyTitle: 'Nenhum patrocinador cadastrado',
     sponsorsPageEmptyBody: 'Ainda não há patrocinadores nas edições publicadas.',
 
-    // ── /depoimentos ──
-    testimonialsPageHeroTitle: 'Depoimentos',
-    testimonialsPageHeroSubtitle: 'O que dizem os participantes do Scoliosis Day.',
-    testimonialsPageTextTitle: 'Depoimentos',
+    // ── Home · Depoimentos em vídeo (/depoimentos foi removida, ver
+    // HomePage.jsx) ──
     testimonialsPageVideoTitle: 'Depoimentos em vídeo',
 
     // Patrocinadores — CTA de captação (/sobre, /edicoes e /patrocinadores)
