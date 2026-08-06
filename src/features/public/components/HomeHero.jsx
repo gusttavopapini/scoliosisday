@@ -21,7 +21,7 @@ import { eventBannerUrl } from '../../../utils/eventBanner.js';
 const TABLET_MEDIA = '(max-width: 1024px)';
 const MOBILE_MEDIA = '(max-width: 640px)';
 
-const AUTO_SLIDE_MS = 7000;
+const AUTO_SLIDE_MS = 3000;
 
 /**
  * Combina o evento atual com os banners manuais ativos num único array de
@@ -94,7 +94,9 @@ export default function HomeHero() {
       setIndex((prev) => (prev + 1) % slides.length);
     }, AUTO_SLIDE_MS);
     return () => clearInterval(timer);
-  }, [paused, slides.length]);
+    // index nas deps: setas manuais (goTo) reiniciam a contagem, pra não
+    // competir com o clique do usuário (mesmo padrão de TestimonialStack.jsx).
+  }, [paused, slides.length, index]);
 
   const slide = slides[index];
 

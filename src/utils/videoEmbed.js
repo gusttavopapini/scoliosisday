@@ -15,7 +15,13 @@ export function getVideoEmbedInfo(url) {
 
   const youtubeMatch = url.match(YOUTUBE_RE);
   if (youtubeMatch) {
-    return { type: 'youtube', embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}` };
+    // enablejsapi=1 + origin: sem isso a YouTube IFrame API não consegue se
+    // conectar a este iframe pra reportar play/pause (ver useEmbedPlaybackState.js).
+    const origin = encodeURIComponent(window.location.origin);
+    return {
+      type: 'youtube',
+      embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}?enablejsapi=1&origin=${origin}`,
+    };
   }
 
   const vimeoMatch = url.match(VIMEO_RE);

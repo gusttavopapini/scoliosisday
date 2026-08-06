@@ -4,22 +4,79 @@
 // cadastrado, a seção inteira some — ao contrário da textual, não há
 // fallback para vídeo.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTestimonials } from '../../../../hooks/useTestimonials.js';
+import { useEmbedPlaybackState } from '../../../../hooks/useEmbedPlaybackState.js';
 import { getVideoEmbedInfo } from '../../../../utils/videoEmbed.js';
 import TestimonialStack from './TestimonialStack.jsx';
+
+/**
+ * Card real (ativo ou vizinho em depth-1, ver VideoTestimonials abaixo).
+ * Precisa ser um componente à parte pra poder chamar hooks — o card
+ * fantasma (distance > 1) não deve pagar o custo de nenhum SDK de player.
+ *
+ * `onPlayingChange` reporta se ESTE card está tocando E ativo — só o
+ * ativo deve conseguir pausar o autoplay do carrossel; o vizinho pré-
+ * carregado fica fora de vista e não é interativo.
+ */
+function VideoTestimonialCard({ item, isActive, onPlayingChange }) {
+  const embed = getVideoEmbedInfo(item.videoUrl);
+  const iframeRef = useRef(null);
+
+  // Só YouTube/Vimeo passam por aqui — mp4 usa os eventos nativos do
+  // <video> abaixo, que já reportam play/pause/ended de graça.
+  const embedIsPlaying = useEmbedPlaybackState({ type: embed?.type, iframeRef });
+
+  useEffect(() => {
+    if (embed?.type === 'youtube' || embed?.type === 'vimeo') {
+      onPlayingChange(isActive && embedIsPlaying);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- embed?.type não muda pro mesmo item.
+  }, [isActive, embedIsPlaying, onPlayingChange]);
+
+  // Card saiu da janela "ativo + depth-1" (virou fantasma) enquanto ainda
+  // achava que estava tocando: não pode deixar o autoplay travado.
+  useEffect(() => () => onPlayingChange(false), [onPlayingChange]);
+
+  return (
+    <div className="sdp-video-testimonial-card">
+      <div className="sdp-video-embed">
+        {embed?.type === 'mp4' ? (
+          // eslint-disable-next-line jsx-a11y/media-has-caption -- vídeo enviado pelo admin, sem legendas geradas.
+          <video
+            src={embed.embedUrl}
+            controls
+            onPlay={() => onPlayingChange(isActive)}
+            onPause={() => onPlayingChange(false)}
+            onEnded={() => onPlayingChange(false)}
+          />
+        ) : (
+          <iframe
+            ref={iframeRef}
+            src={embed?.embedUrl}
+            title={item.name}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        )}
+      </div>
+
+      <div className="sdp-video-testimonial__caption">
+        <span className="sdp-video-testimonial__name">{item.name}</span>
+        <span className="sdp-video-testimonial__role">{item.role}</span>
+      </div>
+    </div>
+  );
+}
 
 /** @param {{ title: string }} props */
 export default function VideoTestimonials({ title }) {
   const { data: items = [] } = useTestimonials('video');
   const [index, setIndex] = useState(0);
-  // Autoplay do carrossel pausa enquanto o vídeo ativo está tocando —
-  // sem isso, a pilha embaralharia por baixo de quem está assistindo.
-  // Só dá pra saber isso de verdade pro <video> nativo (onPlay/onPause
-  // são eventos do próprio elemento); iframe do YouTube/Vimeo não expõe
-  // o estado de reprodução sem embutir o SDK JS de cada plataforma —
-  // fora do escopo desta rodada, então esses continuam sem essa pausa
-  // extra (o autoplay simples do carrossel ainda se aplica a eles).
+  // Autoplay do carrossel pausa enquanto o vídeo ativo está tocando — sem
+  // isso, a pilha embaralharia por baixo de quem está assistindo, mesmo
+  // com o mouse fora do card. Cobre os 3 tipos de embed (mp4 nativo,
+  // YouTube e Vimeo via SDK — ver VideoTestimonialCard acima).
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
@@ -70,35 +127,8 @@ export default function VideoTestimonials({ title }) {
               return <div className="sdp-video-stack-ghost" aria-hidden="true" />;
             }
 
-            const embed = getVideoEmbedInfo(item.videoUrl);
-
             return (
-              <div className="sdp-video-testimonial-card">
-                <div className="sdp-video-embed">
-                  {embed?.type === 'mp4' ? (
-                    // eslint-disable-next-line jsx-a11y/media-has-caption -- vídeo enviado pelo admin, sem legendas geradas.
-                    <video
-                      src={embed.embedUrl}
-                      controls
-                      onPlay={() => isActive && setIsPlaying(true)}
-                      onPause={() => isActive && setIsPlaying(false)}
-                      onEnded={() => isActive && setIsPlaying(false)}
-                    />
-                  ) : (
-                    <iframe
-                      src={embed?.embedUrl}
-                      title={item.name}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  )}
-                </div>
-
-                <div className="sdp-video-testimonial__caption">
-                  <span className="sdp-video-testimonial__name">{item.name}</span>
-                  <span className="sdp-video-testimonial__role">{item.role}</span>
-                </div>
-              </div>
+              <VideoTestimonialCard item={item} isActive={isActive} onPlayingChange={setIsPlaying} />
             );
           }}
         />
