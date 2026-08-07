@@ -16,8 +16,13 @@ import {
   doc,
 } from 'firebase/firestore';
 import { db } from '../config/firebase.js';
+import { translateRootFields } from '../utils/writeTimeTranslation.js';
 
 const BANNERS_COLLECTION = 'banners';
+
+// Mesmos campos traduzíveis do evento (ver services/events.js) — o hero da
+// Home combina banner e evento atual no mesmo carrossel/template.
+const BANNER_TRANSLATABLE_FIELDS = ['headline', 'subtitle', 'cta'];
 
 /** Tamanho de página das listagens. */
 export const BANNERS_PAGE_SIZE = 20;
@@ -76,7 +81,9 @@ export function newBannerId() {
  * @returns {Promise<string>} ID do novo documento
  */
 export async function createBanner(data, explicitId) {
-  const payload = { ...data, createdAt: new Date() };
+  // Sem documento anterior: todo campo traduzível conta como "novo".
+  const translations = await translateRootFields(data, null, BANNER_TRANSLATABLE_FIELDS);
+  const payload = { ...data, ...translations, createdAt: new Date() };
 
   if (explicitId) {
     await setDoc(doc(db, BANNERS_COLLECTION, explicitId), payload);
@@ -89,8 +96,15 @@ export async function createBanner(data, explicitId) {
 
 export async function updateBanner(id, data) {
   const docRef = doc(db, BANNERS_COLLECTION, id);
+  // Busca o documento atual só pra diff de tradução — evita rechamar a API
+  // quando o texto de origem não mudou (ver utils/writeTimeTranslation.js).
+  const snapshot = await getDoc(docRef);
+  const previous = snapshot.exists() ? snapshot.data() : null;
+  const translations = await translateRootFields(data, previous, BANNER_TRANSLATABLE_FIELDS);
+
   await updateDoc(docRef, {
     ...data,
+    ...translations,
     updatedAt: new Date(),
   });
 }

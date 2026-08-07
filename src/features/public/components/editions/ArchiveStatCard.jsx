@@ -1,14 +1,15 @@
 // src/features/public/components/editions/ArchiveStatCard.jsx
 // Uma coluna de estatística da página de arquivo (EditionArchive.jsx).
 // Componente próprio (não inline no .map()) pelo mesmo motivo de
-// PresentationCard.jsx: useTranslatedContent é um hook, e a lista de
-// estatísticas varia (só as com `value` preenchido chegam aqui).
+// PresentationCard.jsx: a lista de estatísticas varia (só as com `value`
+// preenchido chegam aqui) — não afeta hooks aqui dentro (useStoredTranslation
+// é síncrono), mas mantém o padrão consistente entre os dois cards.
 
-import { useTranslatedContent } from '../../../../hooks/useTranslatedContent.js';
+import { useStoredTranslation } from '../../../../hooks/useStoredTranslation.js';
 
 /** @param {{ stat: { prefix?: string, value?: string, suffix?: string, title?: string, description?: string } }} props */
 export default function ArchiveStatCard({ stat }) {
-  const { translated, isTranslating } = useTranslatedContent(stat, ['title', 'description']);
+  const translated = useStoredTranslation(stat, ['title', 'description']);
 
   return (
     <div className="sd-stat sdp-archive-stat">
@@ -19,15 +20,11 @@ export default function ArchiveStatCard({ stat }) {
       </span>
 
       {translated.title && (
-        <h3 className="sdp-archive-stat__title">
-          <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.title}</span>
-        </h3>
+        <h3 className="sdp-archive-stat__title">{translated.title}</h3>
       )}
 
       {translated.description && (
-        <p className="sdp-archive-stat__text">
-          <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.description}</span>
-        </p>
+        <p className="sdp-archive-stat__text">{translated.description}</p>
       )}
     </div>
   );

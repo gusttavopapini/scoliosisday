@@ -21,6 +21,7 @@ import {
 import { db } from '../config/firebase.js';
 import { eventSlug } from '../utils/slugify.js';
 import { EVENT_STATUS } from '../utils/constants.js';
+import { translateRootFields, translateArrayFields } from '../utils/writeTimeTranslation.js';
 
 const EVENTS_COLLECTION = 'events';
 
@@ -79,6 +80,45 @@ function nullifyUndefined(data) {
 /** As três limpezas que todo payload de escrita precisa. */
 function sanitizeWrite(data) {
   return nullifyUndefined(withoutIdField(withoutCurrentFlag(data)));
+}
+
+// Campos de texto livre traduzidos ao salvar (Parte 2 do fix de tradução —
+// ver utils/writeTimeTranslation.js). presentation/archiveStats são
+// arrays de posição fixa (3 itens cada); os demais são campos de raiz.
+const EVENT_ROOT_TRANSLATABLE_FIELDS = ['headline', 'subtitle', 'cta', 'archiveTitle', 'archiveSubtitle'];
+const PRESENTATION_TRANSLATABLE_FIELDS = ['title', 'description'];
+const ARCHIVE_STAT_TRANSLATABLE_FIELDS = ['title', 'description'];
+
+/**
+ * Traduz pra inglês, uma vez, só o que mudou desde `previous` — devolve um
+ * objeto parcial pronto pra entrar no spread do payload de escrita
+ * (`headline_en`, `presentation` já com `title_en`/`description_en` em
+ * cada item, etc.). Nunca lança: falha de tradução vira null no campo
+ * `_en` (ver translateTextForStorage), não bloqueia o salvamento do
+ * conteúdo original.
+ * @param {object} data
+ * @param {object|null} previous
+ */
+async function translateEventFields(data, previous) {
+  const result = await translateRootFields(data, previous, EVENT_ROOT_TRANSLATABLE_FIELDS);
+
+  if (Array.isArray(data.presentation)) {
+    result.presentation = await translateArrayFields(
+      data.presentation,
+      previous?.presentation,
+      PRESENTATION_TRANSLATABLE_FIELDS,
+    );
+  }
+
+  if (Array.isArray(data.archiveStats)) {
+    result.archiveStats = await translateArrayFields(
+      data.archiveStats,
+      previous?.archiveStats,
+      ARCHIVE_STAT_TRANSLATABLE_FIELDS,
+    );
+  }
+
+  return result;
 }
 
 /** Gera um ID de documento no cliente, sem gravar nada ainda. */
@@ -183,16 +223,27 @@ export async function updateEvent(id, data) {
  * Grava um evento em um ID conhecido (gerado no cliente por newEventId).
  * Usa merge para servir tanto ao primeiro salvamento de rascunho quanto às
  * atualizações seguintes, sem duplicar documentos.
+ *
+ * Traduz pra inglês aqui dentro (Parte 2 do fix de tradução) — é o único
+ * caminho de escrita que o EventForm de fato usa (rascunho automático,
+ * "Salvar alterações" e publicar final passam todos por useSaveEvent →
+ * saveEvent), então é o ponto certo pra centralizar isso. O diff contra
+ * `snapshot` (já buscado aqui mesmo, sem leitura extra) evita rechamar a
+ * API a cada tick do rascunho automático quando o texto não mudou.
  */
 export async function saveEvent(id, data) {
   const docRef = doc(db, EVENTS_COLLECTION, id);
   const snapshot = await getDoc(docRef);
+  const previous = snapshot.exists() ? snapshot.data() : null;
   const now = new Date();
+
+  const translations = await translateEventFields(data, previous);
 
   await setDoc(
     docRef,
     {
       ...sanitizeWrite(data),
+      ...translations,
       status: data.status ?? 'draft',
       slug: data.slug || eventSlug(data.headline),
       // Na criação o campo nasce false; em atualizações não é tocado, para

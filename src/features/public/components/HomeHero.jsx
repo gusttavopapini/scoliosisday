@@ -14,7 +14,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../../../hooks/useLanguage.js';
 import { useCurrentPublicEvent } from '../../../hooks/useEvents.js';
 import { useBanners } from '../../../hooks/useBanners.js';
-import { useTranslatedContent } from '../../../hooks/useTranslatedContent.js';
+import { useStoredTranslation } from '../../../hooks/useStoredTranslation.js';
 import { eventBannerUrl } from '../../../utils/eventBanner.js';
 
 /** Os mesmos pontos de corte do CSS do hero (1024/640). */
@@ -37,8 +37,11 @@ function buildSlides(event, banners) {
       id: `event-${event.id}`,
       order: event.bannerOrder ?? 0,
       headline: event.headline,
+      headline_en: event.headline_en,
       subtitle: event.subtitle,
+      subtitle_en: event.subtitle_en,
       cta: event.cta,
+      cta_en: event.cta_en,
       ctaLink: event.ctaLink,
       bannerDesktopUrl: eventBannerUrl(event, 'desktop'),
       bannerTabletUrl: event.bannerTabletUrl?.trim() || '',
@@ -56,8 +59,11 @@ function buildSlides(event, banners) {
       id: `banner-${banner.id}`,
       order: banner.order ?? 0,
       headline: banner.headline,
+      headline_en: banner.headline_en,
       subtitle: banner.subtitle,
+      subtitle_en: banner.subtitle_en,
       cta: banner.cta,
+      cta_en: banner.cta_en,
       ctaLink: banner.ctaLink,
       bannerDesktopUrl: banner.bannerDesktopUrl?.trim() || '',
       bannerTabletUrl: banner.bannerTabletUrl?.trim() || '',
@@ -100,9 +106,10 @@ export default function HomeHero() {
 
   const slide = slides[index];
 
-  // Só o texto digitado pelo admin (evento real ou banner manual) passa pela
-  // API de tradução — sem slide não há o que traduzir.
-  const { translated, isTranslating } = useTranslatedContent(slide, ['headline', 'subtitle', 'cta']);
+  // Texto já traduzido ao salvar no painel (headline_en/subtitle_en/cta_en,
+  // ver services/events.js e services/banners.js) — sem chamada à API em
+  // tempo de leitura. Sem slide não há o que resolver.
+  const translated = useStoredTranslation(slide, ['headline', 'subtitle', 'cta']);
 
   if (!slide) return null;
 
@@ -140,14 +147,14 @@ export default function HomeHero() {
 
           <div className="sdp-hero__content">
             <h1 className="sd-display sd-display--lg sd-display--on-dark">
-              <span className={isTranslating ? 'sdp-translating' : undefined}>{headline}</span>
+              {headline}
             </h1>
             <div className="sd-rule" aria-hidden="true">
               <i /><i /><i /><i /><i />
             </div>
             {subtitle && (
               <p className="sd-lead sd-on-dark">
-                <span className={isTranslating ? 'sdp-translating' : undefined}>{subtitle}</span>
+                {subtitle}
               </p>
             )}
 
@@ -158,12 +165,12 @@ export default function HomeHero() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span className={isTranslating ? 'sdp-translating' : undefined}>{ctaLabel}</span>
+                {ctaLabel}
               </a>
             )}
             {showFallbackLink && (
               <Link className="sd-btn sd-btn--primary sd-btn--lg" to={slide.fallbackLink}>
-                <span className={isTranslating ? 'sdp-translating' : undefined}>{ctaLabel}</span>
+                {ctaLabel}
               </Link>
             )}
           </div>

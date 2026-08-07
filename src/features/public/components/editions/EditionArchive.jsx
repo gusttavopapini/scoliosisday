@@ -10,7 +10,7 @@
 // e estatísticas se ocultam de forma independente, cada um só quando não
 // há dado próprio.
 
-import { useTranslatedContent } from '../../../../hooks/useTranslatedContent.js';
+import { useStoredTranslation } from '../../../../hooks/useStoredTranslation.js';
 import {
   hasArchiveContent,
   getFeaturedGalleryImages,
@@ -21,7 +21,7 @@ import ArchiveStatCard from './ArchiveStatCard.jsx';
 
 /** @param {{ event: object }} props */
 export default function EditionArchive({ event }) {
-  const { translated, isTranslating } = useTranslatedContent(event, ['archiveTitle', 'archiveSubtitle']);
+  const translated = useStoredTranslation(event, ['archiveTitle', 'archiveSubtitle']);
 
   if (!hasArchiveContent(event)) return null;
 
@@ -34,15 +34,13 @@ export default function EditionArchive({ event }) {
       <div className="sd-container">
         <header className="sd-section-header sd-section-header--center sdp-section-header">
           <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
-            <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.archiveTitle}</span>
+            {translated.archiveTitle}
           </h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />
           </div>
           {translated.archiveSubtitle && (
-            <p className="sd-lead">
-              <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.archiveSubtitle}</span>
-            </p>
+            <p className="sd-lead">{translated.archiveSubtitle}</p>
           )}
         </header>
 

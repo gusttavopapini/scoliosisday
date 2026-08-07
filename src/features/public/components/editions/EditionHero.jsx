@@ -4,7 +4,7 @@
 // (mobile/tablet/desktop, com fallback no campo legado) é a mesma da Home.
 
 import { useLanguage } from '../../../../hooks/useLanguage.js';
-import { useTranslatedContent } from '../../../../hooks/useTranslatedContent.js';
+import { useStoredTranslation } from '../../../../hooks/useStoredTranslation.js';
 import { eventBannerUrl } from '../../../../utils/eventBanner.js';
 
 const TABLET_MEDIA = '(max-width: 1024px)';
@@ -13,7 +13,7 @@ const MOBILE_MEDIA = '(max-width: 640px)';
 /** @param {{ event: object, editionBadge?: string }} props */
 export default function EditionHero({ event, editionBadge }) {
   const { t } = useLanguage();
-  const { translated, isTranslating } = useTranslatedContent(event, ['headline', 'subtitle', 'cta']);
+  const translated = useStoredTranslation(event, ['headline', 'subtitle', 'cta']);
 
   const desktopUrl = eventBannerUrl(event, 'desktop');
   const hasBanner = Boolean(desktopUrl);
@@ -39,14 +39,14 @@ export default function EditionHero({ event, editionBadge }) {
         <div className="sdp-edition-hero__content">
           {editionBadge && <span className="sd-tag sd-tag--solid">{editionBadge}</span>}
           <h1 className="sd-display sd-display--lg sd-display--on-dark sdp-edition-hero__headline">
-            <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.headline}</span>
+            {translated.headline}
           </h1>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />
           </div>
           {translated.subtitle && (
             <p className="sd-lead sd-on-dark">
-              <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.subtitle}</span>
+              {translated.subtitle}
             </p>
           )}
 
@@ -57,7 +57,7 @@ export default function EditionHero({ event, editionBadge }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span className={isTranslating ? 'sdp-translating' : undefined}>{ctaLabel}</span>
+              {ctaLabel}
             </a>
           )}
         </div>
