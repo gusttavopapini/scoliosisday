@@ -25,7 +25,7 @@ function formatDateTime(value) {
 export default function RecentEvents({ events, isLoading = false }) {
   if (isLoading) {
     return (
-      <div className="sd-card" aria-busy="true" aria-label="Carregando eventos recentes">
+      <div className="sd-card" aria-busy="true" aria-label="Carregando edições recentes">
         {Array.from({ length: 3 }, (_, i) => (
           <div
             key={i}

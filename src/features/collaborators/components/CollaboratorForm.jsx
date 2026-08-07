@@ -20,6 +20,7 @@ import { collaboratorSchema } from '../schemas/collaboratorSchema.js';
 import { COLLABORATOR_TYPES, AVATAR_COLORS } from '../../../utils/constants.js';
 import { avatarColorIndex } from '../../../utils/initials.js';
 import RichTextEditor from './RichTextEditor.jsx';
+import { COUNTRIES, countryFlagEmoji } from '../../../utils/countryFlags.js';
 import t from '../../../i18n/pt-BR.js';
 
 const COLLABORATOR_TYPE_OPTIONS = [
@@ -60,7 +61,7 @@ export default function CollaboratorForm({ initialData, isEditMode = false, onSu
       firstName: '',
       lastName: '',
       photoUrl: null,
-      minibio: '',
+      flag: '',
       curriculum: '',
       type: COLLABORATOR_TYPES.SPEAKER,
     },
@@ -71,10 +72,6 @@ export default function CollaboratorForm({ initialData, isEditMode = false, onSu
     isDirty,
     onLeave: () => navigate('/painel/colaboradores'),
   });
-
-  const minibioValue = watch('minibio');
-  const minibioLength = minibioValue?.length || 0;
-  const minibioIsOverflow = minibioLength > 300;
 
   // Derivar fullName e avatarColor do initialData.id para exibição.
   // watch() já provoca re-render a cada tecla: memoizar uma concatenação
@@ -252,29 +249,20 @@ export default function CollaboratorForm({ initialData, isEditMode = false, onSu
           <span className="sd-note">Sem foto, o avatar é gerado a partir das iniciais.</span>
         </div>
 
-        {/* ── Mini bio com contador ── */}
+        {/* ── Bandeira / País (opcional) ── */}
         <label className="sd-field">
-          <span className="sd-label">Mini bio</span>
-          <textarea
-            {...register('minibio')}
-            className="sd-input"
-            placeholder="Breve descrição do colaborador (máx. 300 caracteres)"
-            rows={3}
-          />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: 'var(--space-2)',
-            }}
-          >
-            <span className={`sd-small ${minibioIsOverflow ? 'sd-error' : 'sd-muted'}`}>
-              {minibioLength} / 300 caracteres
-            </span>
-            {errors.minibio && (
-              <span className="sd-error">{errors.minibio.message}</span>
-            )}
-          </div>
+          <span className="sd-label">Bandeira <span className="sd-muted">(opcional)</span></span>
+          <span className="sd-select-wrap">
+            <select {...register('flag')} className="sd-select">
+              <option value="">Nenhuma</option>
+              {COUNTRIES.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {countryFlagEmoji(country.code)} {country.name}
+                </option>
+              ))}
+            </select>
+          </span>
+          <span className="sd-note">Exibida ao lado do nome no card do site público.</span>
         </label>
 
         {/* ── Currículo (TipTap) ── */}

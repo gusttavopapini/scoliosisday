@@ -39,9 +39,14 @@ const t = {
 
   nav: {
     dashboard: 'Dashboard',
-    events: 'Eventos',
+    // "Edições", não "Eventos" — rótulo do módulo só no painel; a página
+    // pública /edicoes já se chama assim e não muda.
+    events: 'Edições',
     collaborators: 'Colaboradores',
-    sponsors: 'Patrocinadores',
+    // "Marcas", não "Patrocinadores" — rótulo do módulo só no painel; a
+    // página pública /patrocinadores (t.site.sponsors, mais abaixo neste
+    // arquivo) não muda.
+    sponsors: 'Marcas',
     schedules: 'Programação',
     testimonials: 'Depoimentos',
     banners: 'Banners',
@@ -121,27 +126,28 @@ const t = {
   dashboard: {
     title: 'Dashboard',
     subtitle: 'Visão geral da plataforma',
-    totalEvents: 'Eventos',
+    totalEvents: 'Edições',
     totalCollaborators: 'Colaboradores',
-    totalSponsors: 'Patrocinadores',
+    // "Marcas" — corrige um esquecimento da rodada que renomeou o módulo de
+    // Patrocinadores (só esse card do dashboard tinha ficado pra trás).
+    totalSponsors: 'Marcas',
     pendingStaff: 'Cadastros pendentes',
-    recentEvents: 'Eventos editados recentemente',
+    recentEvents: 'Edições editadas recentemente',
   },
 
   events: {
-    title: 'Eventos',
-    subtitle: 'Gerencie os eventos da plataforma',
-    create: 'Novo evento',
+    title: 'Edições',
+    subtitle: 'Gerencie as edições da plataforma',
+    create: 'Nova edição',
     searchPlaceholder: 'Buscar por nome…',
     filterByStatus: 'Filtrar por status',
-    filterByModality: 'Filtrar por modalidade',
-    name: 'Nome do evento',
+    name: 'Nome da edição',
     date: 'Data',
     location: 'Local',
     status: 'Status',
-    emptyTitle: 'Nenhum evento cadastrado',
-    emptyBody: 'Crie seu primeiro evento para começar.',
-    deleteConfirm: "Excluir o evento '{name}'? Esta ação não pode ser desfeita.",
+    emptyTitle: 'Nenhuma edição cadastrada',
+    emptyBody: 'Crie sua primeira edição para começar.',
+    deleteConfirm: "Excluir a edição '{name}'? Esta ação não pode ser desfeita.",
   },
 
   eventStatus: {
@@ -176,15 +182,15 @@ const t = {
   },
 
   sponsors: {
-    title: 'Patrocinadores',
-    subtitle: 'Empresas e instituições apoiadoras',
-    create: 'Novo patrocinador',
+    title: 'Marcas',
+    subtitle: 'Empresas e instituições patrocinadoras e apoiadoras',
+    create: 'Nova marca',
     searchPlaceholder: 'Buscar por nome…',
     name: 'Nome',
     website: 'Site',
-    emptyTitle: 'Nenhum patrocinador cadastrado',
-    emptyBody: 'Adicione os patrocinadores e apoiadores do evento.',
-    deleteConfirm: "Excluir o patrocinador '{name}'? Esta ação não pode ser desfeita.",
+    emptyTitle: 'Nenhuma marca cadastrada',
+    emptyBody: 'Adicione as marcas patrocinadoras e apoiadoras do evento.',
+    deleteConfirm: "Excluir a marca '{name}'? Esta ação não pode ser desfeita.",
   },
 
   banners: {
@@ -199,7 +205,7 @@ const t = {
     emptyTitle: 'Nenhum banner cadastrado',
     emptyBody: 'Adicione banners para exibir no carrossel da Home.',
     deleteConfirm: "Excluir o banner '{name}'? Esta ação não pode ser desfeita.",
-    limitReached: 'Limite de 5 banners ativos atingido (incluindo o banner do evento atual). Desative outro banner antes de ativar este.',
+    limitReached: 'Limite de 5 banners ativos atingido (incluindo o banner da edição atual). Desative outro banner antes de ativar este.',
   },
 
   schedules: {
@@ -324,8 +330,8 @@ const t = {
     // Link no rodapé dos cards "O que é o Scoliosis Day" (Home e Edições).
     learnMore: 'Saiba mais',
     // Abre o modal de detalhes nos cards de pessoa (organizadores, curadoria, Hall de Estrelas).
-    viewMore: 'Ver mais',
-    // Título da seção de currículo no modal "Ver mais" do PersonCard.
+    viewMore: 'Ver detalhes',
+    // Título da seção de currículo no modal "Ver detalhes" do PersonCard.
     personModalCurriculumTitle: 'Currículo',
 
     // ── Edições (/edicoes) ──
@@ -334,6 +340,13 @@ const t = {
     starsTitle: 'Presenças confirmadas',
     // {ordinal} vem de utils/ordinal.js — "1ª", "2ª"...
     editionBadge: '{ordinal} Edição',
+
+    // Página de arquivo de edição passada (ver EditionArchive.jsx) — só o
+    // essencial de acessibilidade; título/subtítulo/estatísticas são
+    // conteúdo do admin (traduzido via useTranslatedContent, não daqui).
+    archiveGalleryOpenLabel: 'Ver galeria completa',
+    // {current}/{total} via .replace(), mesmo padrão de editionBadge acima.
+    archiveGalleryCounter: '{current} de {total}',
 
     // Modalidades e valores
     pricingInPersonBadge: 'Presencial',
@@ -349,9 +362,10 @@ const t = {
     // Patrocinadores
     sponsorsTitle: 'Patrocinadores',
 
-    // Quem faz o Scoliosis Day / Curadoria Científica
-    // "Scoliosis Day" no título é <BrandWordmark /> — ver AboutPage/EditionsPage.
-    organizersTitleMain: 'Quem faz o',
+    // Comissão organizadora (só em /sobre) / Curadoria Científica.
+    // organizersTitle é texto simples — sem <BrandWordmark />, ao contrário
+    // do título antigo ("Quem faz o Scoliosis Day"); ver AboutPage.jsx.
+    organizersTitle: 'Comissão organizadora',
     curatorsTitle: 'Curadoria científica',
 
     // ── Home · Apoiadores (esteira) ──
@@ -389,7 +403,6 @@ const t = {
     hallOfStarsPageHeroTitle: 'Hall de Estrelas',
     hallOfStarsPageHeroSubtitle: 'Os maiores nomes do tratamento da escoliose reunidos no Scoliosis Day.',
     hallOfStarsPageFeaturedTitle: 'Palestrantes em destaque',
-    hallOfStarsPageFeaturedBadge: 'Destaque',
     hallOfStarsPageAllTitle: 'Todos os palestrantes',
     hallOfStarsPageSearchPlaceholder: 'Buscar por nome…',
     hallOfStarsPageEmptyTitle: 'Nenhum palestrante encontrado',
@@ -407,18 +420,19 @@ const t = {
 
     // Patrocinadores — CTA de captação (/sobre, /edicoes e /patrocinadores)
     sponsorCta: 'Seja um Patrocinador',
-    // Endereço próprio, não t.site.contactEmail — esse é o do rodapé, e não
-    // pode mudar junto só porque o CTA de patrocínio mudou de destino.
+    // Endereço próprio, não ligado ao contato do rodapé — não pode mudar
+    // junto só porque o CTA de patrocínio mudou de destino.
     sponsorCtaEmail: 'scoliosisday@gmail.com',
 
-    // Rodapé
+    // Rodapé — coluna "Acompanhe" (antes "Contato") só tem o ícone do
+    // Instagram, desde que o e-mail saiu dela numa rodada anterior — o
+    // rótulo mudou pra refletir isso (ver PublicFooter.jsx).
     footerTagline: 'O maior encontro sobre escoliose do Brasil, reunindo cirurgiões, fisioterapeutas e profissionais da saúde.',
     footerAbteText: 'Com apoio da Associação Brasileira de Tratamento da Escoliose (ABTE).',
     footerNavLabel: 'Navegação do rodapé',
     footerSiteMap: 'Navegue',
-    footerContactTitle: 'Contato',
-    contactEmail: 'scoliosisday@gmail.com',
-    // Não é mais exibido como texto — vira aria-label do link-ícone do
+    footerFollowTitle: 'Acompanhe',
+    // Não é exibido como texto — vira aria-label do link-ícone do
     // Instagram no rodapé (ver PublicFooter.jsx).
     contactInstagram: '@scoliosisday',
     footerCopyright: '© {year} Scoliosis Day. Todos os direitos reservados.',

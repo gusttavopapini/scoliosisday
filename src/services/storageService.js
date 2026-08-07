@@ -31,6 +31,10 @@ export const UPLOAD_PRESETS = {
     maxSizeMB: 5,
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
   },
+  eventGallery: {
+    maxSizeMB: 5,
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+  },
   testimonialVideo: {
     maxSizeMB: 100,
     allowedTypes: ['video/mp4'],

@@ -1,7 +1,14 @@
 // src/features/events/components/steps/EventStep5.jsx
-// Passo 5: Conteúdo Visual — Depoimentos, Vídeos, Galeria, Cores
+// Passo 5: Conteúdo Visual — Depoimentos, Galeria/Arquivo da edição, Cores
+//
+// "Página de arquivo" (archiveTitle/archiveSubtitle/gallery/archiveStats):
+// conteúdo da edição só exibido em /edicoes quando o evento NÃO é o atual
+// (ver EditionArchive.jsx) — mas preenchível aqui independente de
+// isCurrent, pra dar tempo do staff montar o arquivo antes da edição virar
+// passado.
 
 import { useFieldArray } from 'react-hook-form';
+import GalleryUploader from '../GalleryUploader.jsx';
 
 const COLOR_LABELS = [
   { key: 'background', label: 'Background', cssVar: '--ev-bg' },
@@ -11,7 +18,7 @@ const COLOR_LABELS = [
   { key: 'highlight', label: 'Destaques', cssVar: '--ev-highlight' },
 ];
 
-export default function EventStep5({ register, errors, watch, control }) {
+export default function EventStep5({ register, errors, watch, control, eventId }) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'testimonials',
@@ -23,7 +30,7 @@ export default function EventStep5({ register, errors, watch, control }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div>
         <h2 className="sd-subtitle">Conteúdo Visual e Prova Social</h2>
-        <p className="sd-muted">Depoimentos, vídeos, galeria e paleta de cores</p>
+        <p className="sd-muted">Depoimentos, vídeos, página de arquivo e paleta de cores</p>
       </div>
 
       {/* ── Depoimentos textuais ── */}
@@ -96,11 +103,126 @@ export default function EventStep5({ register, errors, watch, control }) {
         </button>
       </div>
 
-      {/* ── Vídeos e Galeria (placeholders) ── */}
+      {/* ── Vídeos (placeholder) ── */}
       <div style={{ padding: 'var(--space-4)', backgroundColor: 'var(--gray-050)', borderRadius: 'var(--radius-md)' }}>
         <p className="sd-small" style={{ color: 'var(--text-muted)' }}>
-          📹 Vídeos (MP4) e 🖼️ Galeria de fotos (PNG) — Storage pendente nesta versão
+          📹 Vídeos (MP4) — Storage pendente nesta versão
         </p>
+      </div>
+
+      {/* ── Página de arquivo (exibida em /edicoes quando não é a edição atual) ── */}
+      <div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <h3 className="sd-subtitle" style={{ fontSize: 'var(--text-lg)' }}>Página de arquivo</h3>
+          <p className="sd-muted sd-small">
+            Exibida em Edições só quando esta NÃO é a edição atual. Pode ser preenchida a
+            qualquer momento — inclusive antes da edição terminar.
+          </p>
+        </div>
+
+        <label className="sd-field">
+          <span className="sd-label">Título do arquivo</span>
+          <input
+            {...register('archiveTitle')}
+            className="sd-input"
+            type="text"
+            placeholder="Ex: Como foi a 2ª edição do Scoliosis Day"
+            maxLength={120}
+          />
+          {errors.archiveTitle && <span className="sd-error">{errors.archiveTitle.message}</span>}
+        </label>
+
+        <label className="sd-field">
+          <span className="sd-label">Subtítulo do arquivo</span>
+          <textarea
+            {...register('archiveSubtitle')}
+            className="sd-textarea"
+            placeholder="Descrição breve do que essa edição foi"
+            maxLength={200}
+            rows={2}
+          />
+          {errors.archiveSubtitle && <span className="sd-error">{errors.archiveSubtitle.message}</span>}
+        </label>
+
+        <GalleryUploader control={control} watch={watch} eventId={eventId} errors={errors} />
+
+        <div style={{ marginTop: 'var(--space-5)' }}>
+          <span className="sd-label">Estatísticas (opcional)</span>
+          <p className="sd-note" style={{ marginBottom: 'var(--space-3)' }}>
+            Até 3 números em destaque (ex: "+3000" participantes). Deixe um bloco em branco
+            para não exibi-lo.
+          </p>
+
+          <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+            {[0, 1, 2].map((index) => (
+              <div key={index} className="sd-card" style={{ padding: 'var(--space-4)' }}>
+                <h4 className="sd-subtitle" style={{ fontSize: 'var(--text-md)', marginBottom: 'var(--space-3)' }}>
+                  Bloco {index + 1}
+                </h4>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-3)' }}>
+                  <label className="sd-field">
+                    <span className="sd-label">Prefixo</span>
+                    <input
+                      {...register(`archiveStats.${index}.prefix`)}
+                      className="sd-input"
+                      type="text"
+                      placeholder="Ex: +"
+                      maxLength={10}
+                    />
+                  </label>
+
+                  <label className="sd-field">
+                    <span className="sd-label">Valor</span>
+                    <input
+                      {...register(`archiveStats.${index}.value`)}
+                      className="sd-input"
+                      type="text"
+                      placeholder="Ex: 3000"
+                      maxLength={20}
+                    />
+                  </label>
+
+                  <label className="sd-field">
+                    <span className="sd-label">Sufixo</span>
+                    <input
+                      {...register(`archiveStats.${index}.suffix`)}
+                      className="sd-input"
+                      type="text"
+                      placeholder="Ex: %"
+                      maxLength={10}
+                    />
+                  </label>
+                </div>
+
+                <label className="sd-field">
+                  <span className="sd-label">Título</span>
+                  <input
+                    {...register(`archiveStats.${index}.title`)}
+                    className="sd-input"
+                    type="text"
+                    placeholder="Ex: Participantes"
+                    maxLength={60}
+                  />
+                </label>
+
+                <label className="sd-field">
+                  <span className="sd-label">Texto</span>
+                  <textarea
+                    {...register(`archiveStats.${index}.description`)}
+                    className="sd-textarea"
+                    placeholder="Breve descrição do número acima"
+                    maxLength={200}
+                    rows={2}
+                  />
+                </label>
+              </div>
+            ))}
+          </div>
+          {errors.archiveStats?.message && (
+            <span className="sd-error">{errors.archiveStats.message}</span>
+          )}
+        </div>
       </div>
 
       {/* ── Paleta de cores ── */}

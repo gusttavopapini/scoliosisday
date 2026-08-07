@@ -5,8 +5,8 @@
 
 import PersonCard from '../editions/PersonCard.jsx';
 
-/** @param {{ title: string, badge: string, people: object[] }} props */
-export default function FeaturedSpeakers({ title, badge, people }) {
+/** @param {{ title: string, people: object[] }} props */
+export default function FeaturedSpeakers({ title, people }) {
   if (people.length === 0) return null;
 
   return (
@@ -19,9 +19,9 @@ export default function FeaturedSpeakers({ title, badge, people }) {
           </div>
         </header>
 
-        <div className="sd-grid sd-grid--4">
+        <div className="sdp-people-grid">
           {people.map((person) => (
-            <PersonCard key={person.id} person={person} badge={badge} className="sdp-people-card--clamp-2" />
+            <PersonCard key={person.id} person={person} />
           ))}
         </div>
       </div>

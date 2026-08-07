@@ -46,7 +46,7 @@ export default function SponsorsPage() {
   }
 
   // Cascata primeiro: remove o id de events.sponsors e só então apaga
-  // o documento. Se a cascata falhar, o patrocinador continua existindo
+  // o documento. Se a cascata falhar, a marca continua existindo
   // e nenhum evento fica apontando para um documento inexistente.
   async function handleDeleteConfirm() {
     if (!deleteTarget?.id) return;
@@ -59,11 +59,11 @@ export default function SponsorsPage() {
       setDeleteTarget(null);
       toast.success(
         affected > 0
-          ? `Patrocinador excluído e removido de ${affected} evento${affected !== 1 ? 's' : ''}.`
-          : 'Patrocinador excluído com sucesso!',
+          ? `Marca excluída e removida de ${affected} evento${affected !== 1 ? 's' : ''}.`
+          : 'Marca excluída com sucesso!',
       );
     } catch (error) {
-      toast.error(error.message || 'Erro ao excluir patrocinador');
+      toast.error(error.message || 'Erro ao excluir marca');
     } finally {
       setIsCascading(false);
     }
@@ -97,7 +97,7 @@ export default function SponsorsPage() {
 
           {/* ── Busca ── */}
           {!isEmpty && (
-            <div className="sda-toolbar" role="search" aria-label="Busca de patrocinadores">
+            <div className="sda-toolbar" role="search" aria-label="Busca de marcas">
               <label className="sd-field sda-toolbar__search">
                 <span className="sr-only">Buscar por nome…</span>
                 <span
@@ -188,7 +188,7 @@ export default function SponsorsPage() {
             >
               {filtered.length === 0
                 ? t.common.noResults
-                : `${filtered.length} patrocinador${filtered.length !== 1 ? 'es' : ''} encontrado${filtered.length !== 1 ? 's' : ''}`}
+                : `${filtered.length} marca${filtered.length !== 1 ? 's' : ''} encontrada${filtered.length !== 1 ? 's' : ''}`}
             </p>
           )}
 
@@ -231,7 +231,7 @@ export default function SponsorsPage() {
               hasNextPage={hasNextPage}
               isFetchingNextPage={isFetchingNextPage}
               onLoadMore={fetchNextPage}
-              label="Carregar mais patrocinadores"
+              label="Carregar mais marcas"
             />
           )}
         </div>
@@ -240,7 +240,7 @@ export default function SponsorsPage() {
       {/* ── Delete confirm modal ── */}
       {deleteTarget && (
         <ConfirmModal
-          title="Excluir patrocinador?"
+          title="Excluir marca?"
           itemName={deleteTarget.name}
           body={
             <p className="sd-small sd-muted">

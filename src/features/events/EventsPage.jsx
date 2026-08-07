@@ -54,7 +54,6 @@ export default function EventsPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [modalityFilter, setModalityFilter] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
   // Id do evento cujo switch está gravando. Enquanto houver um, todos os
   // switches ficam desabilitados: duas trocas simultâneas disputariam a
@@ -72,10 +71,9 @@ export default function EventsPage() {
     return events.filter((event) => {
       const matchesSearch = !searchQuery || event.headline.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = !statusFilter || event.status === statusFilter;
-      const matchesModality = !modalityFilter || event.modality === modalityFilter;
-      return matchesSearch && matchesStatus && matchesModality;
+      return matchesSearch && matchesStatus;
     });
-  }, [events, searchQuery, statusFilter, modalityFilter]);
+  }, [events, searchQuery, statusFilter]);
 
   function handleEdit(event) {
     navigate(`/painel/eventos/${event.id}/editar`);
@@ -84,10 +82,10 @@ export default function EventsPage() {
   function handleDuplicate(event) {
     duplicateEvent.mutate(event.id, {
       onSuccess: () => {
-        toast.success(`Evento duplicado: ${event.headline} (cópia)`);
+        toast.success(`Edição duplicada: ${event.headline} (cópia)`);
       },
       onError: (error) => {
-        toast.error(error.message || 'Erro ao duplicar evento');
+        toast.error(error.message || 'Erro ao duplicar edição');
       },
     });
   }
@@ -95,10 +93,10 @@ export default function EventsPage() {
   function handlePublish(event) {
     publishEvent.mutate(event.id, {
       onSuccess: () => {
-        toast.success(event.status === 'published' ? 'Evento despublicado' : 'Evento publicado!');
+        toast.success(event.status === 'published' ? 'Edição despublicada' : 'Edição publicada!');
       },
       onError: (error) => {
-        toast.error(error.message || 'Erro ao publicar evento');
+        toast.error(error.message || 'Erro ao publicar edição');
       },
     });
   }
@@ -110,13 +108,13 @@ export default function EventsPage() {
     try {
       if (isChecked) {
         await setCurrentEvent.mutateAsync(event.id);
-        toast.success(`${event.headline} agora é o evento atual`);
+        toast.success(`${event.headline} agora é a edição atual`);
       } else {
         await clearCurrentEvent.mutateAsync(event.id);
-        toast.success(`${event.headline} não é mais o evento atual`);
+        toast.success(`${event.headline} não é mais a edição atual`);
       }
     } catch (error) {
-      toast.error(error.message || 'Erro ao alterar o evento atual');
+      toast.error(error.message || 'Erro ao alterar a edição atual');
     } finally {
       setTogglingId(null);
     }
@@ -127,10 +125,10 @@ export default function EventsPage() {
       deleteEvent.mutate(deleteTarget.id, {
         onSuccess: () => {
           setDeleteTarget(null);
-          toast.success('Evento excluído com sucesso!');
+          toast.success('Edição excluída com sucesso!');
         },
         onError: (error) => {
-          toast.error(error.message || 'Erro ao excluir evento');
+          toast.error(error.message || 'Erro ao excluir edição');
         },
       });
     }
@@ -143,12 +141,11 @@ export default function EventsPage() {
   // filtros continuam visíveis aqui — é para isso que servem: o usuário
   // precisa vê-los para poder mudar ou limpar a seleção.
   const hasNoFilterMatches = events.length > 0 && filtered.length === 0;
-  const hasActiveFilters = Boolean(searchQuery || statusFilter || modalityFilter);
+  const hasActiveFilters = Boolean(searchQuery || statusFilter);
 
   function handleClearFilters() {
     setSearchQuery('');
     setStatusFilter('');
-    setModalityFilter('');
   }
 
   return (
@@ -158,22 +155,26 @@ export default function EventsPage() {
           {/* ── Cabeçalho ── */}
           <header className="sda-pagehead">
             <div className="sda-pagehead__meta">
-              <h1 className="sd-display sd-display--sm sd-display--upright">Eventos</h1>
-              <p className="sd-muted sd-small">Gestão completa de eventos</p>
+              <h1 className="sd-display sd-display--sm sd-display--upright">Edições</h1>
+              <p className="sd-muted sd-small">Gestão completa de edições</p>
             </div>
             <button
               className="sd-btn sd-btn--primary"
               type="button"
               onClick={() => navigate('/painel/eventos/novo')}
               disabled={isLoading}
-              aria-label="Criar evento"
+              aria-label="Criar edição"
             >
               <Plus size={16} aria-hidden="true" />
-              Novo evento
+              Nova edição
             </button>
           </header>
 
-          {/* ── Filtros e Busca — sempre visíveis, mesmo sem resultado ── */}
+          {/* ── Filtros e Busca — sempre visíveis, mesmo sem resultado ──
+              Sem filtro de Modalidade: eventSchema fixa modality em
+              z.literal('hybrid') (ver MODALITY_OPTIONS acima), então toda
+              edição é sempre híbrida — o filtro nunca excluía nada, só
+              oferecia "Todas"/"Híbrido" como opções equivalentes. */}
           <div className="sd-card" style={{ marginBottom: 'var(--space-6)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--space-4)' }}>
               <label className="sd-field">
@@ -197,24 +198,6 @@ export default function EventsPage() {
                   >
                     <option value="">Todos</option>
                     {STATUS_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </span>
-              </label>
-
-              <label className="sd-field">
-                <span className="sd-label">Modalidade</span>
-                <span className="sd-select-wrap">
-                  <select
-                    className="sd-select"
-                    value={modalityFilter}
-                    onChange={(e) => setModalityFilter(e.target.value)}
-                  >
-                    <option value="">Todas</option>
-                    {MODALITY_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
                         {opt.label}
                       </option>
@@ -246,12 +229,12 @@ export default function EventsPage() {
 
           {/* ── Empty state: filtros não bateram com nada ── */}
           {hasNoFilterMatches && (
-            <div className="sda-empty" role="status" aria-label="Nenhum evento encontrado">
+            <div className="sda-empty" role="status" aria-label="Nenhuma edição encontrada">
               <span className="sd-icon-badge sd-icon-badge--lg sd-icon-badge--teal-soft" aria-hidden="true">
                 <SearchX size={32} />
               </span>
-              <h2 className="sd-display sd-display--sm sd-display--upright">Nenhum evento encontrado</h2>
-              <p className="sd-muted">Nenhum evento corresponde aos filtros selecionados.</p>
+              <h2 className="sd-display sd-display--sm sd-display--upright">Nenhuma edição encontrada</h2>
+              <p className="sd-muted">Nenhuma edição corresponde aos filtros selecionados.</p>
               <button className="sd-btn sd-btn--primary" type="button" onClick={handleClearFilters}>
                 <Filter size={16} aria-hidden="true" />
                 Limpar filtros
@@ -318,8 +301,10 @@ export default function EventsPage() {
                     )}
                   </div>
 
-                  {/* Switch de evento atual. stopPropagation porque o card
-                      inteiro navega para a edição ao ser clicado. */}
+                  {/* Switch de edição atual. stopPropagation porque o card
+                      inteiro navega para a edição de conteúdo ao ser
+                      clicado (mesma palavra, dois sentidos diferentes aqui:
+                      "edição" do Scoliosis Day vs. "editar" o formulário). */}
                   <div
                     style={{ marginBottom: 'var(--space-3)' }}
                     onClick={(e) => e.stopPropagation()}
@@ -332,7 +317,7 @@ export default function EventsPage() {
                         onChange={(e) => handleToggleCurrent(event, e.target.checked)}
                       />
                       <span className="sda-switch__track" aria-hidden="true" />
-                      <span className="sda-switch__label">Evento atual</span>
+                      <span className="sda-switch__label">Edição atual</span>
                     </label>
                   </div>
 
@@ -356,7 +341,7 @@ export default function EventsPage() {
                       type="button"
                       onClick={() => handleEdit(event)}
                       title="Editar"
-                      aria-label="Editar evento"
+                      aria-label="Editar edição"
                     >
                       <span style={{ color: 'var(--teal-600)', fontSize: '16px' }}>✎</span>
                     </button>
@@ -365,7 +350,7 @@ export default function EventsPage() {
                       type="button"
                       onClick={() => handleDuplicate(event)}
                       title="Duplicar"
-                      aria-label="Duplicar evento"
+                      aria-label="Duplicar edição"
                     >
                       <Copy size={15} style={{ color: 'var(--teal-600)' }} aria-hidden="true" />
                     </button>
@@ -387,7 +372,7 @@ export default function EventsPage() {
                       type="button"
                       onClick={() => setDeleteTarget(event)}
                       title="Excluir"
-                      aria-label="Excluir evento"
+                      aria-label="Excluir edição"
                     >
                       <Trash2 size={15} style={{ color: 'var(--danger)' }} aria-hidden="true" />
                     </button>
@@ -403,7 +388,7 @@ export default function EventsPage() {
               hasNextPage={hasNextPage}
               isFetchingNextPage={isFetchingNextPage}
               onLoadMore={fetchNextPage}
-              label="Carregar mais eventos"
+              label="Carregar mais edições"
             />
           )}
         </div>
@@ -412,7 +397,7 @@ export default function EventsPage() {
       {/* ── Delete confirm modal ── */}
       {deleteTarget && (
         <ConfirmModal
-          title="Excluir evento?"
+          title="Excluir edição?"
           itemName={deleteTarget.headline}
           warning={t.common.deleteConfirmBody}
           isBusy={deleteEvent.isPending}

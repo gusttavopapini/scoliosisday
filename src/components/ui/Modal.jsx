@@ -32,6 +32,7 @@ function getFocusable(container) {
  *   children: React.ReactNode,
  *   isBusy?: boolean,
  *   closeOnOverlay?: boolean,
+ *   panelClassName?: string,
  * }} props
  */
 export default function Modal({
@@ -40,6 +41,7 @@ export default function Modal({
   children,
   isBusy = false,
   closeOnOverlay = true,
+  panelClassName,
 }) {
   const panelRef = useRef(null);
   const restoreFocusRef = useRef(null);
@@ -96,7 +98,11 @@ export default function Modal({
         onClick={() => closeOnOverlay && !isBusy && onClose()}
         aria-hidden="true"
       />
-      <div className="sda-modal__panel" ref={panelRef} tabIndex={-1}>
+      <div
+        className={`sda-modal__panel${panelClassName ? ` ${panelClassName}` : ''}`}
+        ref={panelRef}
+        tabIndex={-1}
+      >
         {children}
       </div>
     </div>

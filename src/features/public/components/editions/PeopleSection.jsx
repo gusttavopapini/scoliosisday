@@ -6,9 +6,9 @@
 import PersonCard from './PersonCard.jsx';
 
 /**
- * @param {{ title: string, people: object[], showType?: boolean, headingClassName?: string }} props
+ * @param {{ title: string, people: object[], headingClassName?: string }} props
  */
-export default function PeopleSection({ title, people, showType = false, headingClassName = '' }) {
+export default function PeopleSection({ title, people, headingClassName = '' }) {
   if (people.length === 0) return null;
 
   return (
@@ -23,7 +23,7 @@ export default function PeopleSection({ title, people, showType = false, heading
 
         <div className="sdp-people-grid">
           {people.map((person) => (
-            <PersonCard key={person.id} person={person} showType={showType} />
+            <PersonCard key={person.id} person={person} />
           ))}
         </div>
       </div>

@@ -45,9 +45,9 @@ export default function AllSpeakers({ title, searchPlaceholder, emptyTitle, empt
         )}
 
         {filtered.length > 0 ? (
-          <div className="sd-grid sd-grid--4">
+          <div className="sdp-people-grid">
             {filtered.map((person) => (
-              <PersonCard key={person.id} person={person} className="sdp-people-card--clamp-2" />
+              <PersonCard key={person.id} person={person} />
             ))}
           </div>
         ) : people.length > 0 ? (

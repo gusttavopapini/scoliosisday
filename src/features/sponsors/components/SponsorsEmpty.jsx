@@ -11,9 +11,9 @@ export default function SponsorsEmpty({ onCreate }) {
         <Building2 size={28} aria-hidden="true" />
       </span>
       <h2 className="sd-display sd-display--sm sd-display--upright">
-        Nenhum patrocinador
+        Nenhuma marca
       </h2>
-      <p className="sd-muted">Comece adicionando seu primeiro patrocinador ao evento.</p>
+      <p className="sd-muted">Comece adicionando sua primeira marca ao evento.</p>
       <button className="sd-btn sd-btn--primary" type="button" onClick={onCreate}>
         <Plus size={16} aria-hidden="true" /> {t.common.create}
       </button>

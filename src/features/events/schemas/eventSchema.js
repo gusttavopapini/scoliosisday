@@ -49,7 +49,34 @@ export const eventSchema = z.object({
     })
   ).optional().default([]),
   videos: z.array(z.string()).optional().default([]),
-  gallery: z.array(z.string()).optional().default([]),
+  // Galeria da "página de arquivo" (corpo exibido em /edicoes quando o
+  // evento NÃO é o atual — ver EditionArchive.jsx). `featured` marca até 3
+  // fotos pro leque em destaque; o resto só aparece no lightbox da galeria
+  // completa. Preenchível independente de isCurrent — staff pode montar o
+  // arquivo antes mesmo da edição terminar.
+  gallery: z.array(
+    z.object({
+      url: z.string(),
+      featured: z.boolean().optional().default(false),
+    })
+  ).max(20, 'Máximo 20 fotos').optional().default([]),
+  // Título/subtítulo da página de arquivo — distintos de headline/subtitle
+  // (esses são do hero, sempre visíveis; archiveTitle só aparece no corpo
+  // condicional de edição passada).
+  archiveTitle: z.string().max(120, 'Máximo 120 caracteres').optional(),
+  archiveSubtitle: z.string().max(200, 'Máximo 200 caracteres').optional(),
+  // 3 blocos fixos (mesmo padrão de `presentation`), cada campo opcional —
+  // uma edição pode preencher só alguns blocos, e o site público oculta os
+  // vazios individualmente (ver hasArchiveStat em utils/eventArchive.js).
+  archiveStats: z.array(
+    z.object({
+      prefix: z.string().max(10, 'Máximo 10 caracteres').optional(),
+      value: z.string().max(20, 'Máximo 20 caracteres').optional(),
+      suffix: z.string().max(10, 'Máximo 10 caracteres').optional(),
+      title: z.string().max(60, 'Máximo 60 caracteres').optional(),
+      description: z.string().max(200, 'Máximo 200 caracteres').optional(),
+    })
+  ).length(3, 'Devem existir exatamente 3 blocos').optional(),
   colors: z.object({
     background: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório'),
     text: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório'),
@@ -106,6 +133,9 @@ export const eventStepSchema = {
     testimonials: true,
     videos: true,
     gallery: true,
+    archiveTitle: true,
+    archiveSubtitle: true,
+    archiveStats: true,
     colors: true,
   }),
 };

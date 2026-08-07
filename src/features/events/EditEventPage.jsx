@@ -23,14 +23,14 @@ export default function EditEventPage() {
   }
 
   return (
-    <AppShell activeNav="events" breadcrumb="Editar evento">
+    <AppShell activeNav="events" breadcrumb="Editar edição">
       <div className="sda-content">
         <header className="sda-pagehead">
           <div className="sda-pagehead__meta">
             <h1 className="sd-display sd-display--sm sd-display--upright">
-              Editar Evento
+              Editar Edição
             </h1>
-            <p className="sd-muted sd-small">Atualize as informações do evento</p>
+            <p className="sd-muted sd-small">Atualize as informações da edição</p>
           </div>
         </header>
 

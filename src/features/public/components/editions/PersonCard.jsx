@@ -1,36 +1,33 @@
 // src/features/public/components/editions/PersonCard.jsx
 // Card de pessoa do site público — reaproveitado por Presenças Confirmadas,
 // Quem faz o Scoliosis Day, Curadoria Científica (Seções 2, 7 e 8 de
-// /edicoes) e pelo Hall de Estrelas. A tag é opcional e tem duas fontes
-// possíveis: `showType` mostra o tipo do colaborador (ex.: "Palestrante"),
-// `badge` mostra um rótulo fixo escolhido por quem chama (ex.: "Destaque") —
-// nunca os dois ao mesmo tempo, badge vence se as duas vierem.
+// /edicoes) e pelo Hall de Estrelas (Destaque e Todos).
 //
-// className passa a classe para o <article>: some grade quer o clamp da bio
-// em 2 linhas em vez das 3 padrão (.sdp-people-grid), sem precisar de uma
-// nova prop dedicada só pra isso.
+// Reformulação: foto sem pill de nome sobreposto, sem cargo/função e sem
+// badge "Destaque" visíveis no card — só foto, nome (texto simples) +
+// bandeira opcional na mesma linha, e o botão "Ver detalhes" (pill) abaixo,
+// os dois alinhados à esquerda. O tipo do colaborador (era usado para o
+// cargo no card) e a mini bio (removida numa rodada anterior) continuam
+// disponíveis só dentro do modal.
 
 import { useState } from 'react';
 import AvatarInitials from '../../../../components/ui/AvatarInitials.jsx';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
-import { useTranslatedContent } from '../../../../hooks/useTranslatedContent.js';
+import { countryFlagEmoji } from '../../../../utils/countryFlags.js';
 import PersonModal from './PersonModal.jsx';
 
-/**
- * @param {{ person: object, showType?: boolean, badge?: string, className?: string }} props
- */
-export default function PersonCard({ person, showType = false, badge, className }) {
+/** @param {{ person: object }} props */
+export default function PersonCard({ person }) {
   const { t } = useLanguage();
-  // fullName é nome próprio, nunca traduzido — só a minibio passa pela API.
-  const { translated, isTranslating } = useTranslatedContent(person, ['minibio']);
-  // "Ver mais" abre o modal de detalhes — não há página de detalhe por
-  // colaborador no site ainda, então não há pra onde linkar.
+  // "Ver detalhes" abre o modal — não há página de detalhe por colaborador
+  // no site ainda, então não há pra onde linkar.
   const [showModal, setShowModal] = useState(false);
 
-  const tagLabel = badge || (showType && person.type ? t.collaboratorType[person.type] : null);
+  const flagEmoji = person.flag ? countryFlagEmoji(person.flag) : '';
+  const typeLabel = person.type ? t.collaboratorType[person.type] : null;
 
   return (
-    <article className={`sd-card sdp-people-card${className ? ` ${className}` : ''}`}>
+    <article className="sd-card sdp-people-card">
       <div className="sdp-people-card__media">
         <AvatarInitials
           name={person.fullName}
@@ -38,26 +35,27 @@ export default function PersonCard({ person, showType = false, badge, className 
           id={person.id}
           className="sdp-people-card__photo"
         />
-        <span className="sdp-people-card__name-pill">{person.fullName}</span>
       </div>
-      {tagLabel && <p className="sdp-people-card__role">{tagLabel}</p>}
-      {translated.minibio && (
-        <p className="sd-card__body sdp-people-card__bio">
-          <span className={isTranslating ? 'sdp-translating' : undefined}>{translated.minibio}</span>
-        </p>
-      )}
-      {(translated.minibio || person.curriculum) && (
-        <button type="button" className="sdp-people-card__more" onClick={() => setShowModal(true)}>
-          {t.site.viewMore}
-        </button>
-      )}
+
+      <div className="sdp-people-card__row">
+        <span className="sdp-people-card__name">{person.fullName}</span>
+        {flagEmoji && (
+          <span className="sdp-people-card__flag" aria-hidden="true">{flagEmoji}</span>
+        )}
+      </div>
+
+      <button
+        type="button"
+        className="sd-btn sd-btn--outline sd-btn--sm sdp-people-card__more"
+        onClick={() => setShowModal(true)}
+      >
+        {t.site.viewMore}
+      </button>
 
       {showModal && (
         <PersonModal
           person={person}
-          tagLabel={tagLabel}
-          minibio={translated.minibio}
-          isTranslating={isTranslating}
+          tagLabel={typeLabel}
           onClose={() => setShowModal(false)}
         />
       )}

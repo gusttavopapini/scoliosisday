@@ -1,8 +1,8 @@
 // src/features/public/components/sponsors/AllSponsors.jsx
-// Seção única de /patrocinadores: todos os patrocinadores cadastrados na
-// coleção, sem filtro por evento. Sem cadastro nenhum, mostra estado vazio
-// em vez de sumir — a página inteira gira em torno desta seção, não faz
-// sentido ela desaparecer.
+// Seção única de /patrocinadores: recebe já filtrado por
+// PublicSponsorsPage.jsx (type === 'patrocinador', sem filtro por evento).
+// Sem cadastro nenhum, mostra estado vazio em vez de sumir — a página
+// inteira gira em torno desta seção, não faz sentido ela desaparecer.
 
 import { Building2 } from 'lucide-react';
 import SponsorCard from './SponsorCard.jsx';

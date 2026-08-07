@@ -6,14 +6,14 @@ import EventForm from './components/EventForm.jsx';
 
 export default function CreateEventPage() {
   return (
-    <AppShell activeNav="events" breadcrumb="Novo evento">
+    <AppShell activeNav="events" breadcrumb="Nova edição">
       <div className="sda-content">
         <header className="sda-pagehead">
           <div className="sda-pagehead__meta">
             <h1 className="sd-display sd-display--sm sd-display--upright">
-              Criar Evento
+              Criar Edição
             </h1>
-            <p className="sd-muted sd-small">Configure o evento em 5 passos</p>
+            <p className="sd-muted sd-small">Configure a edição em 5 passos</p>
           </div>
         </header>
 

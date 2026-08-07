@@ -1,5 +1,6 @@
 // src/features/public/components/editions/PersonModal.jsx
-// Modal "Ver mais" do PersonCard — foto, nome, cargo, minibio e currículo.
+// Modal "Ver mais" do PersonCard — foto, nome, cargo e currículo. Mini bio
+// removida (campo saiu do formulário de Colaboradores no painel).
 // Reaproveita o primitivo Modal.jsx do painel (foco, Esc, clique fora já
 // resolvidos ali) só com conteúdo/visual sdp-* por dentro.
 //
@@ -14,9 +15,9 @@ import AvatarInitials from '../../../../components/ui/AvatarInitials.jsx';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
 
 /**
- * @param {{ person: object, tagLabel?: string, minibio?: string, isTranslating?: boolean, onClose: () => void }} props
+ * @param {{ person: object, tagLabel?: string, onClose: () => void }} props
  */
-export default function PersonModal({ person, tagLabel, minibio, isTranslating, onClose }) {
+export default function PersonModal({ person, tagLabel, onClose }) {
   const { t } = useLanguage();
 
   return (
@@ -42,12 +43,6 @@ export default function PersonModal({ person, tagLabel, minibio, isTranslating, 
         />
 
         {tagLabel && <p className="sdp-people-modal__role">{tagLabel}</p>}
-
-        {minibio && (
-          <p className="sdp-people-modal__bio">
-            <span className={isTranslating ? 'sdp-translating' : undefined}>{minibio}</span>
-          </p>
-        )}
 
         {person.curriculum && (
           <div className="sdp-people-modal__curriculum">

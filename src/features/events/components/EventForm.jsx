@@ -95,6 +95,13 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     testimonials: [],
     videos: [],
     gallery: [],
+    archiveTitle: '',
+    archiveSubtitle: '',
+    archiveStats: [
+      { prefix: '', value: '', suffix: '', title: '', description: '' },
+      { prefix: '', value: '', suffix: '', title: '', description: '' },
+      { prefix: '', value: '', suffix: '', title: '', description: '' },
+    ],
     // O schema valida /^#[0-9A-F]{6}$/i — var(--token) nunca passaria.
     colors: { ...DEFAULT_EVENT_COLORS },
     isCurrent: false,
@@ -172,12 +179,12 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
         await clearCurrentMutation.mutateAsync(draftIdRef.current);
       }
 
-      toast.success(isEditMode ? 'Evento atualizado e publicado!' : 'Evento criado e publicado!');
+      toast.success(isEditMode ? 'Edição atualizada e publicada!' : 'Edição criada e publicada!');
       navigate('/painel/eventos');
       onSuccess?.();
     } catch (error) {
-      console.error('Erro ao salvar evento:', error);
-      toast.error(error.message || 'Erro ao salvar evento');
+      console.error('Erro ao salvar edição:', error);
+      toast.error(error.message || 'Erro ao salvar edição');
     }
   }
 
@@ -305,7 +312,13 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
           />
         )}
         {currentStep === 5 && (
-          <EventStep5 register={register} control={control} errors={errors} watch={watch} />
+          <EventStep5
+            register={register}
+            control={control}
+            errors={errors}
+            watch={watch}
+            eventId={draftIdRef.current}
+          />
         )}
       </div>
 
@@ -372,7 +385,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
               className="sd-btn sd-btn--primary"
               disabled={isSubmitting || saveMutation.isPending}
             >
-              {isEditMode ? 'Atualizar' : 'Publicar'} Evento
+              {isEditMode ? 'Atualizar' : 'Publicar'} Edição
             </button>
           )}
         </div>

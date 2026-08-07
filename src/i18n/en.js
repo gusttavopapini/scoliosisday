@@ -321,8 +321,8 @@ const t = {
     // Link no rodapé dos cards "O que é o Scoliosis Day" (Home e Edições).
     learnMore: 'Learn more',
     // Abre o modal de detalhes nos cards de pessoa (organizadores, curadoria, Hall de Estrelas).
-    viewMore: 'View more',
-    // Título da seção de currículo no modal "Ver mais" do PersonCard.
+    viewMore: 'View details',
+    // Título da seção de currículo no modal "Ver detalhes" do PersonCard.
     personModalCurriculumTitle: 'Curriculum',
 
     // ── Edições (/edicoes) ──
@@ -331,6 +331,10 @@ const t = {
     starsTitle: 'Confirmed speakers',
     // {ordinal} comes from utils/ordinal.js — "1st", "2nd"...
     editionBadge: '{ordinal} Edition',
+
+    // Past edition's archive page (see EditionArchive.jsx).
+    archiveGalleryOpenLabel: 'View full gallery',
+    archiveGalleryCounter: '{current} of {total}',
 
     // Modalidades e valores
     pricingInPersonBadge: 'In Person',
@@ -346,9 +350,8 @@ const t = {
     // Patrocinadores
     sponsorsTitle: 'Sponsors',
 
-    // Quem faz o Scoliosis Day / Curadoria Científica
-    // "Scoliosis Day" no título é <BrandWordmark /> — ver AboutPage/EditionsPage.
-    organizersTitleMain: 'Who Makes',
+    // Organizing Committee (only on /about) / Scientific curation.
+    organizersTitle: 'Organizing Committee',
     curatorsTitle: 'Scientific curation',
 
     // ── Home · Apoiadores (esteira) ──
@@ -385,7 +388,6 @@ const t = {
     hallOfStarsPageHeroTitle: 'Hall of Stars',
     hallOfStarsPageHeroSubtitle: 'The biggest names in scoliosis treatment gathered at Scoliosis Day.',
     hallOfStarsPageFeaturedTitle: 'Featured speakers',
-    hallOfStarsPageFeaturedBadge: 'Featured',
     hallOfStarsPageAllTitle: 'All speakers',
     hallOfStarsPageSearchPlaceholder: 'Search by name…',
     hallOfStarsPageEmptyTitle: 'No speakers found',
@@ -410,8 +412,7 @@ const t = {
     footerAbteText: 'Supported by the Brazilian Scoliosis Treatment Association (ABTE).',
     footerNavLabel: 'Footer navigation',
     footerSiteMap: 'Browse',
-    footerContactTitle: 'Contact',
-    contactEmail: 'scoliosisday@gmail.com',
+    footerFollowTitle: 'Follow',
     contactInstagram: '@scoliosisday',
     footerCopyright: '© {year} Scoliosis Day. All rights reserved.',
 

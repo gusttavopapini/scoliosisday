@@ -77,19 +77,19 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
           id: initialData.id,
           data: { ...data, website },
         });
-        toast.success('Patrocinador atualizado com sucesso!');
+        toast.success('Marca atualizada com sucesso!');
       } else {
         await createMutation.mutateAsync({
           id: documentIdRef.current,
           data: { ...data, website },
         });
-        toast.success('Patrocinador criado com sucesso!');
+        toast.success('Marca criada com sucesso!');
       }
       navigate('/painel/patrocinadores');
       onSuccess?.();
     } catch (error) {
-      console.error('Erro ao salvar patrocinador:', error);
-      toast.error(error.message || 'Erro ao salvar patrocinador');
+      console.error('Erro ao salvar marca:', error);
+      toast.error(error.message || 'Erro ao salvar marca');
     }
   }
 
@@ -97,18 +97,18 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
     setIsDeleting(true);
     try {
       // Cascata antes da exclusão: nenhum evento pode ficar apontando
-      // para um patrocinador que não existe mais.
+      // para uma marca que não existe mais.
       const affected = await cascadeSponsor(initialData.id);
       await deleteMutation.mutateAsync(initialData.id);
       toast.success(
         affected > 0
-          ? `Patrocinador excluído e removido de ${affected} evento${affected !== 1 ? 's' : ''}.`
-          : 'Patrocinador excluído com sucesso!',
+          ? `Marca excluída e removida de ${affected} evento${affected !== 1 ? 's' : ''}.`
+          : 'Marca excluída com sucesso!',
       );
       navigate('/painel/patrocinadores');
     } catch (error) {
-      console.error('Erro ao excluir patrocinador:', error);
-      toast.error(error.message || 'Erro ao excluir patrocinador');
+      console.error('Erro ao excluir marca:', error);
+      toast.error(error.message || 'Erro ao excluir marca');
     } finally {
       setIsDeleting(false);
       setDeleteConfirmOpen(false);
@@ -158,12 +158,12 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
                 value={field.value || ''}
                 onChange={(url) => field.onChange(url || null)}
                 path={`sponsors/${documentIdRef.current}/logo`}
-                label="Logo do patrocinador"
+                label="Logo da marca"
                 {...UPLOAD_PRESETS.sponsorLogo}
               />
             )}
           />
-          <span className="sd-note">Sem logo, o nome do patrocinador é exibido no lugar.</span>
+          <span className="sd-note">Sem logo, o nome da marca é exibido no lugar.</span>
         </div>
 
         {/* ── Tipo ── */}
@@ -178,9 +178,11 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
               ))}
             </select>
           </span>
+          {/* Exclusividade mútua: cada marca aparece em UM lugar só, nunca
+              nos dois — ver PublicSponsorsPage.jsx/HomeSupporters.jsx. */}
           <span className="sd-note">
-            Apoiadores também entram na esteira de logos da Home, além da
-            grade de /patrocinadores.
+            Patrocinador aparece só na grade de /patrocinadores. Apoiador
+            aparece só na esteira de logos da Home.
           </span>
           {errors.type && (
             <span className="sd-error">{errors.type.message}</span>
@@ -223,7 +225,7 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
             disabled={isSubmitting || createMutation.isPending || updateMutation.isPending}
           >
             <Plus size={16} aria-hidden="true" />
-            {isEditMode ? 'Atualizar' : 'Criar'} Patrocinador
+            {isEditMode ? 'Atualizar' : 'Criar'} Marca
           </button>
         </div>
       </form>
@@ -231,7 +233,7 @@ export default function SponsorForm({ initialData, isEditMode = false, onSuccess
       {/* ── Delete Confirm Modal ── */}
       {deleteConfirmOpen && (
         <ConfirmModal
-          title="Excluir patrocinador?"
+          title="Excluir marca?"
           itemName={initialData?.name}
           body={
             <p className="sd-small sd-muted">

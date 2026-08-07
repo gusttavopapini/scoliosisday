@@ -192,9 +192,10 @@
   color: var(--teal-700);
 }
 
-/* Ícone do Instagram: mesmo link-hover acima (currentColor no SVG do
-   lucide-react já segue o color do <a>), só alinhado com a altura do texto
-   ao lado dele na coluna. */
+/* Ícone do Instagram: mesmo link-hover acima (currentColor no SVG segue o
+   color do <a>) — único item da coluna "Contato" desde que o e-mail saiu
+   dela; tamanho vem de width/height no <InstagramIcon> (PublicFooter.jsx),
+   não daqui. */
 .sdp-footer__instagram {
   display: inline-flex;
   align-items: center;
@@ -578,7 +579,7 @@
    <BrandWordmark />) — caixa de frase + peso Book (400) real, no lugar
    do --fw-display-heavy do kit (que resolve pro Heavy 900 real e ficava
    pesado demais aqui). O texto-fonte de cada um desses (aboutTitleMain,
-   organizersTitleMain, aboutPageIntroTitleMain — ver i18n) já vem em
+   organizersTitle, aboutPageIntroTitleMain — ver i18n) já vem em
    caixa de frase certa no dicionário; só o text-transform:uppercase
    incondicional do .sd-display do kit escondia isso.
 
@@ -923,28 +924,40 @@
 }
 
 /* ============================================================
-   13. EDIÇÕES · GRADE DE PESSOAS
-   Compartilhada por Presenças Confirmadas, Quem faz o Scoliosis Day
-   e Curadoria Científica.
-   ============================================================ */
+   13. GRADE DE PESSOAS (.sdp-people-grid)
+   Compartilhada por Presenças Confirmadas, Quem faz o Scoliosis Day,
+   Curadoria Científica (Sobre e Edições) E Hall de Estrelas (Destaque e
+   Todos) — mesmo componente PersonCard.jsx, mesma grade em todo lugar.
 
+   Flex, não Grid: cada linha (completa ou não) precisa ficar centralizada,
+   nunca alinhada à esquerda quando sobra 1 ou 2 cards na última linha.
+   Grid com `1fr` faz os itens da última linha ocuparem as primeiras
+   colunas sem centralizar (é o que causava o card sozinho colado à
+   esquerda); com flex + justify-content:center + largura FIXA por card
+   (não percentual — um percentual esticaria os cards da linha
+   incompleta), o navegador centraliza a linha inteira de graça, sem
+   hack de coluna fantasma. A largura de cada card é um cálculo sobre os
+   3 (ou 2, ou 1) que cabem por linha em cada breakpoint abaixo — mesmo
+   valor pra todo card, incompleta ou não, por isso nunca estica. */
 .sdp-people-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-5);
 }
 
 .sdp-people-card {
+  flex: 0 0 calc((100% - 2 * var(--space-5)) / 3);
+  max-width: calc((100% - 2 * var(--space-5)) / 3);
   padding: var(--space-5);
   gap: var(--space-3);
 }
 
-/* ---- Foto grande + pill de nome sobreposto ----
+/* ---- Foto grande, sem pill de nome sobreposto ----
    .sdp-people-card__photo serve os dois casos, foto real (<img>) e
    fallback de iniciais (<span>, AvatarInitials.jsx) — mesma altura e
    cantos arredondados nos dois, só a forma interna muda. */
 .sdp-people-card__media {
-  position: relative;
   width: 100%;
 }
 
@@ -962,57 +975,61 @@
   color: var(--text-inverse);
 }
 
-.sdp-people-card__name-pill {
-  position: absolute;
-  top: var(--space-3);
-  left: var(--space-3);
-  max-width: calc(100% - var(--space-6));
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-pill);
-  background: var(--surface-card);
-  box-shadow:var(--shadow-md);
+/* ---- Linha nome + bandeira ----
+   space-between empurra o nome pra esquerda e a bandeira pra direita; sem
+   bandeira, o nome fica sozinho à esquerda de graça (não sobra espaço
+   reservado do lado direito — é assim que space-between se comporta com
+   um filho só). */
+.sdp-people-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.sdp-people-card__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family:var(--font-display);
   font-weight: var(--fw-display-bold);
-  font-size: var(--text-sm);
-  line-height: var(--lh-tight);
+  font-size: var(--text-md);
   color: var(--text-heading);
 }
 
-.sdp-people-card__role {
-  margin: 0;
-  font-size: var(--text-sm);
-  font-weight: var(--fw-bold);
-  color: var(--teal-700);
+.sdp-people-card__flag {
+  flex-shrink: 0;
+  font-size: var(--text-lg);
+  line-height: 1;
 }
 
-.sdp-people-card__bio {
-  font-size: var(--text-sm);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Link "Ver mais" — texto, não botão preenchido; é um <button> (abre o
-   PersonModal) estilizado pra parecer o link de texto do resto do site. */
+/* "Ver detalhes" — reaproveita o botão pill do kit (.sd-btn já nasce com
+   border-radius:pill); align-self:flex-start pra não esticar a largura
+   toda dentro da coluna flex do card. */
 .sdp-people-card__more {
   align-self: flex-start;
   margin-top: auto;
-  padding: var(--space-0);
-  border: none;
-  background: none;
-  font-family:var(--font-text);
-  font-size: var(--text-sm);
-  font-weight: var(--fw-bold);
-  color: var(--teal-700);
-  text-decoration: underline;
-  cursor: pointer;
 }
 
+/* Tablet: 2 por linha — mesma lógica de largura fixa calculada. */
+@media (max-width: 900px) {
+  .sdp-people-card {
+    flex-basis: calc((100% - var(--space-5)) / 2);
+    max-width: calc((100% - var(--space-5)) / 2);
+  }
+}
+
+/* Mobile: 1 por linha (cheia). */
 @media (max-width: 640px) {
   .sdp-people-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-3);
+  }
+
+  .sdp-people-card {
+    flex-basis: 100%;
+    max-width: 100%;
   }
 }
 
@@ -1046,11 +1063,6 @@
   text-align: center;
   font-weight: var(--fw-bold);
   color: var(--teal-700);
-}
-
-.sdp-people-modal__bio {
-  margin: 0;
-  color: var(--text-body);
 }
 
 .sdp-people-modal__curriculum {
@@ -1580,13 +1592,6 @@
    24. HALL DE ESTRELAS
    ============================================================ */
 
-/* Bio truncada em 2 linhas nos cards de palestrante — mais curto que o
-   clamp padrão de 3 linhas de .sdp-people-card__bio, porque aqui a grade
-   é .sd-grid--4 (4 colunas, cards mais estreitos que .sdp-people-grid). */
-.sdp-people-card--clamp-2 .sdp-people-card__bio {
-  -webkit-line-clamp: 2;
-}
-
 .sdp-hallofstars__search {
   max-width: 420px;
   margin-inline: auto;
@@ -2060,5 +2065,185 @@
   .sdp-quote-stack__nav {
     flex-direction: row;
   }
+}
+
+/* ============================================================
+   30. PÁGINA DE ARQUIVO DE EDIÇÃO (EditionArchive.jsx)
+   Corpo de /edicoes para uma edição PASSADA — leque de até 3 fotos em
+   destaque + até 3 blocos de estatística. Geometria do leque é um padrão
+   PRÓPRIO, diferente da pilha de depoimentos (.sdp-quote-stack): aqui as
+   fotos ficam paradas, sobrepostas em posição fixa, foto central maior e
+   à frente, as até 2 outras levemente rotacionadas para os lados atrás
+   dela — sem troca/autoplay, só abrindo o lightbox da galeria completa
+   ao clicar.
+
+   Geometria medida numa referência visual (grade sobreposta):
+     · rotação ±8°, cards laterais a ~90% do tamanho do central (scale)
+     · ~37% da largura de cada lateral escondida atrás do central
+     · recuo vertical simétrico nos dois lados — não é translateY
+       calculado à mão: todas as 3 fotos compartilham o mesmo `top:50%`
+       + `translate(-50%,-50%)` (ancora o CENTRO da foto nesse ponto,
+       não afetado por rotate()/scale() que vêm depois na mesma
+       transform — só o `left` de cada uma muda). O scale(0.9) das
+       laterais encolhe em torno desse centro comum, recuando os 4
+       lados igualmente — é isso que produz o recuo em cima E embaixo
+       sem precisar de nenhum offset vertical à parte.
+   ============================================================ */
+
+.sdp-archive-fan {
+  position: relative;
+  width: 100%;
+  /* 480px * 1.2 — todo o resto da geometria (fotos--0/1/2 abaixo) é
+     definido em % deste container, então aumentar só o max-width escala
+     o conjunto inteiro proporcionalmente sem tocar em rotação,
+     sobreposição ou recuo vertical. */
+  max-width: 576px;
+  aspect-ratio: 4 / 3;
+  margin: var(--space-12) auto var(--space-16);
+}
+
+.sdp-archive-fan__photo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 42%;
+  aspect-ratio: 4 / 5;
+  padding: var(--space-0);
+  border: var(--space-2) solid var(--surface-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-sunken);
+  box-shadow:var(--shadow-md);
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+
+.sdp-archive-fan__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Foto 0: sempre a central, maior (sem scale) e na frente. */
+.sdp-archive-fan__photo--0 {
+  left: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.sdp-archive-fan__photo--0:hover,
+.sdp-archive-fan__photo--0:focus-visible {
+  transform: translate(-50%, -50%) scale(1.04);
+  box-shadow:var(--shadow-lg);
+}
+
+/* Foto 1: atrás, rotacionada para a ESQUERDA — left:24% (não 50%) é o
+   que desloca o centro dela pra esquerda; a transform em si é igual à
+   da central + rotate/scale. */
+.sdp-archive-fan__photo--1 {
+  left: 24%;
+  z-index: 2;
+  transform: translate(-50%, -50%) rotate(-8deg) scale(0.9);
+}
+
+.sdp-archive-fan__photo--1:hover,
+.sdp-archive-fan__photo--1:focus-visible {
+  transform: translate(-50%, -50%) rotate(-8deg) scale(0.94);
+  box-shadow:var(--shadow-lg);
+}
+
+/* Foto 2: atrás, rotacionada para a DIREITA — espelho exato da 1. */
+.sdp-archive-fan__photo--2 {
+  left: 76%;
+  z-index: 2;
+  transform: translate(-50%, -50%) rotate(8deg) scale(0.9);
+}
+
+.sdp-archive-fan__photo--2:hover,
+.sdp-archive-fan__photo--2:focus-visible {
+  transform: translate(-50%, -50%) rotate(8deg) scale(0.94);
+  box-shadow:var(--shadow-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdp-archive-fan__photo {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .sdp-archive-fan {
+    /* 320px * 1.2 */
+    max-width: 384px;
+  }
+}
+
+/* ---- Estatísticas (3 colunas, sem botão) ---- */
+.sdp-archive-stats {
+  text-align: center;
+  justify-items: center;
+}
+
+.sdp-archive-stat {
+  align-items: center;
+}
+
+.sdp-archive-stat__title {
+  margin: var(--space-2) 0 0;
+  font-family:var(--font-text);
+  font-size: var(--text-md);
+  font-weight: var(--fw-semibold);
+  color: var(--text-heading);
+}
+
+.sdp-archive-stat__text {
+  margin: var(--space-1) 0 0;
+  color: var(--text-muted);
+}
+
+/* ---- Lightbox da galeria completa ----
+   Reaproveita a casca .sda-modal* do painel (Modal.jsx), inclusive o
+   fundo claro padrão — panelClassName só alarga o painel (560px é
+   estreito demais pra uma foto). */
+.sdp-archive-lightbox__panel {
+  max-width: 860px;
+}
+
+.sdp-archive-lightbox__body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  min-height: 320px;
+}
+
+.sdp-archive-lightbox__image {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+}
+
+.sdp-archive-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sdp-archive-lightbox__nav--prev {
+  left: var(--space-4);
+}
+
+.sdp-archive-lightbox__nav--next {
+  right: var(--space-4);
+}
+
+.sdp-archive-lightbox__counter {
+  margin: var(--space-0) var(--space-6) var(--space-5);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
 }
 

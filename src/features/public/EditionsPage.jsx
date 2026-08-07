@@ -25,6 +25,7 @@ import PeopleSection from './components/editions/PeopleSection.jsx';
 import EditionPricing from './components/editions/EditionPricing.jsx';
 import EditionPresentation from './components/editions/EditionPresentation.jsx';
 import EditionSchedule from './components/editions/EditionSchedule.jsx';
+import EditionArchive from './components/editions/EditionArchive.jsx';
 
 export default function EditionsPage() {
   const { t, lang } = useLanguage();
@@ -165,28 +166,38 @@ export default function EditionsPage() {
         />
       </div>
 
-      <PeopleSection
-        title={t.site.starsTitle}
-        people={starCollaborators}
-        showType
-        headingClassName="sdp-heading--regular"
-      />
+      {/* Corpo abaixo do banner: inteiramente diferente conforme a edição da
+          aba selecionada é a atual ou não — key={activeEvent.id} remonta
+          EditionArchive do zero a cada troca de aba, mesmo motivo do hero/
+          schedule acima (estado interno do lightbox não deve vazar entre
+          edições). */}
+      {activeEvent.isCurrent ? (
+        <>
+          <PeopleSection
+            title={t.site.starsTitle}
+            people={starCollaborators}
+            headingClassName="sdp-heading--regular"
+          />
 
-      <EditionPricing key={`pricing-${activeEvent.id}`} event={activeEvent} />
+          <EditionPricing key={`pricing-${activeEvent.id}`} event={activeEvent} />
 
-      <EditionPresentation event={activeEvent} />
+          <EditionPresentation event={activeEvent} />
 
-      <EditionSchedule
-        key={`schedule-${activeEvent.id}`}
-        event={activeEvent}
-        collaboratorsById={collaboratorsById}
-      />
+          <EditionSchedule
+            key={`schedule-${activeEvent.id}`}
+            event={activeEvent}
+            collaboratorsById={collaboratorsById}
+          />
 
-      <PeopleSection
-        title={t.site.curatorsTitle}
-        people={curators}
-        headingClassName="sdp-heading--regular"
-      />
+          <PeopleSection
+            title={t.site.curatorsTitle}
+            people={curators}
+            headingClassName="sdp-heading--regular"
+          />
+        </>
+      ) : (
+        <EditionArchive key={`archive-${activeEvent.id}`} event={activeEvent} />
+      )}
     </>
   );
 }

@@ -226,7 +226,7 @@ export default function BannerForm({ initialData, isEditMode = false, onSuccess 
           />
           {errors.order && <span className="sd-error">{errors.order.message}</span>}
           <span className="sd-note">
-            Mesmo espaço numérico da posição do evento atual — define a ordem
+            Mesmo espaço numérico da posição da edição atual — define a ordem
             entre todos os itens do carrossel.
           </span>
         </label>
@@ -239,8 +239,8 @@ export default function BannerForm({ initialData, isEditMode = false, onSuccess 
             <span className="sda-switch__label">Banner ativo</span>
           </label>
           <span className="sd-note">
-            Máximo de 5 banners ativos simultaneamente, contando o banner do
-            evento atual.
+            Máximo de 5 banners ativos simultaneamente, contando o banner da
+            edição atual.
           </span>
         </div>
 

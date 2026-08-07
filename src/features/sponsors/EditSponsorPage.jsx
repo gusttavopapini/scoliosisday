@@ -23,14 +23,14 @@ export default function EditSponsorPage() {
   }
 
   return (
-    <AppShell activeNav="sponsors" breadcrumb="Editar patrocinador">
+    <AppShell activeNav="sponsors" breadcrumb="Editar marca">
       <div className="sda-content">
         <header className="sda-pagehead">
           <div className="sda-pagehead__meta">
             <h1 className="sd-display sd-display--sm sd-display--upright">
-              Editar patrocinador
+              Editar marca
             </h1>
-            <p className="sd-muted sd-small">Atualize as informações do patrocinador</p>
+            <p className="sd-muted sd-small">Atualize as informações da marca</p>
           </div>
         </header>
 

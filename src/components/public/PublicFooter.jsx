@@ -72,8 +72,7 @@ export default function PublicFooter() {
             </nav>
 
             <div className="sd-footer__col">
-              <b>{t.site.footerContactTitle}</b>
-              <a href={`mailto:${t.site.contactEmail}`}>{t.site.contactEmail}</a>
+              <b>{t.site.footerFollowTitle}</b>
               <a
                 href={INSTAGRAM_URL}
                 target="_blank"
@@ -81,7 +80,7 @@ export default function PublicFooter() {
                 aria-label={t.site.contactInstagram}
                 className="sdp-footer__instagram"
               >
-                <InstagramIcon />
+                <InstagramIcon width={25} height={25} />
               </a>
             </div>
           </div>

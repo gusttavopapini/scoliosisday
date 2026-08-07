@@ -18,7 +18,7 @@ export default function EventStep1({ register, control, errors, eventId }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div>
-        <h2 className="sd-subtitle">Identidade do Evento</h2>
+        <h2 className="sd-subtitle">Identidade da Edição</h2>
         <p className="sd-muted">Configure o nome, descrição e call-to-action</p>
       </div>
 
@@ -47,7 +47,7 @@ export default function EventStep1({ register, control, errors, eventId }) {
         </div>
       ))}
 
-      {/* Posição no carrossel da Home (quando este é o evento atual) */}
+      {/* Posição no carrossel da Home (quando esta é a edição atual) */}
       <label className="sd-field" style={{ maxWidth: '260px' }}>
         <span className="sd-label">
           Posição no carrossel <span className="sd-muted">(opcional)</span>
@@ -175,16 +175,16 @@ export default function EventStep1({ register, control, errors, eventId }) {
         <span className="sd-note">URL válida que será usada no botão de inscrição</span>
       </label>
 
-      {/* Evento atual */}
+      {/* Edição atual */}
       <div className="sd-field">
         <label className="sd-checkbox">
           <input {...register('isCurrent')} type="checkbox" />
           <span className="sd-checkbox__box" aria-hidden="true" />
-          <span>Este é o evento atual</span>
+          <span>Esta é a edição atual</span>
         </label>
         <span className="sd-note">
-          Apenas um evento pode ser o atual. Ao ativar, o evento anterior será
-          desmarcado automaticamente.
+          Apenas uma edição pode ser a atual. Ao ativar, a edição anterior será
+          desmarcada automaticamente.
         </span>
       </div>
     </div>

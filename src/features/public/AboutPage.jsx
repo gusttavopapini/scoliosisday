@@ -3,8 +3,9 @@
 // patrocinadores da edição mais recente publicada, e duas listas 100%
 // globais e automáticas — organizadores (type organizer) e curadoria
 // científica (type scientific_curator) — nenhuma das duas depende de
-// evento. "Quem faz o Scoliosis Day" só existe aqui: removida de
-// /edicoes, que tinha uma seleção por evento (ver histórico em
+// evento. "Comissão organizadora" (antes "Quem faz o Scoliosis Day", sem
+// a marca no título desde então) só existe aqui: removida de /edicoes,
+// que tinha uma seleção por evento (ver histórico em
 // EventStep4.jsx/EditionsPage.jsx — curadoria ainda mantém esse modelo
 // de duas camadas lá, organizadores não mais).
 
@@ -15,7 +16,6 @@ import { useCollaborators } from '../../hooks/useCollaborators.js';
 import { useSponsors } from '../../hooks/useSponsors.js';
 import { COLLABORATOR_TYPES } from '../../utils/constants.js';
 import SimpleHero from '../../components/public/SimpleHero.jsx';
-import BrandWordmark from '../../components/BrandWordmark.jsx';
 import AboutIntro from './components/about/AboutIntro.jsx';
 import AboutRecife from './components/about/AboutRecife.jsx';
 import PeopleSection from './components/editions/PeopleSection.jsx';
@@ -58,7 +58,7 @@ export default function AboutPage() {
       <AboutRecife />
 
       <PeopleSection
-        title={<>{t.site.organizersTitleMain} <BrandWordmark /></>}
+        title={t.site.organizersTitle}
         people={organizers}
         headingClassName="sdp-heading--regular"
       />

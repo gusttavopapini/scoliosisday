@@ -169,12 +169,12 @@ export default function ProgrammingForm({ initialData, isEditMode = false, onSuc
         )}
       </label>
 
-      {/* ── Evento (opcional) ── */}
+      {/* ── Edição (opcional) ── */}
       <label className="sd-field">
-        <span className="sd-label">Evento vinculado (opcional)</span>
+        <span className="sd-label">Edição vinculada (opcional)</span>
         <span className="sd-select-wrap">
           <select {...register('eventId')} className="sd-select" disabled={isLoadingEvents}>
-            <option value="">Nenhum evento</option>
+            <option value="">Nenhuma edição</option>
             {events.map((event) => (
               <option key={event.id} value={event.id}>
                 {event.headline}
@@ -182,7 +182,7 @@ export default function ProgrammingForm({ initialData, isEditMode = false, onSuc
             ))}
           </select>
         </span>
-        <span className="sd-note">Opcional. A programação pode existir sem estar ligada a um evento.</span>
+        <span className="sd-note">Opcional. A programação pode existir sem estar ligada a uma edição.</span>
       </label>
 
       {/* ── Quantidade de dias ── */}

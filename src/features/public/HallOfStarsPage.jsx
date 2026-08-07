@@ -43,7 +43,6 @@ export default function HallOfStarsPage() {
 
       <FeaturedSpeakers
         title={t.site.hallOfStarsPageFeaturedTitle}
-        badge={t.site.hallOfStarsPageFeaturedBadge}
         people={featuredSpeakers}
       />
 
