@@ -1,34 +1,30 @@
 // src/utils/countryFlags.js
-// Bandeira do colaborador no card de pessoa (PersonCard.jsx) — emoji nativo
-// via Regional Indicator Symbols, sem precisar de upload/ícone próprio.
-// Lista curta e focada nos países mais comuns num evento médico brasileiro
-// de alcance internacional; não é exaustiva.
+// País do colaborador — lista completa (ISO 3166-1 alpha-2 + nome em
+// português) via i18n-iso-countries, ~249 países/territórios. Usada pelo
+// seletor de bandeira do formulário de Colaboradores — o painel é sempre
+// PT-BR (sem toggle de idioma), por isso só o locale 'pt' é registrado.
+//
+// A bandeira em si, no card público, é renderizada com <CircleFlag> de
+// react-circle-flags (ver PersonCard.jsx) — o código ISO alpha-2 já é
+// compatível direto com o `countryCode` esperado por ela (minúsculo; ver
+// conversão no próprio PersonCard), sem mapeamento extra entre as libs.
 
-export const COUNTRIES = [
-  { code: 'BR', name: 'Brasil' },
-  { code: 'PT', name: 'Portugal' },
-  { code: 'US', name: 'Estados Unidos' },
-  { code: 'AR', name: 'Argentina' },
-  { code: 'CL', name: 'Chile' },
-  { code: 'UY', name: 'Uruguai' },
-  { code: 'PY', name: 'Paraguai' },
-  { code: 'CO', name: 'Colômbia' },
-  { code: 'PE', name: 'Peru' },
-  { code: 'MX', name: 'México' },
-  { code: 'ES', name: 'Espanha' },
-  { code: 'FR', name: 'França' },
-  { code: 'IT', name: 'Itália' },
-  { code: 'DE', name: 'Alemanha' },
-  { code: 'GB', name: 'Reino Unido' },
-  { code: 'CA', name: 'Canadá' },
-  { code: 'JP', name: 'Japão' },
-];
+import countries from 'i18n-iso-countries';
+import ptLocale from 'i18n-iso-countries/langs/pt.json';
+
+countries.registerLocale(ptLocale);
+
+/** Todos os países/territórios ISO 3166-1, nome em português, A→Z. */
+export const COUNTRIES = Object.entries(countries.getNames('pt'))
+  .map(([code, name]) => ({ code, name }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'pt'));
 
 /**
  * Converte um código ISO 3166-1 alpha-2 (ex: "BR") no emoji de bandeira
- * correspondente. Cada letra vira um "regional indicator symbol" (par
- * substituto Unicode) — é assim que o emoji de bandeira funciona nativamente
- * em qualquer fonte de sistema, sem precisar de arquivo de imagem.
+ * correspondente — só pro <option> do <select> do formulário: HTML nativo
+ * não aceita <img>/componente dentro de <option>, apenas texto puro, e
+ * emoji funciona como texto. O card público usa <CircleFlag> de verdade,
+ * não isto.
  * @param {string} code
  * @returns {string}
  */

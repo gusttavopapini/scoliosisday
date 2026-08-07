@@ -11,9 +11,9 @@
 // disponíveis só dentro do modal.
 
 import { useState } from 'react';
+import { CircleFlag } from 'react-circle-flags';
 import AvatarInitials from '../../../../components/ui/AvatarInitials.jsx';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
-import { countryFlagEmoji } from '../../../../utils/countryFlags.js';
 import PersonModal from './PersonModal.jsx';
 
 /** @param {{ person: object }} props */
@@ -23,7 +23,6 @@ export default function PersonCard({ person }) {
   // no site ainda, então não há pra onde linkar.
   const [showModal, setShowModal] = useState(false);
 
-  const flagEmoji = person.flag ? countryFlagEmoji(person.flag) : '';
   const typeLabel = person.type ? t.collaboratorType[person.type] : null;
 
   return (
@@ -39,8 +38,14 @@ export default function PersonCard({ person }) {
 
       <div className="sdp-people-card__row">
         <span className="sdp-people-card__name">{person.fullName}</span>
-        {flagEmoji && (
-          <span className="sdp-people-card__flag" aria-hidden="true">{flagEmoji}</span>
+        {person.flag && (
+          <CircleFlag
+            countryCode={person.flag.toLowerCase()}
+            height={20}
+            width={20}
+            className="sdp-people-card__flag"
+            aria-hidden="true"
+          />
         )}
       </div>
 

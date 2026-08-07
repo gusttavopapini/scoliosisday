@@ -999,10 +999,12 @@
   color: var(--text-heading);
 }
 
+/* <CircleFlag> (react-circle-flags) renderiza um <img> — width/height já
+   vêm como prop no componente, aqui só a forma (circular, sem esticar). */
 .sdp-people-card__flag {
   flex-shrink: 0;
-  font-size: var(--text-lg);
-  line-height: 1;
+  border-radius: var(--radius-full);
+  object-fit: cover;
 }
 
 /* "Ver detalhes" — reaproveita o botão pill do kit (.sd-btn já nasce com
