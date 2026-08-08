@@ -14,6 +14,11 @@ import { useAuth } from '../hooks/useAuth.js';
 import { usePermissions } from '../hooks/usePermissions.js';
 import { AVATAR_COLORS } from '../utils/constants.js';
 import { getInitials, avatarColorIndex } from '../utils/initials.js';
+// Mesmo arquivo do site público (PublicFooter.jsx) — a variante colorida
+// (laranja/teal), não a branca do PublicNavbar.jsx: o fundo da sidebar
+// (--grad-teal, teal-700→teal-950) é da mesma família escura do fundo
+// sólido teal-950 do footer, onde essa variante já funciona hoje.
+import logoColor from '../assets/logo-color.svg';
 
 const NAV_ITEMS = [
   { key: 'dashboard',     icon: LayoutDashboard, label: t.nav.dashboard,      href: '/painel' },
@@ -62,10 +67,9 @@ export default function AppShell({ activeNav, breadcrumb, children }) {
           aria-label="Navegação principal"
         >
           <div className="sda-sidebar__logo">
-            <Link to="/painel" className="sda-sidebar__logo-text" style={{ textDecoration: 'none' }}>
-              Scoliosis<br />Day
+            <Link to="/painel" aria-label="Scoliosis Day — Painel Admin">
+              <img src={logoColor} alt="Scoliosis Day" className="sda-sidebar__logo-img" />
             </Link>
-            <span className="sda-sidebar__logo-sub">Painel Admin</span>
           </div>
 
           <nav>

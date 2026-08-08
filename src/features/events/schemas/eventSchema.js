@@ -3,7 +3,16 @@
 
 import { z } from 'zod';
 
-export const eventSchema = z.object({
+const presentationItemSchema = z.object({
+  icon: z.string().min(1, 'Ícone obrigatório'),
+  title: z.string().min(1, 'Título obrigatório').max(60, 'Máximo 60 caracteres'),
+  description: z.string().max(200, 'Máximo 200 caracteres'),
+});
+
+// Campos que existem e validam do mesmo jeito nos dois modos do wizard
+// (edição atual ou passada). O que muda entre os dois é só a obrigatoriedade
+// de cta/ctaLink/priceInPerson/priceOnline/presentation — ver eventSchema.
+const sharedEventFields = {
   headline: z.string().min(5, 'Mínimo 5 caracteres').max(120, 'Máximo 120 caracteres'),
   subtitle: z.string().max(200, 'Máximo 200 caracteres'),
   // Banner por breakpoint. O campo legado `banner` continua no schema, sem
@@ -22,18 +31,15 @@ export const eventSchema = z.object({
     .min(1, 'Mínimo 1')
     .nullable()
     .optional(),
-  cta: z.string().min(1, 'CTA obrigatório').max(40, 'Máximo 40 caracteres'),
-  ctaLink: z.string().url('URL válida obrigatória'),
+  // Cor customizada do botão CTA do banner — só editável/exibida quando
+  // isCurrent (ver EventStep1.jsx: hideCta), mas fica em sharedEventFields
+  // (não numa das branches do discriminatedUnion) porque uma edição que já
+  // teve isCurrent:true preserva o valor ao virar passada, mesmo sem poder
+  // editá-lo por aqui. null = sem cor customizada, usa o laranja padrão do
+  // design system (ver EditionHero.jsx/HomeHero.jsx).
+  ctaButtonBg: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
+  ctaButtonText: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
   modality: z.literal('hybrid').default('hybrid'),
-  priceInPerson: z.number().min(0, 'Preço não pode ser negativo'),
-  priceOnline: z.number().min(0, 'Preço não pode ser negativo'),
-  presentation: z.array(
-    z.object({
-      icon: z.string().min(1, 'Ícone obrigatório'),
-      title: z.string().min(1, 'Título obrigatório').max(60, 'Máximo 60 caracteres'),
-      description: z.string().max(200, 'Máximo 200 caracteres'),
-    })
-  ).length(3, 'Exatamente 3 cards obrigatórios'),
   speakers: z.array(z.string()).optional().default([]),
   starSpeakerIds: z.array(z.string()).optional().default([]),
   organizerIds: z.array(z.string()).optional().default([]),
@@ -64,7 +70,8 @@ export const eventSchema = z.object({
   // (esses são do hero, sempre visíveis; archiveTitle só aparece no corpo
   // condicional de edição passada).
   archiveTitle: z.string().max(120, 'Máximo 120 caracteres').optional(),
-  archiveSubtitle: z.string().max(200, 'Máximo 200 caracteres').optional(),
+  // Sem .max(): limite de caracteres removido a pedido — texto livre.
+  archiveSubtitle: z.string().optional(),
   // 3 blocos fixos (mesmo padrão de `presentation`), cada campo opcional —
   // uma edição pode preencher só alguns blocos, e o site público oculta os
   // vazios individualmente (ver hasArchiveStat em utils/eventArchive.js).
@@ -95,47 +102,60 @@ export const eventSchema = z.object({
     .min(1, 'Mínimo 1')
     .nullable()
     .optional(),
-  // Quem grava o campo é setCurrentEvent, não os serviços de escrita comuns:
-  // a invariante "só um atual" vive entre documentos. Aqui ele existe para o
-  // toggle do passo 1 poder registrar a intenção do usuário.
-  isCurrent: z.boolean().optional().default(false),
-});
+};
 
-export const eventStepSchema = {
-  step1: eventSchema.pick({
-    headline: true,
-    subtitle: true,
-    editionNumber: true,
-    bannerDesktopUrl: true,
-    bannerTabletUrl: true,
-    bannerMobileUrl: true,
-    bannerOrder: true,
-    cta: true,
-    ctaLink: true,
-    isCurrent: true,
+// isCurrent decide a FORMA do wizard (ver EventForm.jsx): edição atual exige
+// CTA/link de inscrição, valores de ingresso e os 3 cards de apresentação;
+// edição passada não exibe esses campos no formulário reduzido, então eles
+// não podem ser obrigatórios nesse modo — mas continuam aceitos (e
+// preservados) se já vieram preenchidos de quando o evento era o atual.
+export const eventSchema = z.discriminatedUnion('isCurrent', [
+  z.object({
+    ...sharedEventFields,
+    isCurrent: z.literal(true),
+    cta: z.string().min(1, 'CTA obrigatório').max(40, 'Máximo 40 caracteres'),
+    ctaLink: z.string().url('URL válida obrigatória'),
+    priceInPerson: z.number().min(0, 'Preço não pode ser negativo'),
+    priceOnline: z.number().min(0, 'Preço não pode ser negativo'),
+    presentation: z.array(presentationItemSchema).length(3, 'Exatamente 3 cards obrigatórios'),
   }),
-  step2: eventSchema.pick({
-    priceInPerson: true,
-    priceOnline: true,
+  z.object({
+    ...sharedEventFields,
+    isCurrent: z.literal(false),
+    cta: z.string().max(40, 'Máximo 40 caracteres').optional().default(''),
+    ctaLink: z.string().optional().default(''),
+    priceInPerson: z.number().min(0, 'Preço não pode ser negativo').nullable().optional(),
+    priceOnline: z.number().min(0, 'Preço não pode ser negativo').nullable().optional(),
+    presentation: z.array(presentationItemSchema).optional().default([]),
   }),
-  step3: eventSchema.pick({
-    presentation: true,
-  }),
-  step4: eventSchema.pick({
-    speakers: true,
-    starSpeakerIds: true,
-    organizerIds: true,
-    curatorIds: true,
-    programming: true,
-    sponsors: true,
-  }),
-  step5: eventSchema.pick({
-    testimonials: true,
-    videos: true,
-    gallery: true,
-    archiveTitle: true,
-    archiveSubtitle: true,
-    archiveStats: true,
-    colors: true,
-  }),
+]);
+
+// Campos de cada passo do wizard, usados por EventForm.jsx para validação
+// por passo (trigger) e para rotear erros de submit ao passo certo. Listas
+// fixas, não derivadas de `.pick()`, porque eventSchema é um
+// discriminatedUnion (sem método .pick()) desde que passou a variar por
+// isCurrent.
+export const STEP_FIELDS = {
+  step1: [
+    'headline', 'subtitle', 'editionNumber',
+    'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl', 'bannerOrder',
+    'cta', 'ctaLink', 'ctaButtonBg', 'ctaButtonText', 'isCurrent',
+  ],
+  // Passo 1 do wizard reduzido (edição passada): mesmos campos, sem CTA/link
+  // — esse botão não é mais exibido publicamente para edições passadas.
+  step1Reduced: [
+    'headline', 'subtitle', 'editionNumber',
+    'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl', 'bannerOrder',
+    'isCurrent',
+  ],
+  step2: ['priceInPerson', 'priceOnline'],
+  step3: ['presentation'],
+  step4: ['speakers', 'starSpeakerIds', 'organizerIds', 'curatorIds', 'programming', 'sponsors'],
+  // Único passo que ainda existe do antigo "Passo 5": o wizard completo
+  // (isCurrent: true) não tem mais passo de conteúdo de arquivo — só o
+  // reduzido (isCurrent: false), como passo 2. Depoimentos/paleta de cores
+  // saíram do formulário (ver EventStep5.jsx): não tinham nenhuma leitura
+  // pública, então os campos `testimonials`/`colors` do schema seguem
+  // preservados só por compatibilidade com dado histórico já salvo.
+  step5Archive: ['gallery', 'archiveTitle', 'archiveSubtitle', 'archiveStats'],
 };

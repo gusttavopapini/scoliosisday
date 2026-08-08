@@ -3,7 +3,7 @@
 // (starSpeakerIds) em qualquer edição publicada. Sem gente para mostrar,
 // a seção inteira some.
 
-import PersonCard from '../editions/PersonCard.jsx';
+import PeopleGrid from '../editions/PeopleGrid.jsx';
 
 /** @param {{ title: string, people: object[] }} props */
 export default function FeaturedSpeakers({ title, people }) {
@@ -19,11 +19,7 @@ export default function FeaturedSpeakers({ title, people }) {
           </div>
         </header>
 
-        <div className="sdp-people-grid">
-          {people.map((person) => (
-            <PersonCard key={person.id} person={person} />
-          ))}
-        </div>
+        <PeopleGrid people={people} />
       </div>
     </section>
   );

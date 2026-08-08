@@ -3,7 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Copy, Trash2, Share2, Filter, SearchX } from 'lucide-react';
+import { Plus, Copy, Trash2, Filter, SearchX } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AppShell from '../../app/AppShell.jsx';
 import t from '../../i18n/pt-BR.js';
@@ -252,19 +252,46 @@ export default function EventsPage() {
                   style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
                   onClick={() => handleEdit(event)}
                 >
-                  {/* Miniatura do banner */}
-                  {eventBannerUrl(event) && (
-                    <img
-                      src={eventBannerUrl(event)}
-                      alt={event.headline}
-                      style={{
-                        width: '100%',
-                        height: '180px',
-                        objectFit: 'cover',
-                        borderRadius: 'var(--radius-md)',
-                        marginBottom: 'var(--space-3)',
-                      }}
-                    />
+                  {/* Miniatura do banner, com o número da edição sobreposto
+                      no canto superior esquerdo. A badge fica DENTRO deste
+                      container (não como irmã lá fora, como uma rodada
+                      anterior tentou) — o card tem padding próprio
+                      (.sd-card), então medir "8px do canto" a partir do
+                      card, e não da foto, jogava a badge pro respiro do
+                      padding, acima da imagem. Este container não tem
+                      overflow:hidden, então nada corta o ::before do pulse;
+                      o z-index alto de .sda-edition-badge--overlay (admin.css)
+                      já basta pra ficar na frente da foto sem mover nada. */}
+                  {eventBannerUrl(event) ? (
+                    <div style={{ position: 'relative', marginBottom: 'var(--space-3)' }}>
+                      <img
+                        src={eventBannerUrl(event)}
+                        alt={event.headline}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          height: '180px',
+                          objectFit: 'cover',
+                          borderRadius: 'var(--radius-md)',
+                        }}
+                      />
+                      {typeof event.editionNumber === 'number' && (
+                        <span
+                          className={`sda-edition-badge sda-edition-badge--overlay${event.isCurrent ? ' sda-edition-badge--current' : ''}`}
+                        >
+                          {ordinal(event.editionNumber, 'pt-BR')} Edição
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    typeof event.editionNumber === 'number' && (
+                      <span
+                        className={`sda-edition-badge${event.isCurrent ? ' sda-edition-badge--current' : ''}`}
+                        style={{ alignSelf: 'flex-start', marginBottom: 'var(--space-3)' }}
+                      >
+                        {ordinal(event.editionNumber, 'pt-BR')} Edição
+                      </span>
+                    )
                   )}
 
                   {/* Headline */}
@@ -272,52 +299,52 @@ export default function EventsPage() {
                     {event.headline}
                   </h3>
 
-                  {/* Badges */}
+                  {/* Badges — status saiu daqui (agora é o switch abaixo) e
+                      o número da edição foi pro canto da foto. Pill "Atual"
+                      removida: duplicava a badge de edição com pulse
+                      laranja, que já comunica isso sozinha. */}
                   <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-3)', flexWrap: 'wrap' }}>
-                    <span
-                      className="sd-badge"
-                      style={{
-                        backgroundColor:
-                          event.status === 'published'
-                            ? 'var(--teal-600)'
-                            : event.status === 'archived'
-                              ? 'var(--gray-400)'
-                              : 'var(--gray-200)',
-                        color: event.status === 'published' ? 'white' : 'var(--text-body)',
-                      }}
-                    >
-                      {STATUS_OPTIONS.find((s) => s.value === event.status)?.label || 'Rascunho'}
-                    </span>
                     <span className="sd-badge" style={{ backgroundColor: 'var(--teal-050)', color: 'var(--teal-600)' }}>
                       {MODALITY_OPTIONS.find((m) => m.value === event.modality)?.label || 'Híbrido'}
                     </span>
-                    {typeof event.editionNumber === 'number' && (
-                      <span className="sd-tag sd-tag--orange">
-                        {ordinal(event.editionNumber, 'pt-BR')} Edição
-                      </span>
-                    )}
-                    {event.isCurrent && (
-                      <span className="sd-tag sd-tag--solid">Atual</span>
-                    )}
                   </div>
 
-                  {/* Switch de edição atual. stopPropagation porque o card
-                      inteiro navega para a edição de conteúdo ao ser
-                      clicado (mesma palavra, dois sentidos diferentes aqui:
-                      "edição" do Scoliosis Day vs. "editar" o formulário). */}
+                  {/* "Edição atual" (checkbox) e "Publicado/Rascunho"
+                      (switch) trocaram de componente entre si — mesmos
+                      campos/handlers de sempre (isCurrent via
+                      handleToggleCurrent, status via handlePublish, que já
+                      escreve no campo real usado pelas queries públicas).
+                      stopPropagation porque o card inteiro navega para a
+                      edição de conteúdo ao ser clicado. */}
                   <div
-                    style={{ marginBottom: 'var(--space-3)' }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <label className="sda-switch">
+                    <label className="sd-checkbox sda-checkbox--center">
                       <input
                         type="checkbox"
                         checked={!!event.isCurrent}
                         disabled={togglingId !== null}
                         onChange={(e) => handleToggleCurrent(event, e.target.checked)}
                       />
+                      <span className="sd-checkbox__box" aria-hidden="true" />
+                      <span>Edição atual</span>
+                    </label>
+
+                    <label className="sda-switch">
+                      <input
+                        type="checkbox"
+                        checked={event.status === 'published'}
+                        onChange={() => handlePublish(event)}
+                      />
                       <span className="sda-switch__track" aria-hidden="true" />
-                      <span className="sda-switch__label">Edição atual</span>
+                      <span className="sda-switch__label">
+                        {event.status === 'published'
+                          ? 'Publicado'
+                          : event.status === 'archived'
+                            ? 'Arquivado'
+                            : 'Rascunho'}
+                      </span>
                     </label>
                   </div>
 
@@ -326,7 +353,8 @@ export default function EventsPage() {
                     Atualizado: {event.updatedAt?.toDate?.().toLocaleDateString?.('pt-BR') || 'N/A'}
                   </p>
 
-                  {/* Ações */}
+                  {/* Ações — mesmas funções de sempre, agora em pill
+                      (.sda-card-actions__btn em admin.css). */}
                   <div
                     style={{
                       display: 'flex',
@@ -337,44 +365,31 @@ export default function EventsPage() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
-                      className="sd-btn sd-btn--ghost sd-btn--sm"
+                      className="sda-card-actions__btn"
                       type="button"
                       onClick={() => handleEdit(event)}
                       title="Editar"
                       aria-label="Editar edição"
                     >
-                      <span style={{ color: 'var(--teal-600)', fontSize: '16px' }}>✎</span>
+                      <span style={{ fontSize: '16px' }}>✎</span>
                     </button>
                     <button
-                      className="sd-btn sd-btn--ghost sd-btn--sm"
+                      className="sda-card-actions__btn"
                       type="button"
                       onClick={() => handleDuplicate(event)}
                       title="Duplicar"
                       aria-label="Duplicar edição"
                     >
-                      <Copy size={15} style={{ color: 'var(--teal-600)' }} aria-hidden="true" />
+                      <Copy size={15} aria-hidden="true" />
                     </button>
                     <button
-                      className="sd-btn sd-btn--ghost sd-btn--sm"
-                      type="button"
-                      onClick={() => handlePublish(event)}
-                      title={event.status === 'published' ? 'Despublicar' : 'Publicar'}
-                      aria-label={event.status === 'published' ? 'Despublicar' : 'Publicar'}
-                    >
-                      <Share2
-                        size={15}
-                        style={{ color: event.status === 'published' ? 'var(--teal-600)' : 'var(--gray-400)' }}
-                        aria-hidden="true"
-                      />
-                    </button>
-                    <button
-                      className="sd-btn sd-btn--ghost sd-btn--sm"
+                      className="sda-card-actions__btn sda-card-actions__btn--danger"
                       type="button"
                       onClick={() => setDeleteTarget(event)}
                       title="Excluir"
                       aria-label="Excluir edição"
                     >
-                      <Trash2 size={15} style={{ color: 'var(--danger)' }} aria-hidden="true" />
+                      <Trash2 size={15} aria-hidden="true" />
                     </button>
                   </div>
                 </article>

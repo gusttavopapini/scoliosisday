@@ -73,6 +73,16 @@
   margin-top: var(--space-1);
 }
 
+/* Logo real no lugar do texto "Scoliosis Day"/"Painel Admin" — 100% da
+   largura útil do cabeçalho (260px de sidebar menos os --space-6 de
+   padding lateral de .sda-sidebar__logo, ~212px), altura automática pela
+   proporção real do arquivo. */
+.sda-sidebar__logo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .sda-sidebar__section-label {
   display: block;
   padding: var(--space-4) var(--space-6) var(--space-2);
@@ -1478,6 +1488,178 @@
 }
 
 /* ============================================================
+   CHECKBOX CENTRALIZADO (card da listagem de Edições)
+   .sd-checkbox (design-system.css, imutável) usa align-items: flex-start e
+   um margin-top de 1px na caixinha — pensado pra rótulos de várias linhas,
+   onde a caixa acompanha a primeira linha do texto. Pra um rótulo curto de
+   uma linha só ("Edição atual"), isso deixa a caixa visivelmente acima do
+   texto. Override escopado aqui em vez de tocar no arquivo imutável.
+   ============================================================ */
+
+.sda-checkbox--center {
+  align-items: center;
+}
+
+.sda-checkbox--center .sd-checkbox__box {
+  margin-top: 0;
+}
+
+/* ============================================================
+   BADGE DE EDIÇÃO (card da listagem de Edições)
+   Sobreposta ao canto superior esquerdo da foto de capa quando há banner
+   (--overlay); sem banner, cai no fluxo normal do card antes da headline,
+   pra não desaparecer. Cor e "ping" pulsante (mesmo efeito de
+   destaque/alerta do Tailwind `animate-ping`, feito com ::before em vez de
+   box-shadow com rgba — banido pelo lint-tokens) só na edição atual.
+   ============================================================ */
+
+.sda-edition-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: var(--white);
+  color: var(--teal-600);
+  box-shadow:var(--shadow-sm);
+}
+
+.sda-edition-badge--overlay {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  /* Bem acima da foto (sem z-index próprio, plano 0 implícito) — a badge
+     inteira (pill + ::before de pulse) precisa vencer esse plano; o
+     ::before em si usa z-index:-1 só RELATIVO ao stacking context que esta
+     regra cria aqui, não ao z-index global — continua acima da foto. */
+  z-index: 10;
+}
+
+.sda-edition-badge--current {
+  background: var(--orange-600);
+  color: var(--white);
+}
+
+.sda-edition-badge--current::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--orange-600);
+  opacity: 0.6;
+  animation: sda-pulse-alert var(--sda-pulse-duration) var(--ease-out) infinite;
+}
+
+@keyframes sda-pulse-alert {
+  0%   { transform: scale(1);    opacity: 0.6; }
+  70%  { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sda-edition-badge--current::before {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ============================================================
+   AÇÕES DO CARD (grid de Edições)
+   Mesmos botões/funções de sempre (editar, duplicar, publicar, excluir),
+   agora num container circular de fundo sutil em vez de soltos — mesmo
+   princípio de "ícone em pill" do botão de trocar imagem do uploader
+   (.sdaimg-uploader__edit). Excluir usa o par laranja/vermelho já
+   estabelecido no kit para ações destrutivas.
+   ============================================================ */
+
+.sda-card-actions__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--teal-050);
+  color: var(--teal-600);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.sda-card-actions__btn:hover {
+  background: var(--teal-100);
+}
+
+.sda-card-actions__btn--danger {
+  background: var(--orange-100);
+  color: var(--danger);
+}
+
+.sda-card-actions__btn--danger:hover {
+  background: var(--orange-200);
+}
+
+/* ============================================================
+   COLORPICKER (cor do botão CTA — Eventos/Edições e Banners avulsos)
+   Círculo com a cor atual como acionador; popover com input nativo
+   type="color" + campo de hex, sincronizados (ver ColorPicker.jsx).
+   ============================================================ */
+
+.sda-colorpicker {
+  position: relative;
+  display: inline-flex;
+}
+
+.sda-colorpicker__swatch {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  box-shadow:var(--shadow-sm);
+}
+
+.sda-colorpicker__popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  box-shadow:var(--shadow-md);
+}
+
+.sda-colorpicker__native {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+}
+
+.sda-colorpicker__hex {
+  width: 110px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
    21. UPLOAD DE IMAGEM — preview
    O .sda-upload (seção 12) já cobre a área de drop, os estados de
    arraste/erro e a barra de progresso. Aqui entra só o que o kit não
@@ -1492,11 +1674,20 @@
 
 .sdaimg-uploader__preview {
   position: relative;
+  /* Teto compacto: o aspect-ratio (inline, vindo de `aspectRatio`) só serve
+     de referência de proporção/orientação — sem este teto, um banner 16:9
+     ocuparia a largura inteira do campo e ficaria com centenas de pixels de
+     altura, sobrando xadrez vazio ao redor da miniatura (capada a 220px
+     logo abaixo). Com max-height, o navegador encolhe a altura e a imagem
+     em object-fit cobre o container inteiro, sem sobra. */
+  max-height: 220px;
   border: var(--border-width) solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
   /* Xadrez discreto: logo PNG/SVG com fundo transparente precisa de um
-     ground que mostre a transparência em vez de fingir fundo branco. */
+     ground que mostre a transparência em vez de fingir fundo branco. Com a
+     imagem cobrindo 100% do container (regra abaixo), só aparece por trás
+     de recortes/transparência reais — nunca como sobra de espaço vazio. */
   background:
     linear-gradient(45deg, var(--gray-100) 25%, transparent 25%),
     linear-gradient(-45deg, var(--gray-100) 25%, transparent 25%),
@@ -1510,8 +1701,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  max-height: 220px;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .sdaimg-uploader__remove {
@@ -1535,6 +1725,56 @@
 
 .sdaimg-uploader__remove:hover {
   background: var(--orange-100);
+}
+
+/* ---- Botão "Trocar imagem" ----
+   Mesmo cluster do X, uma linha abaixo. Colapsado num ícone só (32px, mesma
+   largura do X) e ancorado por `right`, então crescer em max-width empurra
+   a borda esquerda pra fora sem mover a borda direita — o rótulo "abre"
+   pra dentro do preview em vez de vazar pra fora dele. */
+.sdaimg-uploader__edit {
+  position: absolute;
+  top: calc(var(--space-2) + 32px + var(--space-2));
+  right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  max-width: 32px;
+  padding-left: var(--space-2);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--text-body);
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow:var(--shadow-sm);
+  transition: max-width var(--dur-base) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+
+.sdaimg-uploader__edit svg {
+  flex-shrink: 0;
+}
+
+.sdaimg-uploader__edit-label {
+  padding: 0 var(--space-3) 0 var(--space-2);
+  font-family:var(--font-text);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+}
+
+.sdaimg-uploader__edit:hover,
+.sdaimg-uploader__edit:focus-visible {
+  max-width: 160px;
+  background: var(--teal-050);
+}
+
+/* Telas de toque não têm :hover — sem isto, o rótulo nunca apareceria e o
+   botão ficaria só com um ícone sem legenda visível pra quem usa toque. */
+@media (hover: none) {
+  .sdaimg-uploader__edit {
+    max-width: 160px;
+  }
 }
 
 /* ---- Logo em card de listagem ----
@@ -1574,15 +1814,21 @@
    Para foto de pessoa, onde o enquadramento é sempre 1:1 e recortar é o
    comportamento desejado (object-fit: cover), ao contrário de logo e banner,
    que usam `contain` para não perder nada da arte.
-   O tamanho fixo vale para os dois estados — com imagem e vazio — para a
-   caixa não pular ao enviar a primeira foto. */
+   Fluido (100% do pai) com teto de 200px, não largura/altura fixas: em
+   CollaboratorForm.jsx (campo isolado) o pai é largo, então bate no teto e
+   fica com a mesma aparência de sempre. Em GalleryUploader.jsx, cada item
+   vive numa célula de grid que pode ter só 160px — com valor fixo em px o
+   uploader vazava pra fora do card; aspect-ratio mantém o quadrado em
+   qualquer largura resolvida, sem precisar de altura fixa em nenhum estado
+   (com imagem ou vazio, a caixa não pula ao enviar a primeira foto). */
 .sdaimg-uploader--square {
-  width: 200px;
+  width: 100%;
+  max-width: 200px;
 }
 
 .sdaimg-uploader--square .sdaimg-uploader__preview {
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 .sdaimg-uploader--square .sdaimg-uploader__preview img {
@@ -1593,8 +1839,8 @@
 }
 
 .sdaimg-uploader--square .sda-upload {
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   gap: var(--space-2);
   padding: var(--space-4);
 }

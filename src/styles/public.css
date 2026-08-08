@@ -415,13 +415,6 @@
   object-fit: cover;
 }
 
-.sdp-hero__media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--scrim-dark);
-}
-
 .sdp-hero__content {
   position: relative;
   display: flex;
@@ -573,6 +566,19 @@
      --lh-tight (1.15) é o próximo degrau do kit, ainda mais folgado
      que o --lh-display bem apertado da base. */
   line-height: var(--lh-tight);
+}
+
+/* Mobile: esta headline é uma frase inteira ("Quem viveu o Scoliosis Day
+   conta o impacto do encontro na sua prática."), não um título curto —
+   no --display-lg padrão (56px) ela ocupava quase a tela toda em ~390px de
+   largura, quebrando em muitas linhas. 2 degraus abaixo (--display-sm,
+   32px) em vez do único degrau que .sdp-hero/.sdp-simple-hero usam,
+   porque o texto aqui é bem mais longo que os títulos curtos deles.
+   Desktop (.sd-display--lg puro) não muda. */
+@media (max-width: 640px) {
+  .sdp-testimonials-headline.sd-display--lg {
+    font-size: var(--display-sm);
+  }
 }
 
 /* Heading de seção com a marca "Scoliosis Day" embutida (via
@@ -881,13 +887,6 @@
   object-fit: cover;
 }
 
-.sdp-edition-hero__media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--scrim-dark);
-}
-
 .sdp-edition-hero__content {
   position: relative;
   display: flex;
@@ -1023,7 +1022,8 @@
   }
 }
 
-/* Mobile: 1 por linha (cheia). */
+/* Mobile: 1 por linha (cheia). Só vale pra grade normal — com 3+ cards,
+   PeopleGrid.jsx troca pro modo carrossel (--carousel) abaixo. */
 @media (max-width: 640px) {
   .sdp-people-grid {
     gap: var(--space-3);
@@ -1033,6 +1033,43 @@
     flex-basis: 100%;
     max-width: 100%;
   }
+}
+
+/* ---- Carrossel mobile (3+ cards) ----
+   O modificador --carousel só existe no DOM quando PeopleGrid.jsx detecta
+   mobile via matchMedia — a troca de modo já acontece em JS, então não
+   precisa de @media aqui pra "desligar" em desktop (nunca chega a existir
+   lá). scroll-snap nativo: cada card ocupa 85% da largura (hint visual do
+   próximo), scroll-snap-align:center concentra o card ativo; autoplay,
+   swipe/touch e os dots ficam todos em PeopleGrid.jsx. */
+.sdp-people-grid--carousel {
+  position: relative;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  /* Contém o scroll ao próprio track — sem isto, o scrollTo() horizontal
+     do autoplay (PeopleGrid.jsx) não tem por que vazar verticalmente (a
+     causa real era scrollIntoView(), já trocado por scrollTo() escopado à
+     ref do track), mas overflow-y:hidden é uma segunda camada de proteção
+     barata contra qualquer scroll vertical acidental dentro do track. Sem
+     altura fixa em px de propósito: cada card tem foto com aspect-ratio
+     4/5 — a altura real do card muda com a largura da tela (85% dela), e
+     um valor fixo ou recortaria a foto num celular largo ou sobraria vão
+     vazio num estreito. */
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: var(--space-1);
+}
+
+.sdp-people-grid--carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.sdp-people-grid--carousel .sdp-people-card {
+  flex: 0 0 85%;
+  max-width: 85%;
+  scroll-snap-align: center;
 }
 
 /* ---- Modal "Ver mais" (PersonModal) ----

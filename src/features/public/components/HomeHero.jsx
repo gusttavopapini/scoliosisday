@@ -43,6 +43,8 @@ function buildSlides(event, banners) {
       cta: event.cta,
       cta_en: event.cta_en,
       ctaLink: event.ctaLink,
+      ctaButtonBg: event.ctaButtonBg,
+      ctaButtonText: event.ctaButtonText,
       bannerDesktopUrl: eventBannerUrl(event, 'desktop'),
       bannerTabletUrl: event.bannerTabletUrl?.trim() || '',
       bannerMobileUrl: event.bannerMobileUrl?.trim() || '',
@@ -65,6 +67,8 @@ function buildSlides(event, banners) {
       cta: banner.cta,
       cta_en: banner.cta_en,
       ctaLink: banner.ctaLink,
+      ctaButtonBg: banner.ctaButtonBg,
+      ctaButtonText: banner.ctaButtonText,
       bannerDesktopUrl: banner.bannerDesktopUrl?.trim() || '',
       bannerTabletUrl: banner.bannerTabletUrl?.trim() || '',
       bannerMobileUrl: banner.bannerMobileUrl?.trim() || '',
@@ -123,6 +127,16 @@ export default function HomeHero() {
   const showFallbackLink = !hasOwnLink && Boolean(slide.fallbackLink);
   const ctaLabel = (translated?.cta ?? slide.cta)?.trim() || t.site.cta;
 
+  // Cor customizada do botão (painel: Eventos/Edições e Banners avulsos).
+  // Sem valor, mantém exatamente o visual de .sd-btn--primary de hoje —
+  // fallback é o MESMO hex já usado por essa classe (design-system.css),
+  // não um token novo, pra banner sem cor customizada ficar idêntico.
+  const ctaButtonStyle = {
+    backgroundColor: slide.ctaButtonBg || 'var(--orange-600)',
+    borderColor: slide.ctaButtonBg || 'var(--orange-600)',
+    color: slide.ctaButtonText || 'var(--white)',
+  };
+
   function goTo(nextIndex) {
     setIndex((nextIndex + slides.length) % slides.length);
   }
@@ -164,12 +178,13 @@ export default function HomeHero() {
                 href={slide.ctaLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                style={ctaButtonStyle}
               >
                 {ctaLabel}
               </a>
             )}
             {showFallbackLink && (
-              <Link className="sd-btn sd-btn--primary sd-btn--lg" to={slide.fallbackLink}>
+              <Link className="sd-btn sd-btn--primary sd-btn--lg" to={slide.fallbackLink} style={ctaButtonStyle}>
                 {ctaLabel}
               </Link>
             )}

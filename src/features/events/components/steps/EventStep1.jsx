@@ -3,7 +3,9 @@
 
 import { Controller } from 'react-hook-form';
 import ImageUploader from '../../../../components/form/ImageUploader.jsx';
+import ColorPicker from '../../../../components/form/ColorPicker.jsx';
 import { UPLOAD_PRESETS } from '../../../../services/storageService.js';
+import { CTA_BUTTON_FALLBACK } from '../../constants/defaultPalette.js';
 
 // Um banner por breakpoint: o site público escolhe a arte pela largura da tela
 // em vez de reescalar uma única imagem. `slug` entra no caminho do Storage e
@@ -14,7 +16,7 @@ const BANNER_FIELDS = [
   { name: 'bannerMobileUrl',  slug: 'banner-mobile',  label: 'Banner Mobile',  size: '640×960px',   ratio: '2 / 3' },
 ];
 
-export default function EventStep1({ register, control, errors, eventId }) {
+export default function EventStep1({ register, control, errors, eventId, hideCta = false }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div>
@@ -144,36 +146,92 @@ export default function EventStep1({ register, control, errors, eventId }) {
         <span className="sd-note">Até 200 caracteres</span>
       </label>
 
-      {/* CTA */}
-      <label className="sd-field">
-        <span className="sd-label">
-          Call-to-Action <span style={{ color: 'var(--danger)' }}>*</span>
-        </span>
-        <input
-          {...register('cta')}
-          className="sd-input"
-          type="text"
-          placeholder="Ex: Inscrever-se"
-          maxLength={40}
-        />
-        {errors.cta && <span className="sd-error">{errors.cta.message}</span>}
-        <span className="sd-note">Até 40 caracteres</span>
-      </label>
+      {/* CTA — oculto quando a edição não é a atual: o botão de inscrição não
+          é mais exibido publicamente nesse caso (ver EditionHero.jsx). */}
+      {!hideCta && (
+        <>
+          <label className="sd-field">
+            <span className="sd-label">
+              Call-to-Action <span style={{ color: 'var(--danger)' }}>*</span>
+            </span>
+            <input
+              {...register('cta')}
+              className="sd-input"
+              type="text"
+              placeholder="Ex: Inscrever-se"
+              maxLength={40}
+            />
+            {errors.cta && <span className="sd-error">{errors.cta.message}</span>}
+            <span className="sd-note">Até 40 caracteres</span>
+          </label>
 
-      {/* Link de inscrição */}
-      <label className="sd-field">
-        <span className="sd-label">
-          Link de Inscrição <span style={{ color: 'var(--danger)' }}>*</span>
-        </span>
-        <input
-          {...register('ctaLink')}
-          className="sd-input"
-          type="url"
-          placeholder="https://exemplo.com/inscreva-se"
-        />
-        {errors.ctaLink && <span className="sd-error">{errors.ctaLink.message}</span>}
-        <span className="sd-note">URL válida que será usada no botão de inscrição</span>
-      </label>
+          {/* Link de inscrição */}
+          <label className="sd-field">
+            <span className="sd-label">
+              Link de Inscrição <span style={{ color: 'var(--danger)' }}>*</span>
+            </span>
+            <input
+              {...register('ctaLink')}
+              className="sd-input"
+              type="url"
+              placeholder="https://exemplo.com/inscreva-se"
+            />
+            {errors.ctaLink && <span className="sd-error">{errors.ctaLink.message}</span>}
+            <span className="sd-note">URL válida que será usada no botão de inscrição</span>
+          </label>
+
+          {/* Cor do botão CTA */}
+          <div className="sd-field">
+            <span className="sd-label">
+              🎨 Cor do botão <span className="sd-muted">(opcional)</span>
+            </span>
+            <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <Controller
+                  name="ctaButtonBg"
+                  control={control}
+                  render={({ field }) => (
+                    <ColorPicker
+                      value={field.value}
+                      onChange={field.onChange}
+                      fallback={CTA_BUTTON_FALLBACK.bg}
+                      label="Cor de fundo do botão"
+                    />
+                  )}
+                />
+                <span className="sd-small">Background</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <Controller
+                  name="ctaButtonText"
+                  control={control}
+                  render={({ field }) => (
+                    <ColorPicker
+                      value={field.value}
+                      onChange={field.onChange}
+                      fallback={CTA_BUTTON_FALLBACK.text}
+                      label="Cor do texto do botão"
+                    />
+                  )}
+                />
+                <span className="sd-small">Texto</span>
+              </div>
+            </div>
+            {(errors.ctaButtonBg || errors.ctaButtonText) && (
+              <span className="sd-error">
+                {errors.ctaButtonBg?.message || errors.ctaButtonText?.message}
+              </span>
+            )}
+            <span className="sd-note">Sem cor definida, o botão usa o laranja padrão do site.</span>
+          </div>
+        </>
+      )}
+
+      {hideCta && (
+        <p className="sd-note">
+          Como esta não é a edição atual, o botão de inscrição não é exibido no banner público.
+        </p>
+      )}
 
       {/* Edição atual */}
       <div className="sd-field">

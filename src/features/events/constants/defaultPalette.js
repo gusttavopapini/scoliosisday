@@ -17,3 +17,14 @@ export const DEFAULT_EVENT_COLORS = {
   detail: '#14BAC2',
   highlight: '#FC975A',
 };
+
+// Fallback do ColorPicker de cor do botão CTA (EventStep1.jsx e
+// BannerForm.jsx) — mesmo par usado por .sd-btn--primary hoje (fundo
+// --orange-600, texto branco), pra o círculo mostrar exatamente a cor real
+// de um botão sem customização, e pro <input type="color"> nativo (que
+// exige hex literal, var() não serve de valor de input) abrir já na cor
+// certa.
+export const CTA_BUTTON_FALLBACK = {
+  bg: '#FC975A',
+  text: '#FFFFFF',
+};

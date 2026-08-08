@@ -4,7 +4,7 @@
 
 import { Stethoscope, MessageCircle, Users } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
-import BrandWordmark from '../../../../components/BrandWordmark.jsx';
+import AccentWord from '../../../../components/public/AccentWord.jsx';
 import AcronymSafeText from '../../../../components/public/AcronymSafeText.jsx';
 
 const CARDS = [
@@ -21,7 +21,7 @@ export default function AboutIntro() {
       <div className="sd-container">
         <header className="sd-section-header sd-section-header--center sdp-section-header">
           <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
-            {t.site.aboutPageIntroTitleMain} <BrandWordmark />
+            {t.site.aboutPageIntroTitleMain} <AccentWord>{t.site.aboutPageIntroTitleAccent}</AccentWord>
           </h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />

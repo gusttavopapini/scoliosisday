@@ -2,7 +2,7 @@
 // Seção 2 da Home: o que é o Scoliosis Day — três cards institucionais.
 // Conteúdo 100% estático, direto do dicionário.
 
-import { GraduationCap, Users, Award } from 'lucide-react';
+import { GraduationCap, Users, Globe } from 'lucide-react';
 import { useLanguage } from '../../../hooks/useLanguage.js';
 import BrandWordmark from '../../../components/BrandWordmark.jsx';
 import AcronymSafeText from '../../../components/public/AcronymSafeText.jsx';
@@ -10,7 +10,7 @@ import AcronymSafeText from '../../../components/public/AcronymSafeText.jsx';
 const CARDS = [
   { icon: GraduationCap, titleKey: 'aboutCard1Title', textKey: 'aboutCard1Text' },
   { icon: Users, titleKey: 'aboutCard2Title', textKey: 'aboutCard2Text' },
-  { icon: Award, titleKey: 'aboutCard3Title', textKey: 'aboutCard3Text' },
+  { icon: Globe, titleKey: 'aboutCard3Title', textKey: 'aboutCard3Text' },
 ];
 
 export default function HomeAbout() {

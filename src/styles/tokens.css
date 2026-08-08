@@ -200,4 +200,9 @@
      que pediu uma transição visivelmente mais suave/lenta que qualquer
      token já existente no kit. */
   --dur-slower: 600ms;
+
+  /* Ciclo do "ping" pulsante da badge de edição atual (ver
+     .sda-edition-badge--current em admin.css) — nenhum --dur-* do kit
+     chega perto de ~1.8s, então precisa do próprio token aqui. */
+  --sda-pulse-duration: 1.8s;
 }

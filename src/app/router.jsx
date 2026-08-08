@@ -19,12 +19,13 @@
 // oxlint-disable react/only-export-components
 
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import PublicLayout from '../components/public/PublicLayout.jsx';
 import PublicRoute from '../components/layout/PublicRoute.jsx';
 import ProtectedRoute from '../components/layout/ProtectedRoute.jsx';
 import SetPasswordRoute from '../components/layout/SetPasswordRoute.jsx';
 import PageSkeleton from '../components/ui/PageSkeleton.jsx';
+import ScrollToTop from './ScrollToTop.jsx';
 
 // ── Páginas do site público (carregadas sob demanda) ──
 const HomePage = lazy(() => import('../features/public/HomePage.jsx'));
@@ -71,94 +72,112 @@ function suspended(Page) {
   );
 }
 
+// Raiz sem path, pai de TODAS as árvores abaixo (site público e painel,
+// autenticado ou não) — o único lugar por onde toda navegação passa. É aqui
+// que entra o reset de scroll: uma adição centralizada em vez de repetir em
+// cada layout/página.
+function RootLayout() {
+  return (
+    <>
+      <ScrollToTop />
+      <Outlet />
+    </>
+  );
+}
+
 export const router = createBrowserRouter([
-  // ── Site público ──
-  // PublicLayout traz o LanguageProvider e o navbar; as filhas só rendem miolo.
   {
-    element: <PublicLayout />,
+    element: <RootLayout />,
     children: [
-      { path: '/', element: suspended(HomePage) },
-      { path: '/edicoes', element: suspended(EditionsPage) },
-      { path: '/sobre', element: suspended(AboutPage) },
-      { path: '/hall-de-estrelas', element: suspended(HallOfStarsPage) },
-      { path: '/patrocinadores', element: suspended(PublicSponsorsPage) },
+      // ── Site público ──
+      // PublicLayout traz o LanguageProvider e o navbar; as filhas só rendem miolo.
+      {
+        element: <PublicLayout />,
+        children: [
+          { path: '/', element: suspended(HomePage) },
+          { path: '/edicoes', element: suspended(EditionsPage) },
+          { path: '/sobre', element: suspended(AboutPage) },
+          { path: '/hall-de-estrelas', element: suspended(HallOfStarsPage) },
+          { path: '/patrocinadores', element: suspended(PublicSponsorsPage) },
 
-      // /depoimentos foi removida — texto e vídeo vivem só na Home agora
-      // (ver #depoimentos em HomePage.jsx). Sem redirect: cai no 404
-      // público (rota * abaixo), decisão explícita — reportada ao pedir
-      // este ajuste.
+          // /depoimentos foi removida — texto e vídeo vivem só na Home agora
+          // (ver #depoimentos em HomePage.jsx). Sem redirect: cai no 404
+          // público (rota * abaixo), decisão explícita — reportada ao pedir
+          // este ajuste.
 
-      // Academy ainda não tem página. A rota fica de pé para não quebrar
-      // links já divulgados, mas não aparece mais no menu (ver NAV_LINKS
-      // em PublicNavbar.jsx).
-      { path: '/academy', element: <Navigate to="/" replace /> },
+          // Academy ainda não tem página. A rota fica de pé para não quebrar
+          // links já divulgados, mas não aparece mais no menu (ver NAV_LINKS
+          // em PublicNavbar.jsx).
+          { path: '/academy', element: <Navigate to="/" replace /> },
 
-      // 404 do site. O splat aqui é o mais genérico do router: qualquer rota
-      // estática ou /painel/* declarada abaixo é mais específica e ganha dele
-      // no ranking do React Router, independente da ordem.
-      { path: '*', element: suspended(NotFoundPublicPage) },
-    ],
-  },
+          // 404 do site. O splat aqui é o mais genérico do router: qualquer rota
+          // estática ou /painel/* declarada abaixo é mais específica e ganha dele
+          // no ranking do React Router, independente da ordem.
+          { path: '*', element: suspended(NotFoundPublicPage) },
+        ],
+      },
 
-  // ── Autenticação do painel (não acessível se já logado) ──
-  {
-    element: <PublicRoute />,
-    children: [
-      { path: '/login', element: suspended(LoginPage) },
-      { path: '/cadastro', element: suspended(SignupPage) },
-      { path: '/esqueci-a-senha', element: suspended(ForgotPasswordPage) },
-    ],
-  },
+      // ── Autenticação do painel (não acessível se já logado) ──
+      {
+        element: <PublicRoute />,
+        children: [
+          { path: '/login', element: suspended(LoginPage) },
+          { path: '/cadastro', element: suspended(SignupPage) },
+          { path: '/esqueci-a-senha', element: suspended(ForgotPasswordPage) },
+        ],
+      },
 
-  // ── Rota bloqueante de definição de senha ──
-  {
-    element: <SetPasswordRoute />,
-    children: [
-      { path: '/definir-senha', element: suspended(SetPasswordPage) },
-    ],
-  },
+      // ── Rota bloqueante de definição de senha ──
+      {
+        element: <SetPasswordRoute />,
+        children: [
+          { path: '/definir-senha', element: suspended(SetPasswordPage) },
+        ],
+      },
 
-  // ── Rotas protegidas (admin + staff) ──
-  {
-    element: <ProtectedRoute />,
-    children: [
-      // Dashboard
-      { path: '/painel', element: suspended(DashboardPage) },
+      // ── Rotas protegidas (admin + staff) ──
+      {
+        element: <ProtectedRoute />,
+        children: [
+          // Dashboard
+          { path: '/painel', element: suspended(DashboardPage) },
 
-      // Módulos (placeholder de telas — Fases 4–8)
-      { path: '/painel/eventos', element: suspended(EventsPage) },
-      { path: '/painel/eventos/novo', element: suspended(CreateEventPage) },
-      { path: '/painel/eventos/:id/editar', element: suspended(EditEventPage) },
-      { path: '/painel/colaboradores', element: suspended(CollaboratorsPage) },
-      { path: '/painel/colaboradores/novo', element: suspended(CreateCollaboratorPage) },
-      { path: '/painel/colaboradores/:id/editar', element: suspended(EditCollaboratorPage) },
-      { path: '/painel/patrocinadores', element: suspended(SponsorsPage) },
-      { path: '/painel/patrocinadores/novo', element: suspended(CreateSponsorPage) },
-      { path: '/painel/patrocinadores/:id/editar', element: suspended(EditSponsorPage) },
-      { path: '/painel/programacoes', element: suspended(ProgrammingsPage) },
-      { path: '/painel/programacoes/novo', element: suspended(CreateProgrammingPage) },
-      { path: '/painel/programacoes/:id/editar', element: suspended(EditProgrammingPage) },
-      { path: '/painel/depoimentos', element: suspended(TestimonialsPanelPage) },
-      { path: '/painel/depoimentos/novo', element: suspended(CreateTestimonialPage) },
-      { path: '/painel/depoimentos/:id/editar', element: suspended(EditTestimonialPage) },
-      { path: '/painel/banners', element: suspended(BannersPage) },
-      { path: '/painel/banners/novo', element: suspended(CreateBannerPage) },
-      { path: '/painel/banners/:id/editar', element: suspended(EditBannerPage) },
+          // Módulos (placeholder de telas — Fases 4–8)
+          { path: '/painel/eventos', element: suspended(EventsPage) },
+          { path: '/painel/eventos/novo', element: suspended(CreateEventPage) },
+          { path: '/painel/eventos/:id/editar', element: suspended(EditEventPage) },
+          { path: '/painel/colaboradores', element: suspended(CollaboratorsPage) },
+          { path: '/painel/colaboradores/novo', element: suspended(CreateCollaboratorPage) },
+          { path: '/painel/colaboradores/:id/editar', element: suspended(EditCollaboratorPage) },
+          { path: '/painel/patrocinadores', element: suspended(SponsorsPage) },
+          { path: '/painel/patrocinadores/novo', element: suspended(CreateSponsorPage) },
+          { path: '/painel/patrocinadores/:id/editar', element: suspended(EditSponsorPage) },
+          { path: '/painel/programacoes', element: suspended(ProgrammingsPage) },
+          { path: '/painel/programacoes/novo', element: suspended(CreateProgrammingPage) },
+          { path: '/painel/programacoes/:id/editar', element: suspended(EditProgrammingPage) },
+          { path: '/painel/depoimentos', element: suspended(TestimonialsPanelPage) },
+          { path: '/painel/depoimentos/novo', element: suspended(CreateTestimonialPage) },
+          { path: '/painel/depoimentos/:id/editar', element: suspended(EditTestimonialPage) },
+          { path: '/painel/banners', element: suspended(BannersPage) },
+          { path: '/painel/banners/novo', element: suspended(CreateBannerPage) },
+          { path: '/painel/banners/:id/editar', element: suspended(EditBannerPage) },
 
-      // Desenvolvimento
-      { path: '/painel/dev/ui', element: suspended(UIDevPage) },
+          // Desenvolvimento
+          { path: '/painel/dev/ui', element: suspended(UIDevPage) },
 
-      // 404 do painel: /painel/qualquer-coisa continua atrás do
-      // ProtectedRoute e mostra a tela com copy de painel, não a do site.
-      { path: '/painel/*', element: suspended(NotFoundPage) },
-    ],
-  },
+          // 404 do painel: /painel/qualquer-coisa continua atrás do
+          // ProtectedRoute e mostra a tela com copy de painel, não a do site.
+          { path: '/painel/*', element: suspended(NotFoundPage) },
+        ],
+      },
 
-  // ── Rota admin-only ──
-  {
-    element: <ProtectedRoute adminOnly />,
-    children: [
-      { path: '/painel/staff', element: suspended(StaffPage) },
+      // ── Rota admin-only ──
+      {
+        element: <ProtectedRoute adminOnly />,
+        children: [
+          { path: '/painel/staff', element: suspended(StaffPage) },
+        ],
+      },
     ],
   },
 ]);

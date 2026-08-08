@@ -3,7 +3,7 @@
 // Sem gente para mostrar, a seção inteira some (cada seção da página de
 // edição só existe quando há dado real por trás).
 
-import PersonCard from './PersonCard.jsx';
+import PeopleGrid from './PeopleGrid.jsx';
 
 /**
  * @param {{ title: string, people: object[], headingClassName?: string }} props
@@ -21,11 +21,7 @@ export default function PeopleSection({ title, people, headingClassName = '' }) 
           </div>
         </header>
 
-        <div className="sdp-people-grid">
-          {people.map((person) => (
-            <PersonCard key={person.id} person={person} />
-          ))}
-        </div>
+        <PeopleGrid people={people} />
       </div>
     </section>
   );

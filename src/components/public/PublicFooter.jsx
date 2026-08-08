@@ -60,7 +60,6 @@ export default function PublicFooter() {
               <img src={logoColor} alt={t.site.brand} className="sdp-wordmark__logo" />
             </Link>
             <p>{t.site.footerTagline}</p>
-            <p>{t.site.footerAbteText}</p>
           </div>
 
           <div className="sd-footer__cols">

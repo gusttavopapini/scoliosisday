@@ -23,6 +23,16 @@ export default function EditionHero({ event, editionBadge }) {
   const ctaLabel = translated.cta?.trim() || t.site.cta;
   const ctaLink = event.ctaLink?.trim() || '';
 
+  // Cor customizada do botão (painel, Passo 1 do wizard) — sem valor,
+  // mantém o visual padrão de .sd-btn--primary (mesmo hex do design
+  // system, não um token novo, pra edição sem cor customizada ficar igual
+  // a hoje — mesmo cálculo de HomeHero.jsx, único outro lugar com esse botão).
+  const ctaButtonStyle = {
+    backgroundColor: event.ctaButtonBg || 'var(--orange-600)',
+    borderColor: event.ctaButtonBg || 'var(--orange-600)',
+    color: event.ctaButtonText || 'var(--white)',
+  };
+
   return (
     <section className="sdp-edition-hero">
       <div className={`sdp-edition-hero__frame${hasBanner ? '' : ' sdp-edition-hero__frame--brand sd-dots'}`}>
@@ -50,12 +60,13 @@ export default function EditionHero({ event, editionBadge }) {
             </p>
           )}
 
-          {ctaLink && (
+          {event.isCurrent && ctaLink && (
             <a
               className="sd-btn sd-btn--primary sd-btn--lg"
               href={ctaLink}
               target="_blank"
               rel="noopener noreferrer"
+              style={ctaButtonStyle}
             >
               {ctaLabel}
             </a>

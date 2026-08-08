@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase.js';
 import { translateRootFields } from '../utils/writeTimeTranslation.js';
+import { deepNullifyUndefined } from '../utils/firestoreSanitize.js';
 
 const BANNERS_COLLECTION = 'banners';
 
@@ -83,7 +84,11 @@ export function newBannerId() {
 export async function createBanner(data, explicitId) {
   // Sem documento anterior: todo campo traduzível conta como "novo".
   const translations = await translateRootFields(data, null, BANNER_TRANSLATABLE_FIELDS);
-  const payload = { ...data, ...translations, createdAt: new Date() };
+  // deepNullifyUndefined no payload final (depois de ...translations), não
+  // só em `data` — mesmo motivo de services/events.js: um campo opcional
+  // vazio (ex: ctaButtonBg/ctaButtonText) pode chegar undefined, e o
+  // Firestore rejeita a escrita inteira se sobrar um só.
+  const payload = deepNullifyUndefined({ ...data, ...translations, createdAt: new Date() });
 
   if (explicitId) {
     await setDoc(doc(db, BANNERS_COLLECTION, explicitId), payload);
@@ -102,11 +107,11 @@ export async function updateBanner(id, data) {
   const previous = snapshot.exists() ? snapshot.data() : null;
   const translations = await translateRootFields(data, previous, BANNER_TRANSLATABLE_FIELDS);
 
-  await updateDoc(docRef, {
+  await updateDoc(docRef, deepNullifyUndefined({
     ...data,
     ...translations,
     updatedAt: new Date(),
-  });
+  }));
 }
 
 export async function deleteBanner(id) {

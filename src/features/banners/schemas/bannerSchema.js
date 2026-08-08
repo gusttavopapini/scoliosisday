@@ -12,6 +12,10 @@ export const bannerSchema = z.object({
   subtitle: z.string().max(200, 'Máximo 200 caracteres').optional().default(''),
   cta: z.string().max(40, 'Máximo 40 caracteres').optional().default(''),
   ctaLink: z.string().url('URL inválida').optional().or(z.literal('')),
+  // Cor customizada do botão CTA — null/vazio usa o laranja padrão do
+  // design system (mesmo campo/regra do evento, ver eventSchema.js).
+  ctaButtonBg: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
+  ctaButtonText: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
   bannerDesktopUrl: z.string().optional().default(''),
   bannerTabletUrl: z.string().optional().default(''),
   bannerMobileUrl: z.string().optional().default(''),

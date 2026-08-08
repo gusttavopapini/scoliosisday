@@ -10,7 +10,7 @@
 // não guarda a URL — só o progresso e o erro do upload em andamento.
 
 import { useRef, useState } from 'react';
-import { UploadCloud, X, AlertCircle } from 'lucide-react';
+import { UploadCloud, X, AlertCircle, Pencil } from 'lucide-react';
 import { uploadFile, deleteFile, validateFile } from '../../services/storageService.js';
 
 /**
@@ -122,9 +122,14 @@ export default function ImageUploader({
     .filter(Boolean)
     .join(' ');
 
+  // Com imagem carregada, a caixa grande de dropzone dá lugar ao cluster de
+  // botões pequenos no canto do preview (remover / trocar) — ela só volta a
+  // aparecer vazia ou durante um novo envio (troca em andamento).
+  const hasValue = Boolean(value) && !isUploading;
+
   return (
     <div className={`sdaimg-uploader${square ? ' sdaimg-uploader--square' : ''}`}>
-      {value && !isUploading && (
+      {hasValue && (
         <div
           className="sdaimg-uploader__preview"
           style={!square && aspectRatio ? { aspectRatio } : undefined}
@@ -141,61 +146,77 @@ export default function ImageUploader({
               <X size={16} aria-hidden="true" />
             </button>
           )}
+          {!disabled && (
+            <button
+              type="button"
+              className="sdaimg-uploader__edit"
+              onClick={openPicker}
+              aria-label="Trocar imagem"
+              title="Trocar imagem"
+            >
+              <Pencil size={16} aria-hidden="true" />
+              {/* Some sob :hover/:focus num ícone só; sempre visível em
+                  telas de toque, que não têm hover (ver admin.css). */}
+              <span className="sdaimg-uploader__edit-label">Trocar imagem</span>
+            </button>
+          )}
         </div>
       )}
 
-      <div
-        className={areaClassName}
-        role="button"
-        tabIndex={isBusy ? -1 : 0}
-        aria-disabled={isBusy}
-        onClick={openPicker}
-        onKeyDown={handleKeyDown}
-        onDragOver={(event) => {
-          event.preventDefault();
-          if (!isBusy) setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-      >
-        <span className={`sda-upload__icon${error ? ' sda-upload__icon--error' : ''}`} aria-hidden="true">
-          {error ? <AlertCircle size={28} /> : <UploadCloud size={28} />}
-        </span>
+      {!hasValue && (
+        <div
+          className={areaClassName}
+          role="button"
+          tabIndex={isBusy ? -1 : 0}
+          aria-disabled={isBusy}
+          onClick={openPicker}
+          onKeyDown={handleKeyDown}
+          onDragOver={(event) => {
+            event.preventDefault();
+            if (!isBusy) setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+        >
+          <span className={`sda-upload__icon${error ? ' sda-upload__icon--error' : ''}`} aria-hidden="true">
+            {error ? <AlertCircle size={28} /> : <UploadCloud size={28} />}
+          </span>
 
-        <span className={`sda-upload__label${error ? ' sda-upload__label--error' : ''}`}>
-          {isUploading
-            ? `Enviando… ${progress}%`
-            : value
-              ? 'Trocar imagem'
+          <span className={`sda-upload__label${error ? ' sda-upload__label--error' : ''}`}>
+            {isUploading
+              ? `Enviando… ${progress}%`
               : square
                 ? 'Arraste ou clique'
                 : 'Arraste uma imagem ou clique para escolher'}
-        </span>
+          </span>
 
-        <span className="sda-upload__hint">{error || hint}</span>
+          <span className="sda-upload__hint">{error || hint}</span>
 
-        {isUploading && (
-          <div
-            className="sda-progress"
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div className="sda-progress__fill" style={{ width: `${progress}%` }} />
-          </div>
-        )}
+          {isUploading && (
+            <div
+              className="sda-progress"
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <div className="sda-progress__fill" style={{ width: `${progress}%` }} />
+            </div>
+          )}
+        </div>
+      )}
 
-        <input
-          ref={inputRef}
-          type="file"
-          className="sr-only"
-          accept={allowedTypes.join(',')}
-          onChange={handleInputChange}
-          disabled={isBusy}
-          tabIndex={-1}
-        />
-      </div>
+      {/* Fora dos dois blocos acima: tanto o dropzone quanto o botão de
+          editar (estado com imagem) abrem o mesmo seletor via inputRef. */}
+      <input
+        ref={inputRef}
+        type="file"
+        className="sr-only"
+        accept={allowedTypes.join(',')}
+        onChange={handleInputChange}
+        disabled={isBusy}
+        tabIndex={-1}
+      />
     </div>
   );
 }

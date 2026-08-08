@@ -322,11 +322,11 @@ const t = {
     aboutTitleMain: 'O que é o',
     aboutSubtitle: 'Um encontro que une ciência, prática clínica e formação profissional em torno da escoliose.',
     aboutCard1Title: 'Educação e Ciência de Alto Nível',
-    aboutCard1Text: 'O Scoliosis Day é o ponto de encontro global para a vanguarda do tratamento da escoliose. Com uma filosofia pautada na educação e na ciência de alta qualidade, o evento reúne cirurgiões da coluna vertebral, fisioterapeutas, ortesistas de prestígio internacional, residentes e outros profissionais envolvidos no cuidado da escoliose.',
+    aboutCard1Text: 'Alto padrão científico do cuidado à escoliose no Brasil. Promove atualização constante baseada em evidências e conecta profissionais da saúde às discussões mais avançadas sobre o tratamento das deformidades da coluna.',
     aboutCard2Title: 'Debate Multidisciplinar',
-    aboutCard2Text: 'Essencialmente educativo, o Scoliosis Day promove a atualização científica, a troca de conhecimento e o debate multidisciplinar entre diferentes áreas da saúde. Mais do que um congresso, é um espaço que conecta a prática clínica, a ciência, a indústria, profissionais em formação e especialistas de referência nacional e internacional.',
-    aboutCard3Title: 'Apoio da ABTE',
-    aboutCard3Text: 'Desde a primeira edição, o Scoliosis Day conta com o apoio da Associação Brasileira de Tratamento da Escoliose (ABTE), reforçando seu compromisso com a comunidade científica dedicada à escoliose no Brasil.',
+    aboutCard2Text: 'Ao reunir diferentes especialidades em um só espaço, o Scoliosis Day fortalece uma abordagem integrada ao tratamento da escoliose, unindo prática clínica, ciência e indústria em prol de melhores resultados para o paciente.',
+    aboutCard3Title: 'Alcance internacional',
+    aboutCard3Text: 'O Scoliosis Day ultrapassa fronteiras. Através do Conteúdo Premium e da transmissão ao vivo do evento, já alcançou profissionais em mais de 10 países, incluindo Espanha, Itália, Alemanha e Estados Unidos.',
     // Link no rodapé dos cards "O que é o Scoliosis Day" (Home e Edições).
     learnMore: 'Saiba mais',
     // Abre o modal de detalhes nos cards de pessoa (organizadores, curadoria, Hall de Estrelas).
@@ -385,14 +385,15 @@ const t = {
     aboutPageHeroTitle: 'Sobre Nós',
     aboutPageHeroSubtitle: 'O principal evento científico multidisciplinar do Brasil com foco em conhecimento, inovação e excelência.',
     // "Scoliosis Day" no heading é <BrandWordmark /> (ver aboutTitleMain).
-    aboutPageIntroTitleMain: 'Sobre o',
-    aboutPageIntroText: 'O Scoliosis Day vem consolidando-se como referência internacional no tratamento das deformidades da coluna vertebral, reunindo grandes nomes da saúde do mundo a favor da educação. O Scoliosis Day é o ponto de encontro global para a vanguarda do tratamento da escoliose. Com uma filosofia pautada na educação e na ciência de alta qualidade, o evento reúne cirurgiões da coluna vertebral, fisioterapeutas, ortesistas de prestígio internacional, residentes e outros profissionais envolvidos no cuidado da escoliose.',
-    aboutPageCard1Title: 'Por que participar?',
-    aboutPageCard1Text: 'É uma experiência única com os maiores nomes da área, construir networking estratégico e ampliar sua visão sobre os desafios e avanços no cuidado com a escoliose.',
-    aboutPageCard2Title: 'Interatividade em foco!',
-    aboutPageCard2Text: 'Diferente de um congresso, o Scoliosis Day sempre nos dá a oportunidade de vivência com palestrantes de relevância em toda sua duração. Horas juntos trocando conhecimento de alta qualidade sobre as deformidades da coluna vertebral.',
-    aboutPageCard3Title: 'Equipe multidisciplinar',
-    aboutPageCard3Text: 'Médicos, Fisioterapeutas, Ortesistas e Psicólogos juntos traçando o futuro do tratamento cirúrgico e conservador das deformidades da coluna vertebral.',
+    aboutPageIntroTitleMain: 'Estamos fazendo',
+    aboutPageIntroTitleAccent: 'história!',
+    aboutPageIntroText: 'Em quatro edições, o Scoliosis Day saiu de 63 para 272 participantes e já recebeu nomes como Manuel Rigo, Sanja Schreiber, Sabrina Donzelli e René Castelein. Uma trajetória construída, edição após edição, por quem decidiu levar o debate sobre escoliose a sério no Brasil.',
+    aboutPageCard1Title: 'Formato Híbrido e Pré-Congresso',
+    aboutPageCard1Text: 'O Scoliosis Day conta com tradução simultânea e modalidade online, ampliando o acesso a profissionais de fora do Brasil. O pré-congresso Conteúdo Premium disponibiliza aulas com especialistas antes mesmo do evento presencial.',
+    aboutPageCard2Title: 'Networking Qualificado',
+    aboutPageCard2Text: 'Os vínculos construídos durante o Scoliosis Day frequentemente resultam em parcerias clínicas e colaborações científicas que se estendem além da programação oficial.',
+    aboutPageCard3Title: 'Atuação Integrada',
+    aboutPageCard3Text: 'Cirurgiões da coluna vertebral, fisioterapeutas, ortesistas e psicólogos participam da mesma programação, refletindo a abordagem integrada exigida pelo tratamento da escoliose.',
     // "Recife" é <AccentWord/> (--font-accent itálico) — ver AboutRecife.jsx.
     aboutPageRecifeTitleAccent: 'Recife',
     aboutPageRecifeTitleRest: ' é onde nascemos',
@@ -427,8 +428,7 @@ const t = {
     // Rodapé — coluna "Acompanhe" (antes "Contato") só tem o ícone do
     // Instagram, desde que o e-mail saiu dela numa rodada anterior — o
     // rótulo mudou pra refletir isso (ver PublicFooter.jsx).
-    footerTagline: 'O maior encontro sobre escoliose do Brasil, reunindo cirurgiões, fisioterapeutas e profissionais da saúde.',
-    footerAbteText: 'Com apoio da Associação Brasileira de Tratamento da Escoliose (ABTE).',
+    footerTagline: 'O maior encontro multidisciplinar sobre escoliose do Brasil. Ciência, prática clínica e alcance internacional, com a visão de transformar o padrão de cuidado ao paciente.',
     footerNavLabel: 'Navegação do rodapé',
     footerSiteMap: 'Navegue',
     footerFollowTitle: 'Acompanhe',

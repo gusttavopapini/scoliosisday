@@ -22,6 +22,7 @@ import { db } from '../config/firebase.js';
 import { eventSlug } from '../utils/slugify.js';
 import { EVENT_STATUS } from '../utils/constants.js';
 import { translateRootFields, translateArrayFields } from '../utils/writeTimeTranslation.js';
+import { deepNullifyUndefined } from '../utils/firestoreSanitize.js';
 
 const EVENTS_COLLECTION = 'events';
 
@@ -63,23 +64,19 @@ function withoutIdField(data) {
 }
 
 /**
- * Undefined nunca pode ir para setDoc()/updateDoc() — o Firestore rejeita a
- * escrita inteira ("Unsupported field value: undefined"). Vira null, não é
- * omitido: como saveEvent grava com merge:true, omitir a chave manteria um
- * valor antigo no Firestore em vez de limpar o campo que o formulário
- * deixou vazio. Defesa de segunda linha — a causa raiz (defaultValues do
- * form nunca deveria produzir undefined) é corrigida em EventForm.jsx, mas
- * isto protege qualquer campo opcional futuro que caia no mesmo problema.
+ * As três limpezas que todo payload de escrita precisa. deepNullifyUndefined
+ * (utils/firestoreSanitize.js) é recursivo de propósito: um payload de
+ * evento tem undefined em risco em qualquer nível (presentation[],
+ * archiveStats[], gallery[], colors{} — todo array de objeto ou objeto
+ * aninhado do schema), não só nas chaves de raiz. Uma versão só de raiz já
+ * causou bug numa rodada anterior: os itens de presentation/archiveStats
+ * voltam de translateArrayFields (writeTimeTranslation.js) via
+ * `...translations`, espalhado no payload DEPOIS deste sanitizeWrite(data)
+ * — por isso cada função de escrita abaixo aplica deepNullifyUndefined de
+ * novo no payload FINAL, já com translations/status/slug mesclados.
  */
-function nullifyUndefined(data) {
-  return Object.fromEntries(
-    Object.entries(data).map(([key, value]) => [key, value === undefined ? null : value]),
-  );
-}
-
-/** As três limpezas que todo payload de escrita precisa. */
 function sanitizeWrite(data) {
-  return nullifyUndefined(withoutIdField(withoutCurrentFlag(data)));
+  return deepNullifyUndefined(withoutIdField(withoutCurrentFlag(data)));
 }
 
 // Campos de texto livre traduzidos ao salvar (Parte 2 do fix de tradução —
@@ -196,7 +193,11 @@ export async function fetchEventById(id) {
 
 export async function createEvent(data) {
   const collectionRef = collection(db, EVENTS_COLLECTION);
-  const docRef = await addDoc(collectionRef, {
+  // Sanitizado de novo ao final: sanitizeWrite(data) já limpa o `data` de
+  // entrada, mas os campos gerados aqui embaixo (status/slug) são
+  // literais seguros — o ponto é blindar o payload INTEIRO no formato que
+  // de fato vai pro setDoc, não confiar que cada pedaço já chegou limpo.
+  const payload = deepNullifyUndefined({
     ...sanitizeWrite(data),
     // Respeita o status enviado pelo formulário; 'draft' é apenas o padrão.
     status: data.status ?? 'draft',
@@ -207,16 +208,22 @@ export async function createEvent(data) {
     createdAt: new Date(),
     updatedAt: new Date(),
   });
+  if (import.meta.env.DEV) console.debug('[events] createEvent payload', payload);
+
+  const docRef = await addDoc(collectionRef, payload);
   return docRef.id;
 }
 
 export async function updateEvent(id, data) {
   const docRef = doc(db, EVENTS_COLLECTION, id);
-  await updateDoc(docRef, {
+  const payload = deepNullifyUndefined({
     ...sanitizeWrite(data),
     slug: data.slug || eventSlug(data.headline),
     updatedAt: new Date(),
   });
+  if (import.meta.env.DEV) console.debug('[events] updateEvent payload', payload);
+
+  await updateDoc(docRef, payload);
 }
 
 /**
@@ -239,20 +246,26 @@ export async function saveEvent(id, data) {
 
   const translations = await translateEventFields(data, previous);
 
-  await setDoc(
-    docRef,
-    {
-      ...sanitizeWrite(data),
-      ...translations,
-      status: data.status ?? 'draft',
-      slug: data.slug || eventSlug(data.headline),
-      // Na criação o campo nasce false; em atualizações não é tocado, para
-      // não desfazer o que setCurrentEvent decidiu.
-      ...(snapshot.exists() ? {} : { createdAt: now, isCurrent: false }),
-      updatedAt: now,
-    },
-    { merge: true },
-  );
+  // Sanitizado de novo depois de ...translations: translateArrayFields
+  // (ver writeTimeTranslation.js) reconstrói cada item de
+  // presentation/archiveStats como `{...item, ...traduções}` a partir do
+  // `data` ORIGINAL, sem passar pela limpeza de sanitizeWrite(data) — um
+  // undefined ali (ex: item novo de archiveStats ainda sem os campos
+  // opcionais preenchidos) chegava intacto no setDoc(). deepNullifyUndefined
+  // no payload final, depois de todos os spreads, fecha essa brecha.
+  const payload = deepNullifyUndefined({
+    ...sanitizeWrite(data),
+    ...translations,
+    status: data.status ?? 'draft',
+    slug: data.slug || eventSlug(data.headline),
+    // Na criação o campo nasce false; em atualizações não é tocado, para
+    // não desfazer o que setCurrentEvent decidiu.
+    ...(snapshot.exists() ? {} : { createdAt: now, isCurrent: false }),
+    updatedAt: now,
+  });
+  if (import.meta.env.DEV) console.debug('[events] saveEvent payload', payload);
+
+  await setDoc(docRef, payload, { merge: true });
 
   return id;
 }
@@ -392,7 +405,7 @@ export async function duplicateEvent(id) {
   // com ele em toda leitura (inclusive na exclusão).
   const original = sanitizeWrite(docSnap.data());
   const copyHeadline = `${original.headline} (cópia)`;
-  const newDocRef = await addDoc(collection(db, EVENTS_COLLECTION), {
+  const payload = deepNullifyUndefined({
     ...original,
     headline: copyHeadline,
     // Deriva do headline da cópia: o slug do original pode não existir.
@@ -403,5 +416,8 @@ export async function duplicateEvent(id) {
     createdAt: new Date(),
     updatedAt: new Date(),
   });
+  if (import.meta.env.DEV) console.debug('[events] duplicateEvent payload', payload);
+
+  const newDocRef = await addDoc(collection(db, EVENTS_COLLECTION), payload);
   return newDocRef.id;
 }

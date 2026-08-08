@@ -7,17 +7,20 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useCreateProgramming, useUpdateProgramming } from '../../../hooks/useProgrammings.js';
+import { useCreateProgramming, useUpdateProgramming, useDeleteProgramming } from '../../../hooks/useProgrammings.js';
 import { useCollaborators } from '../../../hooks/useCollaborators.js';
 import { useEvents } from '../../../hooks/useEvents.js';
+import { useProgrammingImpact, useCascades } from '../../../hooks/useIntegrity.js';
 import { programmingSchema } from '../schemas/programmingSchema.js';
 import { newDay, newSession, normalizeDays } from '../../../utils/programmingDays.js';
 import SessionCard from './SessionCard.jsx';
+import ConfirmModal from '../../../components/ui/ConfirmModal.jsx';
 import DiscardChangesModal from '../../../components/ui/DiscardChangesModal.jsx';
 import { useDiscardGuard } from '../../../hooks/useDiscardGuard.js';
+import t from '../../../i18n/pt-BR.js';
 
 const MIN_DAYS = 1;
 
@@ -42,6 +45,14 @@ export default function ProgrammingForm({ initialData, isEditMode = false, onSuc
 
   const createMutation = useCreateProgramming();
   const updateMutation = useUpdateProgramming();
+  const deleteMutation = useDeleteProgramming();
+  // { affectedEvents } — exclusão da Programação inteira, distinta do ícone
+  // de lixeira por sessão (SessionCard/onDelete), que só remove uma sessão
+  // do array local, sem tocar no documento no Firestore.
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isCascading, setIsCascading] = useState(false);
+  const { check: checkImpact, isChecking } = useProgrammingImpact();
+  const { cascadeProgramming } = useCascades();
   const { data: allCollaborators = [] } = useCollaborators();
   const speakers = allCollaborators.filter((c) => c.type === 'speaker');
   const { data: events = [], isLoading: isLoadingEvents } = useEvents();
@@ -147,6 +158,41 @@ export default function ProgrammingForm({ initialData, isEditMode = false, onSuc
     } catch (error) {
       console.error('Erro ao salvar programação:', error);
       toast.error(error.message || 'Erro ao salvar programação');
+    }
+  }
+
+  // Levanta o impacto antes de confirmar: o usuário precisa saber quantos
+  // eventos ficarão sem programação vinculada — mesmo fluxo de
+  // ProgrammingsPage.jsx (listagem), só que redirecionando pra lá ao final
+  // em vez de já estar nela.
+  async function handleDeleteRequest() {
+    try {
+      const affectedEvents = await checkImpact(initialData.id);
+      setDeleteTarget({ affectedEvents });
+    } catch (error) {
+      toast.error(error.message || 'Erro ao verificar eventos vinculados');
+    }
+  }
+
+  async function handleDeleteConfirm() {
+    if (!initialData?.id) return;
+
+    setIsCascading(true);
+    try {
+      const affected = await cascadeProgramming(initialData.id);
+      await deleteMutation.mutateAsync(initialData.id);
+
+      setDeleteTarget(null);
+      toast.success(
+        affected > 0
+          ? `Programação excluída e desvinculada de ${affected} evento${affected !== 1 ? 's' : ''}.`
+          : 'Programação excluída com sucesso!',
+      );
+      navigate('/painel/programacoes');
+    } catch (error) {
+      toast.error(error.message || 'Erro ao excluir programação');
+    } finally {
+      setIsCascading(false);
     }
   }
 
@@ -301,6 +347,19 @@ export default function ProgrammingForm({ initialData, isEditMode = false, onSuc
           alignItems: 'center',
         }}
       >
+        {isEditMode && (
+          <button
+            type="button"
+            className="sd-btn sd-btn--outline sd-btn--danger"
+            onClick={handleDeleteRequest}
+            disabled={isCascading || isChecking || deleteMutation.isPending}
+            style={{ marginRight: 'auto' }}
+          >
+            <Trash2 size={16} aria-hidden="true" />
+            Excluir
+          </button>
+        )}
+
         <button
           type="button"
           className="sd-btn sd-btn--outline"
@@ -325,6 +384,40 @@ export default function ProgrammingForm({ initialData, isEditMode = false, onSuc
         <DiscardChangesModal
           onCancel={discard.cancelLeave}
           onConfirm={discard.confirmLeave}
+        />
+      )}
+
+      {/* ── Delete confirm modal, com aviso de impacto (mesmo padrão de
+          ProgrammingsPage.jsx) — exclui a Programação inteira, não a sessão
+          ativa exibida no formulário. ── */}
+      {deleteTarget && (
+        <ConfirmModal
+          title="Excluir programação?"
+          itemName={initialData?.name}
+          body={
+            deleteTarget.affectedEvents.length > 0 ? (
+              <>
+                <p className="sd-small">
+                  <strong>{deleteTarget.affectedEvents.length}</strong> evento
+                  {deleteTarget.affectedEvents.length !== 1 ? 's ficarão' : ' ficará'} sem
+                  programação vinculada:
+                </p>
+                <ul style={{ margin: 'var(--space-2) 0 0', paddingLeft: 'var(--space-5)' }}>
+                  {deleteTarget.affectedEvents.map((event) => (
+                    <li key={event.id} className="sd-small sd-muted">
+                      {event.headline}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="sd-small sd-muted">Nenhum evento está vinculado a esta programação.</p>
+            )
+          }
+          warning={t.common.deleteConfirmBody}
+          isBusy={isCascading || deleteMutation.isPending}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={handleDeleteConfirm}
         />
       )}
     </>

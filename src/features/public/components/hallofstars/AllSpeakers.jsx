@@ -8,7 +8,7 @@
 import { useState, useMemo } from 'react';
 import { Users } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
-import PersonCard from '../editions/PersonCard.jsx';
+import PeopleGrid from '../editions/PeopleGrid.jsx';
 
 /** @param {{ title: string, searchPlaceholder: string, emptyTitle: string, emptyBody: string, people: object[] }} props */
 export default function AllSpeakers({ title, searchPlaceholder, emptyTitle, emptyBody, people }) {
@@ -45,11 +45,7 @@ export default function AllSpeakers({ title, searchPlaceholder, emptyTitle, empt
         )}
 
         {filtered.length > 0 ? (
-          <div className="sdp-people-grid">
-            {filtered.map((person) => (
-              <PersonCard key={person.id} person={person} />
-            ))}
-          </div>
+          <PeopleGrid people={filtered} />
         ) : people.length > 0 ? (
           <div className="sdp-section-empty" role="status">
             <Users size={32} aria-hidden="true" />
