@@ -156,6 +156,15 @@
   text-transform: none;
 }
 
+/* Modificador pontual — só onde "Scoliosis Day" reportou quebra em duas
+   linhas no mobile (heading "O que é o Scoliosis Day", HomeAbout.jsx), não
+   no .sdp-brand-wordmark base: aplicar nowrap em toda ocorrência do site
+   arriscaria estourar largura em headings mais estreitos que nunca tiveram
+   esse problema. */
+.sdp-brand-wordmark--nowrap {
+  white-space: nowrap;
+}
+
 /* ---- Cluster da direita: idioma + CTA + hambúrguer ---- */
 .sdp-navbar__actions {
   display: flex;
@@ -394,13 +403,11 @@
   margin-inline: auto;
   overflow: hidden;
   border-radius: var(--radius-xl);
-  /* Ground escuro enquanto a imagem carrega: o texto on-dark nunca
-     fica sobre fundo claro, nem por um frame. */
+  /* Ground escuro enquanto a imagem carrega — e agora também o fundo do
+     estado sem-banner (.sdp-hero--brand não sobrepõe mais var(--grad-hero)
+     por cima): sólido, sem gradiente nenhum, texto on-dark nunca fica
+     sobre fundo claro, nem por um frame. */
   background: var(--surface-dark);
-}
-
-.sdp-hero--brand {
-  background: var(--grad-hero);
 }
 
 .sdp-hero__media {
@@ -868,11 +875,10 @@
   margin-inline: auto;
   border-radius: var(--radius-xl);
   overflow: hidden;
+  /* Sólido, sem gradiente — mesmo fundo do estado "carregando imagem" serve
+     de fallback pro estado sem-banner (--frame--brand não sobrepõe mais
+     var(--grad-hero) por cima, ver .sdp-hero__frame acima). */
   background: var(--surface-dark);
-}
-
-.sdp-edition-hero__frame--brand {
-  background: var(--grad-hero);
 }
 
 .sdp-edition-hero__media {

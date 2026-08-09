@@ -35,7 +35,7 @@ export default function EditionHero({ event, editionBadge }) {
 
   return (
     <section className="sdp-edition-hero">
-      <div className={`sdp-edition-hero__frame${hasBanner ? '' : ' sdp-edition-hero__frame--brand sd-dots'}`}>
+      <div className={`sdp-edition-hero__frame${hasBanner ? '' : ' sd-dots'}`}>
         {hasBanner && (
           <div className="sdp-edition-hero__media" aria-hidden="true">
             <picture>

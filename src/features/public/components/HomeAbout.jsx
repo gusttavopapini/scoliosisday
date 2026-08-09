@@ -21,7 +21,7 @@ export default function HomeAbout() {
       <div className="sd-container">
         <header className="sd-section-header sd-section-header--center sdp-section-header">
           <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
-            {t.site.aboutTitleMain} <BrandWordmark />
+            {t.site.aboutTitleMain} <BrandWordmark className="sdp-brand-wordmark sdp-brand-wordmark--nowrap" />
           </h2>
           <div className="sd-rule" aria-hidden="true">
             <i /><i /><i /><i /><i />

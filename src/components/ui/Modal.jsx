@@ -58,6 +58,39 @@ export default function Modal({
     };
   }, []);
 
+  // Trava o scroll da página por trás enquanto o modal está aberto — vale
+  // pra qualquer consumidor deste primitivo (PersonModal, ArchiveGalleryLightbox
+  // no site público; ConfirmModal, DiscardChangesModal etc no painel), uma
+  // correção só cobre todos. overflow:hidden sozinho não impede o scroll
+  // por trás em touch no iOS Safari; position:fixed trava de fato, mas
+  // precisa compensar o scroll atual (top negativo) pra não pular a
+  // página pro topo, e restaurar a posição exata ao fechar. O scroll
+  // interno do modal continua funcionando — .sda-modal__body já tem
+  // overflow-y:auto próprio, alheio ao que acontece no body.
+  useEffect(() => {
+    const { body } = document;
+    const scrollY = window.scrollY;
+    const previous = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    };
+
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+
+    return () => {
+      body.style.overflow = previous.overflow;
+      body.style.position = previous.position;
+      body.style.top = previous.top;
+      body.style.width = previous.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   function handleKeyDown(event) {
     if (event.key === 'Escape') {
       if (!isBusy) onClose();

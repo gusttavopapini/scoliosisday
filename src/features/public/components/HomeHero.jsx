@@ -147,7 +147,7 @@ export default function HomeHero() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className={`sdp-hero__frame${hasBanner ? '' : ' sdp-hero--brand sd-dots'}`}>
+      <div className={`sdp-hero__frame${hasBanner ? '' : ' sd-dots'}`}>
         <div key={slide.id} className="sdp-hero__slide sdp-carousel__slide">
           {hasBanner && (
             <div className="sdp-hero__media" aria-hidden="true">
