@@ -31,8 +31,13 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-/** @param {{ people: object[] }} props */
-export default function PeopleGrid({ people }) {
+/**
+ * @param {{ people: object[], columns?: 3 | 4 }} props
+ * `columns` só muda a largura calculada de cada coluna no modo grade
+ * (desktop/tablet) — o carrossel mobile abaixo (3+ pessoas) é alheio a
+ * isso, sempre um card por vez independente de `columns`.
+ */
+export default function PeopleGrid({ people, columns = 3 }) {
   const trackRef = useRef(null);
   const resumeTimerRef = useRef(null);
   // Lazy initializer: lê o viewport real já no primeiro render, pra não
@@ -81,7 +86,7 @@ export default function PeopleGrid({ people }) {
 
   if (!isCarousel) {
     return (
-      <div className="sdp-people-grid">
+      <div className={`sdp-people-grid${columns === 4 ? ' sdp-people-grid--cols-4' : ''}`}>
         {people.map((person) => (
           <PersonCard key={person.id} person={person} />
         ))}

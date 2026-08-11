@@ -62,6 +62,7 @@ const EditTestimonialPage = lazy(() => import('../features/testimonials/EditTest
 const BannersPage = lazy(() => import('../features/banners/BannersPage.jsx'));
 const CreateBannerPage = lazy(() => import('../features/banners/CreateBannerPage.jsx'));
 const EditBannerPage = lazy(() => import('../features/banners/EditBannerPage.jsx'));
+const SettingsPage = lazy(() => import('../features/settings/SettingsPage.jsx'));
 
 /** Envolve uma página no limite de Suspense usado por todas as rotas. */
 function suspended(Page) {
@@ -161,6 +162,7 @@ export const router = createBrowserRouter([
           { path: '/painel/banners', element: suspended(BannersPage) },
           { path: '/painel/banners/novo', element: suspended(CreateBannerPage) },
           { path: '/painel/banners/:id/editar', element: suspended(EditBannerPage) },
+          { path: '/painel/configuracoes', element: suspended(SettingsPage) },
 
           // Desenvolvimento
           { path: '/painel/dev/ui', element: suspended(UIDevPage) },

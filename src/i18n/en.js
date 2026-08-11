@@ -413,7 +413,6 @@ const t = {
     footerNavLabel: 'Footer navigation',
     footerSiteMap: 'Browse',
     footerFollowTitle: 'Follow',
-    contactInstagram: '@scoliosisday',
     footerCopyright: '© {year} Scoliosis Day. All rights reserved.',
 
     // 404 do site público

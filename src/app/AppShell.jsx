@@ -7,18 +7,17 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, Users, Building2, Star,
-  FileText, Quote, Image, Menu, X, LogOut,
+  FileText, Quote, Image, Settings, Menu, X, LogOut,
 } from 'lucide-react';
 import t from '../i18n/pt-BR.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePermissions } from '../hooks/usePermissions.js';
 import { AVATAR_COLORS } from '../utils/constants.js';
 import { getInitials, avatarColorIndex } from '../utils/initials.js';
-// Mesmo arquivo do site público (PublicFooter.jsx) — a variante colorida
-// (laranja/teal), não a branca do PublicNavbar.jsx: o fundo da sidebar
-// (--grad-teal, teal-700→teal-950) é da mesma família escura do fundo
-// sólido teal-950 do footer, onde essa variante já funciona hoje.
-import logoColor from '../assets/logo-color.svg';
+// Mesmo arquivo do site público usado no PublicNavbar.jsx (variante
+// branca) — troca pedida explicitamente, mesmo o Footer usando a colorida
+// (logo-color.svg): confirmado antes de trocar, decisão do usuário.
+import logoWhite from '../assets/logo-white.svg';
 
 const NAV_ITEMS = [
   { key: 'dashboard',     icon: LayoutDashboard, label: t.nav.dashboard,      href: '/painel' },
@@ -28,6 +27,7 @@ const NAV_ITEMS = [
   { key: 'schedules',     icon: FileText,        label: t.nav.schedules,       href: '/painel/programacoes' },
   { key: 'testimonials',  icon: Quote,           label: t.nav.testimonials,    href: '/painel/depoimentos' },
   { key: 'banners',       icon: Image,           label: t.nav.banners,         href: '/painel/banners' },
+  { key: 'settings',      icon: Settings,        label: t.nav.settings,        href: '/painel/configuracoes' },
   { key: 'staff',         icon: Star,            label: t.nav.staff,           href: '/painel/staff', module: 'staff' },
 ];
 
@@ -68,7 +68,7 @@ export default function AppShell({ activeNav, breadcrumb, children }) {
         >
           <div className="sda-sidebar__logo">
             <Link to="/painel" aria-label="Scoliosis Day — Painel Admin">
-              <img src={logoColor} alt="Scoliosis Day" className="sda-sidebar__logo-img" />
+              <img src={logoWhite} alt="Scoliosis Day" className="sda-sidebar__logo-img" />
             </Link>
           </div>
 

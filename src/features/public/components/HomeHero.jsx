@@ -21,7 +21,7 @@ import { eventBannerUrl } from '../../../utils/eventBanner.js';
 const TABLET_MEDIA = '(max-width: 1024px)';
 const MOBILE_MEDIA = '(max-width: 640px)';
 
-const AUTO_SLIDE_MS = 3000;
+const AUTO_SLIDE_MS = 2000;
 
 /**
  * Combina o evento atual com os banners manuais ativos num único array de
@@ -81,8 +81,8 @@ function buildSlides(event, banners) {
 
 export default function HomeHero() {
   const { t } = useLanguage();
-  const { data: event } = useCurrentPublicEvent();
-  const { data: allBanners = [] } = useBanners();
+  const { data: event, isPending: isEventPending } = useCurrentPublicEvent();
+  const { data: allBanners = [], isPending: isBannersPending } = useBanners();
 
   const slides = useMemo(() => buildSlides(event, allBanners), [event, allBanners]);
 
@@ -115,6 +115,21 @@ export default function HomeHero() {
   // tempo de leitura. Sem slide não há o que resolver.
   const translated = useStoredTranslation(slide, ['headline', 'subtitle', 'cta']);
 
+  // Enquanto as duas queries (evento atual + banners) ainda estão em voo, a
+  // seção inteira não existe no DOM até aqui — sem isto, o hero (que reserva
+  // ~95vh via .sdp-hero__frame) "aparece do nada" e empurra o resto da
+  // página pra baixo assim que os dados chegam. O esqueleto ocupa a mesma
+  // altura real desde o primeiro render, sem layout shift.
+  if (isEventPending || isBannersPending) {
+    return (
+      <section className="sdp-hero" aria-hidden="true">
+        <div className="sdp-hero__frame sdp-hero__skeleton" />
+      </section>
+    );
+  }
+
+  // Depois de resolvidas as duas queries: sem evento atual e sem banner
+  // manual ativo, a seção some de vez — não é mais "carregando".
   if (!slide) return null;
 
   const desktopUrl = slide.bannerDesktopUrl;

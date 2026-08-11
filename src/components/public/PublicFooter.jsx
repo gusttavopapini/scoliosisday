@@ -7,33 +7,9 @@
 
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage.js';
+import { useSocialLinks } from '../../hooks/useSettings.js';
+import { getSocialPlatform } from '../../utils/socialPlatforms.js';
 import logoColor from '../../assets/logo-color.svg';
-
-// lucide-react (a biblioteca de ícones já usada no projeto) não tem ícones
-// de marca/rede social — confirmado antes de importar qualquer coisa nova.
-// SVG inline no mesmo estilo dos ícones lucide (stroke 2px, cantos
-// arredondados, currentColor), sem adicionar dependência nova ao projeto.
-function InstagramIcon(props) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-    </svg>
-  );
-}
 
 // Mesma ordem do navbar (ver NAV_LINKS em PublicNavbar.jsx) — Depoimentos
 // também não entra aqui pelo mesmo motivo: /depoimentos foi removida, sem
@@ -46,10 +22,16 @@ const FOOTER_LINKS = [
   { key: 'sponsors', to: '/patrocinadores' },
 ];
 
-const INSTAGRAM_URL = 'https://www.instagram.com/scoliosisday';
-
 export default function PublicFooter() {
   const { t } = useLanguage();
+  const { data: socialLinks = [] } = useSocialLinks();
+
+  // Só ativos, na ordem cadastrada no painel (/painel/configuracoes) —
+  // mesmo padrão de "seções sem dado se ocultam" usado no resto do site:
+  // sem nenhuma rede ativa, a coluna inteira some (sem espaço vazio).
+  const activeSocialLinks = socialLinks
+    .filter((link) => link.active && link.url?.trim())
+    .sort((a, b) => a.order - b.order);
 
   return (
     <footer className="sd-footer">
@@ -70,18 +52,31 @@ export default function PublicFooter() {
               ))}
             </nav>
 
-            <div className="sd-footer__col">
-              <b>{t.site.footerFollowTitle}</b>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={t.site.contactInstagram}
-                className="sdp-footer__instagram"
-              >
-                <InstagramIcon width={25} height={25} />
-              </a>
-            </div>
+            {activeSocialLinks.length > 0 && (
+              <div className="sd-footer__col">
+                <b>{t.site.footerFollowTitle}</b>
+                <div className="sdp-footer__social">
+                  {activeSocialLinks.map((link) => {
+                    const platform = getSocialPlatform(link.platform);
+                    if (!platform) return null;
+                    const { Icon } = platform;
+
+                    return (
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={platform.label}
+                        className="sdp-footer__social-link"
+                      >
+                        <Icon size={25} aria-hidden="true" />
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

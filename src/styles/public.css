@@ -201,13 +201,25 @@
   color: var(--teal-700);
 }
 
-/* Ícone do Instagram: mesmo link-hover acima (currentColor no SVG segue o
-   color do <a>) — único item da coluna "Contato" desde que o e-mail saiu
-   dela; tamanho vem de width/height no <InstagramIcon> (PublicFooter.jsx),
-   não daqui. */
-.sdp-footer__instagram {
+/* Ícones de redes sociais (cadastradas em /painel/configuracoes) — mesmo
+   link-hover acima (currentColor no SVG dos ícones react-icons/fa6 segue o
+   color do <a>). max-width trava em exatamente 3 por linha (3 alvos de
+   40px + 2 gaps), centralizado — não depende da largura real da coluna,
+   que em telas estreitas poderia encaixar só 2 ou forçar mais que 3. */
+.sdp-footer__social {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  max-width: calc(3 * 40px + 2 * var(--space-3));
+}
+
+.sdp-footer__social-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
 }
 
 .sdp-page .sd-footer__bottom {
@@ -408,6 +420,29 @@
      por cima): sólido, sem gradiente nenhum, texto on-dark nunca fica
      sobre fundo claro, nem por um frame. */
   background: var(--surface-dark);
+}
+
+/* ---- Esqueleto do hero (HomeHero.jsx, enquanto evento atual + banners
+   ainda estão em voo) ---- Mesma animação de .sdp-translating (shimmer
+   @keyframes sda-shimmer, definida em admin.css — carregado globalmente em
+   main.jsx, então já disponível aqui sem duplicar). Sobrepõe o
+   background:var(--surface-dark) acima por vir depois no arquivo. */
+.sdp-hero__skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--gray-100) 25%,
+    var(--gray-200) 37%,
+    var(--gray-100) 63%
+  );
+  background-size: 400% 100%;
+  animation: sda-shimmer var(--dur-slow) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdp-hero__skeleton {
+    animation: none;
+    background: var(--gray-100);
+  }
 }
 
 .sdp-hero__media {
@@ -1036,6 +1071,32 @@
   }
 
   .sdp-people-card {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ---- Variante "Todos os palestrantes" (Hall de Estrelas) — 4 colunas ----
+   Só essa seção (PeopleGrid.jsx recebe columns={4} em AllSpeakers.jsx) —
+   "Hall de Estrelas" (destaque, FeaturedSpeakers.jsx) e as demais seções
+   que reaproveitam PeopleGrid.jsx continuam nas 3 colunas padrão acima,
+   sem tocar em nada. Mesma lógica de largura fixa calculada da grade base,
+   só com um card a mais por linha — e os MESMOS breakpoints (900/640) do
+   card em si, não muda. */
+.sdp-people-grid--cols-4 .sdp-people-card {
+  flex-basis: calc((100% - 3 * var(--space-5)) / 4);
+  max-width: calc((100% - 3 * var(--space-5)) / 4);
+}
+
+@media (max-width: 900px) {
+  .sdp-people-grid--cols-4 .sdp-people-card {
+    flex-basis: calc((100% - var(--space-5)) / 2);
+    max-width: calc((100% - var(--space-5)) / 2);
+  }
+}
+
+@media (max-width: 640px) {
+  .sdp-people-grid--cols-4 .sdp-people-card {
     flex-basis: 100%;
     max-width: 100%;
   }

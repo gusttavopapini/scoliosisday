@@ -75,6 +75,10 @@ const sharedEventFields = {
   // 3 blocos fixos (mesmo padrão de `presentation`), cada campo opcional —
   // uma edição pode preencher só alguns blocos, e o site público oculta os
   // vazios individualmente (ver hasArchiveStat em utils/eventArchive.js).
+  // prefix/suffix saíram do formulário (EventStep5.jsx) e da renderização
+  // pública (ArchiveStatCard.jsx) — só `value` é editado/exibido agora.
+  // Campos continuam aqui por compatibilidade com edições que já tinham
+  // prefix/suffix preenchidos; nunca apagar dado histórico do Firestore.
   archiveStats: z.array(
     z.object({
       prefix: z.string().max(10, 'Máximo 10 caracteres').optional(),

@@ -26,7 +26,7 @@ import { useLanguage } from '../../../../hooks/useLanguage.js';
 
 // Mesmo intervalo do carrossel de banners da Home (HomeHero.jsx), pra
 // manter o ritmo de autoplay consistente entre os carrosséis do site.
-const AUTO_SLIDE_MS = 3000;
+const AUTO_SLIDE_MS = 2000;
 
 /** Classe de profundidade a partir da distância circular até o ativo. */
 function depthClass(distance) {

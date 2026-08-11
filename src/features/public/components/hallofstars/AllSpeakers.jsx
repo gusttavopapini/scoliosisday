@@ -45,7 +45,7 @@ export default function AllSpeakers({ title, searchPlaceholder, emptyTitle, empt
         )}
 
         {filtered.length > 0 ? (
-          <PeopleGrid people={filtered} />
+          <PeopleGrid people={filtered} columns={4} />
         ) : people.length > 0 ? (
           <div className="sdp-section-empty" role="status">
             <Users size={32} aria-hidden="true" />

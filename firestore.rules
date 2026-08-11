@@ -88,6 +88,15 @@ service cloud.firestore {
       allow write: if isPanelUser();
     }
 
+    // ── Settings ──
+    // Configurações globais do site (hoje: settings/socialMedia). Público:
+    // é o que alimenta o rodapé de todo visitante, sem autenticação —
+    // mesmo padrão de banners/sponsors/programmings/testimonials acima.
+    match /settings/{id} {
+      allow read:  if true;
+      allow write: if isPanelUser();
+    }
+
     // ── Mail (Trigger Email extension) ──
     match /mail/{id} {
       allow create: if isPanelUser();

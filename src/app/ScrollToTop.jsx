@@ -11,6 +11,18 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
+// Fora do componente — roda uma vez só, na primeira vez que este módulo é
+// avaliado (ScrollToTop é montado uma única vez, na raiz do router).
+// history.scrollRestoration por padrão é 'auto': o navegador tenta
+// restaurar sozinho a posição de scroll salva por ele em cada navegação
+// (mais agressivo em mobile), competindo com o window.scrollTo(0,0) do
+// efeito abaixo — corrida que explica o reset "às vezes funcionar, às
+// vezes não". 'manual' desliga essa restauração nativa, deixando o reset
+// só por nossa conta.
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
+
 export default function ScrollToTop() {
   const { pathname } = useLocation();
 

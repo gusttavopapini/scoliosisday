@@ -66,7 +66,7 @@ export default function EventStep5({ register, errors, watch, control, eventId }
       <div>
         <span className="sd-label">Estatísticas (opcional)</span>
         <p className="sd-note" style={{ marginBottom: 'var(--space-3)' }}>
-          Até 3 números em destaque (ex: "+3000" participantes). Deixe um bloco em branco
+          Até 3 números em destaque (ex: "3000" participantes). Deixe um bloco em branco
           para não exibi-lo.
         </p>
 
@@ -77,40 +77,16 @@ export default function EventStep5({ register, errors, watch, control, eventId }
                 Bloco {index + 1}
               </h4>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-3)' }}>
-                <label className="sd-field">
-                  <span className="sd-label">Prefixo</span>
-                  <input
-                    {...register(`archiveStats.${index}.prefix`)}
-                    className="sd-input"
-                    type="text"
-                    placeholder="Ex: +"
-                    maxLength={10}
-                  />
-                </label>
-
-                <label className="sd-field">
-                  <span className="sd-label">Valor</span>
-                  <input
-                    {...register(`archiveStats.${index}.value`)}
-                    className="sd-input"
-                    type="text"
-                    placeholder="Ex: 3000"
-                    maxLength={20}
-                  />
-                </label>
-
-                <label className="sd-field">
-                  <span className="sd-label">Sufixo</span>
-                  <input
-                    {...register(`archiveStats.${index}.suffix`)}
-                    className="sd-input"
-                    type="text"
-                    placeholder="Ex: %"
-                    maxLength={10}
-                  />
-                </label>
-              </div>
+              <label className="sd-field">
+                <span className="sd-label">Valor</span>
+                <input
+                  {...register(`archiveStats.${index}.value`)}
+                  className="sd-input"
+                  type="text"
+                  placeholder="Ex: 3000"
+                  maxLength={20}
+                />
+              </label>
 
               <label className="sd-field">
                 <span className="sd-label">Título</span>

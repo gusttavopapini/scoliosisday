@@ -51,6 +51,7 @@ const t = {
     testimonials: 'Depoimentos',
     banners: 'Banners',
     staff: 'Equipe',
+    settings: 'Configurações',
     logout: 'Sair',
   },
 
@@ -432,9 +433,6 @@ const t = {
     footerNavLabel: 'Navegação do rodapé',
     footerSiteMap: 'Navegue',
     footerFollowTitle: 'Acompanhe',
-    // Não é exibido como texto — vira aria-label do link-ícone do
-    // Instagram no rodapé (ver PublicFooter.jsx).
-    contactInstagram: '@scoliosisday',
     footerCopyright: '© {year} Scoliosis Day. Todos os direitos reservados.',
 
     // 404 do site público
