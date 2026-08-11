@@ -6,7 +6,7 @@ import { fetchSocialLinks, saveSocialLinks } from '../services/settings.js';
 
 const QUERY_KEY = ['settings', 'socialMedia'];
 
-/** Lista de redes sociais — painel (SocialMediaModal) e site público (PublicFooter). */
+/** Lista de redes sociais — painel (SettingsPage) e site público (PublicFooter). */
 export function useSocialLinks() {
   return useQuery({
     queryKey: QUERY_KEY,

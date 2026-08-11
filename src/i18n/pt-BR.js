@@ -51,7 +51,9 @@ const t = {
     testimonials: 'Depoimentos',
     banners: 'Banners',
     staff: 'Equipe',
-    settings: 'Configurações',
+    // "Redes Sociais", não "Configurações" — a página só edita redes
+    // sociais hoje; rótulo do módulo só no painel, rota não muda.
+    settings: 'Redes Sociais',
     logout: 'Sair',
   },
 

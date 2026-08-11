@@ -1,6 +1,6 @@
 // src/utils/socialPlatforms.js
 // Plataformas de rede social suportadas pelo sistema de configurações
-// (painel: SocialMediaModal.jsx · público: PublicFooter.jsx) — os dois
+// (painel: SettingsPage.jsx · público: PublicFooter.jsx) — os dois
 // lados leem esta mesma lista, pra nunca divergir ícone/rótulo entre
 // admin e site.
 //

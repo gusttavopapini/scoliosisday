@@ -13,7 +13,7 @@ export default function AllSponsors({ emptyTitle, emptyBody, sponsors }) {
     <section className="sd-section sd-section--tight">
       <div className="sd-container">
         {sponsors.length > 0 ? (
-          <div className="sd-grid sd-grid--4">
+          <div className="sdp-sponsors-grid">
             {sponsors.map((sponsor) => (
               <SponsorCard key={sponsor.id} sponsor={sponsor} />
             ))}

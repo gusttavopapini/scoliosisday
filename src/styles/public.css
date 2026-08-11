@@ -1713,6 +1713,37 @@
    repetição do estado de repouso.
    ============================================================ */
 
+/* Flex, não .sd-grid--4 (grid): igual ao .sdp-people-grid, uma última
+   linha incompleta precisa ficar centralizada, não colada à esquerda —
+   grid com 1fr faz os itens sobrarem nas primeiras colunas. Largura fixa
+   por card (não percentual) replica exatamente as mesmas 4/2/1 colunas
+   de .sd-grid--4 (design-system.css), só trocando a centralização. */
+.sdp-sponsors-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.sdp-sponsors-grid .sdp-sponsor-card {
+  flex: 0 0 calc((100% - 3 * var(--space-5)) / 4);
+  max-width: calc((100% - 3 * var(--space-5)) / 4);
+}
+
+@media (max-width: 900px) {
+  .sdp-sponsors-grid .sdp-sponsor-card {
+    flex-basis: calc((100% - var(--space-5)) / 2);
+    max-width: calc((100% - var(--space-5)) / 2);
+  }
+}
+
+@media (max-width: 620px) {
+  .sdp-sponsors-grid .sdp-sponsor-card {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+}
+
 .sdp-sponsor-card {
   display: flex;
   flex-direction: column;
