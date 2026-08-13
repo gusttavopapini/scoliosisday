@@ -5,7 +5,7 @@ import { Controller } from 'react-hook-form';
 import ImageUploader from '../../../../components/form/ImageUploader.jsx';
 import ColorPicker from '../../../../components/form/ColorPicker.jsx';
 import { UPLOAD_PRESETS } from '../../../../services/storageService.js';
-import { CTA_BUTTON_FALLBACK } from '../../constants/defaultPalette.js';
+import { CTA_BUTTON_FALLBACK, SEPARATOR_FALLBACK } from '../../constants/defaultPalette.js';
 
 // Um banner por breakpoint: o site público escolhe a arte pela largura da tela
 // em vez de reescalar uma única imagem. `slug` entra no caminho do Storage e
@@ -16,7 +16,7 @@ const BANNER_FIELDS = [
   { name: 'bannerMobileUrl',  slug: 'banner-mobile',  label: 'Banner Mobile',  size: '640×960px',   ratio: '2 / 3' },
 ];
 
-export default function EventStep1({ register, control, errors, eventId, hideCta = false }) {
+export default function EventStep1({ register, control, errors, watch, eventId, hideCta = false }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div>
@@ -232,6 +232,62 @@ export default function EventStep1({ register, control, errors, eventId, hideCta
           Como esta não é a edição atual, o botão de inscrição não é exibido no banner público.
         </p>
       )}
+
+      {/* Cor do separador — ao contrário do botão, editável nos dois modos:
+          o separador aparece no banner mesmo em edições passadas. */}
+      <div className="sd-field">
+        <span className="sd-label">
+          🎨 Cor do separador <span className="sd-muted">(opcional)</span>
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <Controller
+            name="separatorColor"
+            control={control}
+            render={({ field }) => (
+              <ColorPicker
+                value={field.value}
+                onChange={field.onChange}
+                fallback={SEPARATOR_FALLBACK}
+                label="Cor do separador"
+              />
+            )}
+          />
+          <span className="sd-small">Separador</span>
+        </div>
+        {errors.separatorColor && (
+          <span className="sd-error">{errors.separatorColor.message}</span>
+        )}
+        <span className="sd-note">Sem cor definida, o separador usa o laranja padrão do site.</span>
+      </div>
+
+      {/* Prévia — só os elementos editáveis (separador + botão, quando
+          houver), em fundo escuro igual ao hero público real (ver
+          .sda-colorpreview em admin.css). Sem cor definida, usa os mesmos
+          fallbacks do site, nunca um elemento sem cor. */}
+      <div className="sd-field">
+        <span className="sd-label">Prévia</span>
+        <div className="sda-colorpreview">
+          <div
+            className="sd-rule"
+            aria-hidden="true"
+            style={{ '--rule-color': watch('separatorColor') || undefined }}
+          >
+            <i /><i /><i /><i /><i />
+          </div>
+          {!hideCta && (
+            <span
+              className="sd-btn sd-btn--primary"
+              style={{
+                backgroundColor: watch('ctaButtonBg') || CTA_BUTTON_FALLBACK.bg,
+                borderColor: watch('ctaButtonBg') || CTA_BUTTON_FALLBACK.bg,
+                color: watch('ctaButtonText') || CTA_BUTTON_FALLBACK.text,
+              }}
+            >
+              {watch('cta')?.trim() || 'Call-to-Action'}
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* Edição atual */}
       <div className="sd-field">

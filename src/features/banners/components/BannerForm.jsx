@@ -21,8 +21,6 @@ import { bannerSchema } from '../schemas/bannerSchema.js';
 import { newBannerId } from '../../../services/banners.js';
 import { UPLOAD_PRESETS } from '../../../services/storageService.js';
 import ImageUploader from '../../../components/form/ImageUploader.jsx';
-import ColorPicker from '../../../components/form/ColorPicker.jsx';
-import { CTA_BUTTON_FALLBACK } from '../../events/constants/defaultPalette.js';
 import t from '../../../i18n/pt-BR.js';
 
 const BANNER_FIELDS = [
@@ -56,6 +54,12 @@ export default function BannerForm({ initialData, isEditMode = false, onSuccess 
   // initialData nasceria undefined (não o default seguro), e undefined
   // nunca sobrevive a um setDoc(). Nenhum campo aqui é opcional hoje, mas o
   // padrão fica protegido contra o mesmo problema em campos futuros.
+  //
+  // ctaButtonBg/ctaButtonText saíram da UI deste formulário (a edição de cor
+  // do botão/separador do banner passou a viver só no wizard de Edições,
+  // EventForm.jsx) mas continuam aqui como default seguro: banners antigos
+  // que já tinham essas cores preenchidas continuam devolvendo o mesmo valor
+  // a cada salvamento, em vez de perdê-lo por não ter mais campo editável.
   const DEFAULT_VALUES = {
     headline: '',
     subtitle: '',
@@ -183,51 +187,6 @@ export default function BannerForm({ initialData, isEditMode = false, onSuccess 
           <span className="sd-note">Sem link, o banner é exibido sem botão de ação.</span>
           {errors.ctaLink && <span className="sd-error">{errors.ctaLink.message}</span>}
         </label>
-
-        {/* ── Cor do botão CTA ── */}
-        <div className="sd-field">
-          <span className="sd-label">
-            🎨 Cor do botão <span className="sd-muted">(opcional)</span>
-          </span>
-          <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <Controller
-                name="ctaButtonBg"
-                control={control}
-                render={({ field }) => (
-                  <ColorPicker
-                    value={field.value}
-                    onChange={field.onChange}
-                    fallback={CTA_BUTTON_FALLBACK.bg}
-                    label="Cor de fundo do botão"
-                  />
-                )}
-              />
-              <span className="sd-small">Background</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <Controller
-                name="ctaButtonText"
-                control={control}
-                render={({ field }) => (
-                  <ColorPicker
-                    value={field.value}
-                    onChange={field.onChange}
-                    fallback={CTA_BUTTON_FALLBACK.text}
-                    label="Cor do texto do botão"
-                  />
-                )}
-              />
-              <span className="sd-small">Texto</span>
-            </div>
-          </div>
-          {(errors.ctaButtonBg || errors.ctaButtonText) && (
-            <span className="sd-error">
-              {errors.ctaButtonBg?.message || errors.ctaButtonText?.message}
-            </span>
-          )}
-          <span className="sd-note">Sem cor definida, o botão usa o laranja padrão do site.</span>
-        </div>
 
         {/* ── Banners por breakpoint ── */}
         {BANNER_FIELDS.map(({ name, slug, label, size, ratio }) => (

@@ -51,7 +51,11 @@ export default function EditionHero({ event, editionBadge }) {
           <h1 className="sd-display sd-display--lg sd-display--on-dark sdp-edition-hero__headline">
             {translated.headline}
           </h1>
-          <div className="sd-rule" aria-hidden="true">
+          <div
+            className="sd-rule"
+            aria-hidden="true"
+            style={event.separatorColor ? { '--rule-color': event.separatorColor } : undefined}
+          >
             <i /><i /><i /><i /><i />
           </div>
           {translated.subtitle && (

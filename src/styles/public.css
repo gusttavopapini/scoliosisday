@@ -2384,3 +2384,36 @@
   font-size: var(--text-sm);
 }
 
+/* ============================================================
+   31. EDIÇÕES · LOCALIZAÇÃO (EditionLocation.jsx)
+   Última seção de /edicoes para a edição atual, só quando event.location
+   existe. Mapa Leaflet somente leitura (zoom/pan livres, sem marcador
+   arrastável — ver LocationPickerModal.jsx pro editável, no admin).
+   ============================================================ */
+
+.sdp-location {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  max-width: var(--content-narrow);
+  margin: 0 auto;
+}
+
+.sdp-location__address {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-body);
+  font-size: var(--text-base);
+  text-align: center;
+}
+
+.sdp-location__map {
+  width: 100%;
+  height: 360px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+

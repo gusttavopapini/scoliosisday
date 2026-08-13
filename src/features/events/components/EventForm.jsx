@@ -95,6 +95,9 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     // escolher uma cor. null = "sem cor customizada" (ColorPicker.jsx).
     ctaButtonBg: null,
     ctaButtonText: null,
+    separatorColor: null,
+    // null = sem local definido — ver LocationPickerModal.jsx/EventStep2.jsx.
+    location: null,
     modality: 'hybrid',
     priceInPerson: null,
     priceOnline: null,
@@ -337,6 +340,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
             register={register}
             control={control}
             errors={errors}
+            watch={watch}
             eventId={draftIdRef.current}
             hideCta={!isCurrentValue}
           />

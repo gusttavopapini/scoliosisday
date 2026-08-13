@@ -45,6 +45,7 @@ function buildSlides(event, banners) {
       ctaLink: event.ctaLink,
       ctaButtonBg: event.ctaButtonBg,
       ctaButtonText: event.ctaButtonText,
+      separatorColor: event.separatorColor,
       bannerDesktopUrl: eventBannerUrl(event, 'desktop'),
       bannerTabletUrl: event.bannerTabletUrl?.trim() || '',
       bannerMobileUrl: event.bannerMobileUrl?.trim() || '',
@@ -178,7 +179,11 @@ export default function HomeHero() {
             <h1 className="sd-display sd-display--lg sd-display--on-dark">
               {headline}
             </h1>
-            <div className="sd-rule" aria-hidden="true">
+            <div
+              className="sd-rule"
+              aria-hidden="true"
+              style={slide.separatorColor ? { '--rule-color': slide.separatorColor } : undefined}
+            >
               <i /><i /><i /><i /><i />
             </div>
             {subtitle && (

@@ -354,6 +354,12 @@ const t = {
     organizersTitle: 'Organizing Committee',
     curatorsTitle: 'Scientific curation',
 
+    // Event location (current edition only, see EditionLocation.jsx) — the
+    // address itself is admin-entered (EventStep2.jsx) and not translated:
+    // it's a physical fact, same in both languages.
+    locationTitle: 'Location',
+    locationDirections: 'View on Google Maps',
+
     // ── Home · Apoiadores (esteira) ──
     supportersTitle: 'Supporters',
 
@@ -369,7 +375,6 @@ const t = {
 
     // ── /sobre ──
     aboutPageHeroTitle: 'About Us',
-    aboutPageHeroSubtitle: 'Brazil’s leading multidisciplinary scientific event, focused on knowledge, innovation and excellence.',
     // "Scoliosis Day" no heading é <BrandWordmark /> (ver aboutTitleMain).
     aboutPageIntroTitleMain: 'We are making',
     aboutPageIntroTitleAccent: 'history!',

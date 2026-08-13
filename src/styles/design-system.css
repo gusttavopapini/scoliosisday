@@ -316,8 +316,8 @@ body.sd-body {
 
 /* ---- Régua assinatura: barra laranja + cauda de pontos ---- */
 .sd-rule { display: flex; align-items: center; gap: 8px; margin: 0; border: none; }
-.sd-rule::before { content: ""; height: 3px; width: 64px; background: var(--orange-600); border-radius: 2px; }
-.sd-rule i { width: 6px; height: 6px; border-radius: 50%; background: var(--orange-600); }
+.sd-rule::before { content: ""; height: 3px; width: 64px; background: var(--rule-color, var(--orange-600)); border-radius: 2px; }
+.sd-rule i { width: 6px; height: 6px; border-radius: 50%; background: var(--rule-color, var(--orange-600)); }
 .sd-rule i:nth-child(2) { width: 5px; height: 5px; opacity: .8; }
 .sd-rule i:nth-child(3) { width: 4.5px; height: 4.5px; opacity: .62; }
 .sd-rule i:nth-child(4) { width: 4px; height: 4px; opacity: .45; }

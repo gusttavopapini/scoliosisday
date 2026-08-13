@@ -1,7 +1,10 @@
 // src/features/events/components/steps/EventStep2.jsx
 // Passo 2: Modalidade e Valores — Todos os eventos são híbridos, com preços separados
 
+import { useState } from 'react';
 import { Controller } from 'react-hook-form';
+import { MapPin } from 'lucide-react';
+import LocationPickerModal from '../../../../components/form/LocationPickerModal.jsx';
 
 function formatCurrency(value) {
   if (!value) return '';
@@ -78,6 +81,8 @@ function PriceField({ name, label, control, errors, watch }) {
 }
 
 export default function EventStep2({ control, errors, watch }) {
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div>
@@ -94,6 +99,62 @@ export default function EventStep2({ control, errors, watch }) {
 
       <PriceField name="priceInPerson" label="Valor Presencial" control={control} errors={errors} watch={watch} />
       <PriceField name="priceOnline" label="Valor Online" control={control} errors={errors} watch={watch} />
+
+      {/* Local do evento — exibido no fim da página pública da edição (ver
+          EditionLocation.jsx). Sem local definido, a seção nem aparece lá. */}
+      <div className="sd-field">
+        <span className="sd-label">
+          📍 Local do evento <span className="sd-muted">(opcional)</span>
+        </span>
+        <Controller
+          name="location"
+          control={control}
+          render={({ field }) => (
+            <>
+              {field.value ? (
+                <div className="sda-locationfield">
+                  <span className="sda-locationfield__address">
+                    <MapPin size={16} aria-hidden="true" />
+                    {field.value.address}
+                  </span>
+                  <button
+                    type="button"
+                    className="sd-btn sd-btn--outline sd-btn--sm"
+                    onClick={() => setIsLocationModalOpen(true)}
+                  >
+                    Alterar localização
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="sd-btn sd-btn--outline sd-btn--sm"
+                  onClick={() => setIsLocationModalOpen(true)}
+                >
+                  <MapPin size={16} aria-hidden="true" />
+                  Selecionar localização no mapa
+                </button>
+              )}
+
+              {isLocationModalOpen && (
+                <LocationPickerModal
+                  initialLocation={field.value}
+                  onConfirm={field.onChange}
+                  onClose={() => setIsLocationModalOpen(false)}
+                />
+              )}
+            </>
+          )}
+        />
+        {errors.location && (
+          <span className="sd-error">
+            {errors.location.message || errors.location.address?.message}
+          </span>
+        )}
+        <span className="sd-note">
+          Exibido ao final da página pública desta edição, com link para o Google Maps.
+        </span>
+      </div>
     </div>
   );
 }

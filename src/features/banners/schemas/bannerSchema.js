@@ -14,6 +14,9 @@ export const bannerSchema = z.object({
   ctaLink: z.string().url('URL inválida').optional().or(z.literal('')),
   // Cor customizada do botão CTA — null/vazio usa o laranja padrão do
   // design system (mesmo campo/regra do evento, ver eventSchema.js).
+  // Sem UI própria (ver BannerForm.jsx) — mantidos só pra não perder a cor
+  // de banners antigos que já tinham isso preenchido antes da edição de cor
+  // migrar para o wizard de Edições (EventStep1.jsx).
   ctaButtonBg: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
   ctaButtonText: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
   bannerDesktopUrl: z.string().optional().default(''),

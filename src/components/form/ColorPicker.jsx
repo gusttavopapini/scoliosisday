@@ -1,19 +1,33 @@
 // src/components/form/ColorPicker.jsx
 // Seletor de cor compacto: um círculo com a cor atual (ou o fallback do
-// design system) como acionador. Clicar abre um popover com o input nativo
-// type="color" (já traz o círculo cromático do SO no macOS/iOS/Chrome) e um
-// campo de texto pra digitar o hex direto, sincronizados entre si.
-//
-// Sem lib externa — o nativo cobre o caso de uso pedido.
+// design system) como acionador. Clicar abre um popover inline (editor
+// cromático da react-colorful — área de saturação/brilho + slider de matiz)
+// e um campo de texto pra digitar o hex direto, sincronizados entre si.
+// Sem seletor nativo do SO.
 //
 // Controlado como o resto dos campos do projeto: quem chama passa
 // value/onChange. value null/vazio = "sem cor customizada": o círculo
 // mostra o fallback só como PREVIEW, nunca grava o fallback como valor real
 // (onChange só dispara numa escolha explícita do usuário).
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { HexColorPicker } from 'react-colorful';
 
 const HEX_RE = /^#[0-9A-Fa-f]{6}$/;
+
+// Exclusividade entre instâncias: abrir um popover fecha qualquer outro já
+// aberto na página (Cor do botão, Cor do separador, etc.), sem acoplar os
+// componentes entre si — só o módulo guarda quem está aberto agora.
+let activeCloseFn = null;
+
+function openExclusive(closeFn) {
+  if (activeCloseFn && activeCloseFn !== closeFn) activeCloseFn();
+  activeCloseFn = closeFn;
+}
+
+function releaseExclusive(closeFn) {
+  if (activeCloseFn === closeFn) activeCloseFn = null;
+}
 
 /**
  * @param {{
@@ -34,8 +48,15 @@ export default function ColorPicker({ value, onChange, fallback, label }) {
     setHexInput(value || fallback);
   }, [value, fallback]);
 
+  const closeSelf = useCallback(() => setIsOpen(false), []);
+
+  // Um único useEffect cobre os dois lados da exclusividade: abrir registra
+  // esta instância como a ativa (fechando a anterior, se houver); fechar por
+  // qualquer caminho (clique fora, Escape, ou o closeFn vindo de outra
+  // instância) libera o registro na limpeza.
   useEffect(() => {
     if (!isOpen) return undefined;
+    openExclusive(closeSelf);
 
     function handlePointerDown(event) {
       if (!containerRef.current?.contains(event.target)) setIsOpen(false);
@@ -49,8 +70,9 @@ export default function ColorPicker({ value, onChange, fallback, label }) {
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
+      releaseExclusive(closeSelf);
     };
-  }, [isOpen]);
+  }, [isOpen, closeSelf]);
 
   function commitHex(raw) {
     const hex = raw.startsWith('#') ? raw : `#${raw}`;
@@ -73,12 +95,10 @@ export default function ColorPicker({ value, onChange, fallback, label }) {
 
       {isOpen && (
         <div className="sda-colorpicker__popover" role="dialog" aria-label={label}>
-          <input
-            type="color"
-            className="sda-colorpicker__native"
-            value={HEX_RE.test(hexInput) ? hexInput : fallback}
-            onChange={(event) => commitHex(event.target.value)}
-            aria-label={`${label} — seletor do sistema`}
+          <HexColorPicker
+            className="sda-colorpicker__wheel"
+            color={HEX_RE.test(hexInput) ? hexInput : fallback}
+            onChange={commitHex}
           />
           <input
             type="text"

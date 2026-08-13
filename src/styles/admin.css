@@ -442,6 +442,12 @@
   animation: sda-modal-in var(--dur-base) var(--ease-out) both;
 }
 
+/* Modais com conteúdo mais largo que o padrão (ex: LocationPickerModal —
+   mapa precisa de espaço horizontal pra ser utilizável). */
+.sda-modal__panel--wide {
+  max-width: 720px;
+}
+
 @keyframes sda-modal-in {
   from {
     opacity: 0;
@@ -1609,9 +1615,12 @@
 }
 
 /* ============================================================
-   COLORPICKER (cor do botão CTA — Eventos/Edições e Banners avulsos)
-   Círculo com a cor atual como acionador; popover com input nativo
-   type="color" + campo de hex, sincronizados (ver ColorPicker.jsx).
+   COLORPICKER (cor do botão CTA e do separador — Eventos/Edições e
+   Banners avulsos)
+   Círculo com a cor atual como acionador; popover inline com editor
+   cromático da react-colorful (área de saturação/brilho + matiz) + campo
+   de hex, sincronizados (ver ColorPicker.jsx). Só um popover aberto por
+   vez entre todas as instâncias da página.
    ============================================================ */
 
 .sda-colorpicker {
@@ -1635,28 +1644,127 @@
   left: 0;
   z-index: 20;
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  flex-direction: column;
+  gap: var(--space-3);
   padding: var(--space-3);
   border: var(--border-width) solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--surface-card);
-  box-shadow:var(--shadow-md);
+  box-shadow: var(--shadow-md);
 }
 
-.sda-colorpicker__native {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: var(--border-width) solid var(--border-subtle);
+.sda-colorpicker__wheel.react-colorful {
+  width: 180px;
+  height: 180px;
+}
+
+.sda-colorpicker__wheel .react-colorful__saturation {
   border-radius: var(--radius-sm);
-  background: none;
-  cursor: pointer;
+}
+
+.sda-colorpicker__wheel .react-colorful__hue {
+  height: 14px;
+  border-radius: var(--radius-pill);
+  margin-top: var(--space-2);
+}
+
+.sda-colorpicker__wheel .react-colorful__hue-pointer,
+.sda-colorpicker__wheel .react-colorful__saturation-pointer {
+  width: 16px;
+  height: 16px;
 }
 
 .sda-colorpicker__hex {
-  width: 110px;
+  width: 180px;
   text-transform: uppercase;
+}
+
+/* Prévia do separador + botão com as cores em edição (EventStep1.jsx) —
+   mesmo --surface-dark do fundo real do hero público (.sdp-hero__frame /
+   .sdp-edition-hero__frame), pra separador/botão ficarem legíveis igual
+   ficariam lá; num cartão branco o botão de texto claro ficaria ilegível. */
+.sda-colorpreview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--surface-dark);
+}
+
+/* ============================================================
+   LOCATIONPICKER (campo "Local do evento" — EventStep2.jsx) e o modal de
+   mapa que ele abre (LocationPickerModal.jsx). Fora do fluxo numerado por
+   ser tão recente quanto o bloco COLORPICKER acima.
+   ============================================================ */
+
+/* Estado "já tem local salvo" do campo, no wizard (fora do modal). */
+.sda-locationfield {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.sda-locationfield__address {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-body);
+  font-size: var(--text-sm);
+}
+
+.sda-locationpicker__search {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.sda-locationpicker__search .sd-input {
+  flex: 1;
+}
+
+.sda-locationpicker__results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: calc(var(--space-3) * -1) 0 var(--space-3);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  max-height: 160px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.sda-locationpicker__results button {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  text-align: left;
+  font-size: var(--text-sm);
+  color: var(--text-body);
+  cursor: pointer;
+}
+
+.sda-locationpicker__results button:hover {
+  background: var(--surface-sunken);
+}
+
+.sda-locationpicker__map {
+  height: 360px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-4);
 }
 
 /* ============================================================

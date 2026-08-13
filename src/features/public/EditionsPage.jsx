@@ -26,6 +26,7 @@ import EditionPricing from './components/editions/EditionPricing.jsx';
 import EditionPresentation from './components/editions/EditionPresentation.jsx';
 import EditionSchedule from './components/editions/EditionSchedule.jsx';
 import EditionArchive from './components/editions/EditionArchive.jsx';
+import EditionLocation from './components/editions/EditionLocation.jsx';
 
 export default function EditionsPage() {
   const { t, lang } = useLanguage();
@@ -194,6 +195,8 @@ export default function EditionsPage() {
             people={curators}
             headingClassName="sdp-heading--regular"
           />
+
+          <EditionLocation key={`location-${activeEvent.id}`} event={activeEvent} />
         </>
       ) : (
         <EditionArchive key={`archive-${activeEvent.id}`} event={activeEvent} />

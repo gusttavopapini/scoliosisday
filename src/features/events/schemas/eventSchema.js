@@ -39,6 +39,25 @@ const sharedEventFields = {
   // design system (ver EditionHero.jsx/HomeHero.jsx).
   ctaButtonBg: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
   ctaButtonText: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
+  // Cor customizada do separador (.sd-rule) — ao contrário do botão, editável
+  // e exibida nos dois modos do wizard: uma edição passada não tem CTA, mas
+  // ainda tem separador no banner (ver EditionHero.jsx). null = laranja
+  // padrão do design system.
+  separatorColor: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
+  // Local do evento (Passo 2, EventStep2.jsx) — só editável/exibido quando
+  // isCurrent (edições passadas não têm este campo no wizard por ora), mas
+  // fica em sharedEventFields pelo mesmo motivo de ctaButtonBg: preserva o
+  // valor se uma edição atual com local definido depois virar passada.
+  // null = sem local definido; o objeto inteiro nunca é gravado pela metade
+  // (endereço sempre exige lat/lng, ver LocationPickerModal.jsx).
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string().min(1, 'Endereço obrigatório'),
+    })
+    .nullable()
+    .optional(),
   modality: z.literal('hybrid').default('hybrid'),
   speakers: z.array(z.string()).optional().default([]),
   starSpeakerIds: z.array(z.string()).optional().default([]),
@@ -143,16 +162,17 @@ export const STEP_FIELDS = {
   step1: [
     'headline', 'subtitle', 'editionNumber',
     'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl', 'bannerOrder',
-    'cta', 'ctaLink', 'ctaButtonBg', 'ctaButtonText', 'isCurrent',
+    'cta', 'ctaLink', 'ctaButtonBg', 'ctaButtonText', 'separatorColor', 'isCurrent',
   ],
   // Passo 1 do wizard reduzido (edição passada): mesmos campos, sem CTA/link
-  // — esse botão não é mais exibido publicamente para edições passadas.
+  // — esse botão não é mais exibido publicamente para edições passadas. O
+  // separador continua (ver EditionHero.jsx: aparece nos dois modos).
   step1Reduced: [
     'headline', 'subtitle', 'editionNumber',
     'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl', 'bannerOrder',
-    'isCurrent',
+    'separatorColor', 'isCurrent',
   ],
-  step2: ['priceInPerson', 'priceOnline'],
+  step2: ['priceInPerson', 'priceOnline', 'location'],
   step3: ['presentation'],
   step4: ['speakers', 'starSpeakerIds', 'organizerIds', 'curatorIds', 'programming', 'sponsors'],
   // Único passo que ainda existe do antigo "Passo 5": o wizard completo

@@ -28,3 +28,8 @@ export const CTA_BUTTON_FALLBACK = {
   bg: '#FC975A',
   text: '#FFFFFF',
 };
+
+// Fallback do ColorPicker de cor do separador (EventStep1.jsx) — mesmo hex
+// hardcoded hoje em .sd-rule (design-system.css), pra o círculo abrir já na
+// cor real de um separador sem customização.
+export const SEPARATOR_FALLBACK = '#FC975A';

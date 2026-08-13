@@ -53,7 +53,7 @@ export default function AboutPage() {
 
   return (
     <>
-      <SimpleHero title={t.site.aboutPageHeroTitle} subtitle={t.site.aboutPageHeroSubtitle} />
+      <SimpleHero title={t.site.aboutPageHeroTitle} />
       <AboutIntro />
       <AboutRecife />
 

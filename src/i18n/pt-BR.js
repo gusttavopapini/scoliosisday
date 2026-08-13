@@ -371,6 +371,12 @@ const t = {
     organizersTitle: 'Comissão organizadora',
     curatorsTitle: 'Curadoria científica',
 
+    // Local do evento (só edição atual, ver EditionLocation.jsx) — endereço
+    // vem do admin (EventStep2.jsx), sem tradução: é um dado físico, igual
+    // nas duas línguas.
+    locationTitle: 'Localização',
+    locationDirections: 'Ver no Google Maps',
+
     // ── Home · Apoiadores (esteira) ──
     supportersTitle: 'Apoiadores',
 
@@ -386,7 +392,6 @@ const t = {
 
     // ── /sobre ──
     aboutPageHeroTitle: 'Sobre Nós',
-    aboutPageHeroSubtitle: 'O principal evento científico multidisciplinar do Brasil com foco em conhecimento, inovação e excelência.',
     // "Scoliosis Day" no heading é <BrandWordmark /> (ver aboutTitleMain).
     aboutPageIntroTitleMain: 'Estamos fazendo',
     aboutPageIntroTitleAccent: 'história!',

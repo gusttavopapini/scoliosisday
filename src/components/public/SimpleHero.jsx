@@ -4,13 +4,13 @@
 // página pública que não tem um hero dinâmico próprio — Sobre, Hall de
 // Estrelas, Patrocinadores, Depoimentos.
 
-/** @param {{ title: string, subtitle: string }} props */
+/** @param {{ title: string, subtitle?: string }} props */
 export default function SimpleHero({ title, subtitle }) {
   return (
     <section className="sdp-simple-hero sd-dots">
       <div className="sd-container sdp-simple-hero__inner">
         <h1 className="sd-display sd-display--lg sd-display--on-dark">{title}</h1>
-        <p className="sd-lead sd-on-dark">{subtitle}</p>
+        {subtitle && <p className="sd-lead sd-on-dark">{subtitle}</p>}
       </div>
     </section>
   );
