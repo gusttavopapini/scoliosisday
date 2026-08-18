@@ -22,7 +22,9 @@ export const bannerSchema = z.object({
   bannerDesktopUrl: z.string().optional().default(''),
   bannerTabletUrl: z.string().optional().default(''),
   bannerMobileUrl: z.string().optional().default(''),
-  // Posição no carrossel — mesmo espaço numérico do bannerOrder do evento.
+  // Posição no carrossel, entre os banners manuais. O banner da edição
+  // atual não disputa esta ordem: quando exibido (showBannerOnHome), vem
+  // sempre antes de todos — ver buildSlides em HomeHero.jsx.
   order: z
     .number({ invalid_type_error: 'Informe um número' })
     .int('Use um número inteiro')

@@ -3,6 +3,35 @@
 
 import { z } from 'zod';
 
+/** '' para campo em branco, inclusive quando só tem espaço. */
+const trimmed = (value) => value?.trim() ?? '';
+
+/**
+ * Validação all-or-nothing do bloco de texto corrido opcional: bloco
+ * inteiramente vazio passa (não vai pro Firestore, não aparece no site);
+ * qualquer campo preenchido torna o outro obrigatório. É independente da
+ * validação de `presentation` (os 3 cards do mesmo passo): preencher um
+ * não obriga o outro. Ver utils/contentBlocks.js pela regra compartilhada
+ * com a escrita e com a leitura pública.
+ */
+const textBlockSchema = z
+  .object({
+    title: z.string().max(120, 'Máximo 120 caracteres').optional().default(''),
+    body: z.string().optional().default(''),
+  })
+  .superRefine((block, ctx) => {
+    const title = trimmed(block.title);
+    const body = trimmed(block.body);
+    if (!title && !body) return;
+
+    if (!title) {
+      ctx.addIssue({ code: 'custom', path: ['title'], message: 'Título obrigatório quando há texto' });
+    }
+    if (!body) {
+      ctx.addIssue({ code: 'custom', path: ['body'], message: 'Texto obrigatório quando há título' });
+    }
+  });
+
 const presentationItemSchema = z.object({
   icon: z.string().min(1, 'Ícone obrigatório'),
   title: z.string().min(1, 'Título obrigatório').max(60, 'Máximo 60 caracteres'),
@@ -22,9 +51,15 @@ const sharedEventFields = {
   bannerDesktopUrl: z.string().optional(),
   bannerTabletUrl: z.string().optional(),
   bannerMobileUrl: z.string().optional(),
-  // Posição do banner deste evento no carrossel da Home, quando isCurrent.
-  // nullable/optional porque eventos anteriores ao carrossel não têm posição
-  // — o merge do carrossel trata a ausência como "primeiro" (ver HomeHero).
+  // Se o banner desta edição entra no carrossel da Home. Antes disso o
+  // banner da edição atual ia pra Home SEMPRE, sem controle nenhum; agora
+  // só entra marcado (e com imagem carregada), e sempre em 1º lugar —
+  // ver buildSlides em HomeHero.jsx.
+  showBannerOnHome: z.boolean().optional(),
+  // LEGADO: posição do banner deste evento entre os banners manuais.
+  // Não é mais editável no wizard nem lido pelo carrossel — o banner da
+  // edição, quando exibido, é sempre o primeiro slide. O campo continua no
+  // schema para não invalidar documentos que já o têm salvo.
   bannerOrder: z
     .number({ invalid_type_error: 'Informe um número' })
     .int('Use um número inteiro')
@@ -107,6 +142,12 @@ const sharedEventFields = {
       description: z.string().max(200, 'Máximo 200 caracteres').optional(),
     })
   ).length(3, 'Devem existir exatamente 3 blocos').optional(),
+  // Bloco de texto corrido opcional, igual nos dois modos do wizard (por
+  // isso vive aqui, em sharedEventFields, e não numa branch da união):
+  // Passo 3 na edição atual, Passo 2 na passada. Ausente/null numa edição
+  // que não o preencheu — o site público simplesmente não renderiza a
+  // seção (ver EditionTextBlock.jsx e utils/contentBlocks.js).
+  textBlock: textBlockSchema.nullable().optional(),
   colors: z.object({
     background: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório'),
     text: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório'),
@@ -161,7 +202,7 @@ export const eventSchema = z.discriminatedUnion('isCurrent', [
 export const STEP_FIELDS = {
   step1: [
     'headline', 'subtitle', 'editionNumber',
-    'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl', 'bannerOrder',
+    'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl', 'showBannerOnHome',
     'cta', 'ctaLink', 'ctaButtonBg', 'ctaButtonText', 'separatorColor', 'isCurrent',
   ],
   // Passo 1 do wizard reduzido (edição passada): mesmos campos, sem CTA/link
@@ -169,11 +210,13 @@ export const STEP_FIELDS = {
   // separador continua (ver EditionHero.jsx: aparece nos dois modos).
   step1Reduced: [
     'headline', 'subtitle', 'editionNumber',
-    'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl', 'bannerOrder',
+    'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl',
     'separatorColor', 'isCurrent',
   ],
   step2: ['priceInPerson', 'priceOnline', 'location'],
-  step3: ['presentation'],
+  // O bloco de texto corrido divide o Passo 3 com os 3 cards de
+  // apresentação, e é validado junto deles ao avançar.
+  step3: ['presentation', 'textBlock'],
   step4: ['speakers', 'starSpeakerIds', 'organizerIds', 'curatorIds', 'programming', 'sponsors'],
   // Único passo que ainda existe do antigo "Passo 5": o wizard completo
   // (isCurrent: true) não tem mais passo de conteúdo de arquivo — só o
@@ -181,5 +224,7 @@ export const STEP_FIELDS = {
   // saíram do formulário (ver EventStep5.jsx): não tinham nenhuma leitura
   // pública, então os campos `testimonials`/`colors` do schema seguem
   // preservados só por compatibilidade com dado histórico já salvo.
-  step5Archive: ['gallery', 'archiveTitle', 'archiveSubtitle', 'archiveStats'],
+  // Último passo do fluxo reduzido — abriga o mesmo bloco de texto
+  // corrido do Passo 3 do fluxo completo (ver TextBlockFields.jsx).
+  step5Archive: ['gallery', 'archiveTitle', 'archiveSubtitle', 'archiveStats', 'textBlock'],
 };

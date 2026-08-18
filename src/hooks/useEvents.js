@@ -102,6 +102,26 @@ export function usePublishedEvents() {
   });
 }
 
+/**
+ * Quantas edições JÁ ACONTECERAM: publicadas, menos a atual.
+ *
+ * A edição em destaque (isCurrent:true) ainda vai acontecer, então não
+ * entra na conta de "Edições realizadas" — antes entrava, porque o
+ * contador era só publishedEvents.length.
+ *
+ * Sem isCurrent no documento (dado anterior ao campo), o evento conta
+ * como passado: só o evento explicitamente marcado é o atual, e
+ * services/events.js garante um único marcado por vez.
+ *
+ * Vive aqui, e não solto no componente, para que qualquer outro lugar que
+ * venha a exibir esse número use a mesma regra. Reaproveita o cache de
+ * usePublishedEvents — não dispara uma segunda consulta.
+ */
+export function usePastEditionsCount() {
+  const { data: publishedEvents = [] } = usePublishedEvents();
+  return publishedEvents.filter((event) => !event.isCurrent).length;
+}
+
 /** Define o evento atual, desmarcando o anterior no mesmo batch. */
 export function useSetCurrentEvent() {
   const queryClient = useQueryClient();

@@ -19,6 +19,7 @@
 // editáveis por aqui.
 
 import GalleryUploader from '../GalleryUploader.jsx';
+import TextBlockFields from './TextBlockFields.jsx';
 
 export default function EventStep5({ register, errors, watch, control, eventId }) {
   return (
@@ -116,6 +117,10 @@ export default function EventStep5({ register, errors, watch, control, eventId }
           <span className="sd-error">{errors.archiveStats.message}</span>
         )}
       </div>
+
+      {/* Mesmo bloco opcional do Passo 3 do fluxo completo — a edição
+          passada não tem aquele passo, e este é o último dela. */}
+      <TextBlockFields register={register} errors={errors} />
     </div>
   );
 }

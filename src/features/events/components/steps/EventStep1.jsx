@@ -17,6 +17,11 @@ const BANNER_FIELDS = [
 ];
 
 export default function EventStep1({ register, control, errors, watch, eventId, hideCta = false }) {
+  // Qualquer uma das três artes já serve pro carrossel (o site escolhe por
+  // breakpoint e cai nas irmãs quando falta a preferida — ver
+  // eventBannerUrl em utils/eventBanner.js).
+  const hasBanner = BANNER_FIELDS.some(({ name }) => watch(name)?.trim());
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div>
@@ -49,37 +54,37 @@ export default function EventStep1({ register, control, errors, watch, eventId, 
         </div>
       ))}
 
-      {/* Posição no carrossel da Home (quando esta é a edição atual) */}
-      <label className="sd-field" style={{ maxWidth: '260px' }}>
-        <span className="sd-label">
-          Posição no carrossel <span className="sd-muted">(opcional)</span>
-        </span>
-        <Controller
-          name="bannerOrder"
-          control={control}
-          render={({ field }) => (
+      {/* Banner desta edição no carrossel da Home — só na edição atual: o
+          carrossel da Home lê o banner do evento isCurrent, e nenhum outro.
+          Antes esse banner ia pra Home SEMPRE que existisse; agora depende
+          desta marcação, e quando marcado é sempre o 1º slide (ver
+          buildSlides em HomeHero.jsx).
+
+          Substituiu o campo numérico "Posição no carrossel" (bannerOrder),
+          que perdeu função com a posição fixa em 1º. O dado já salvo
+          continua no Firestore, apenas não é mais editável nem lido. */}
+      {!hideCta && (
+        <div className="sd-field">
+          <label className="sd-checkbox">
+            {/* `disabled` no input, e não em register(), de propósito:
+                register({ disabled: true }) zera o valor no form state pra
+                undefined, e undefined não sobrevive a um setDoc(). Assim o
+                valor salvo continua intacto se a arte for removida. */}
             <input
-              className="sd-input"
-              type="number"
-              min={1}
-              step={1}
-              placeholder="Ex: 1"
-              value={field.value ?? ''}
-              onChange={(event) => {
-                const raw = event.target.value;
-                field.onChange(raw === '' ? null : Number(raw));
-              }}
+              {...register('showBannerOnHome')}
+              type="checkbox"
+              disabled={!hasBanner}
             />
-          )}
-        />
-        {errors.bannerOrder && (
-          <span className="sd-error">{errors.bannerOrder.message}</span>
-        )}
-        <span className="sd-note">
-          Posição deste banner entre os banners manuais no carrossel da Home,
-          quando este evento é o atual. Sem valor, aparece primeiro.
-        </span>
-      </label>
+            <span className="sd-checkbox__box" aria-hidden="true" />
+            <span>Exibir este banner no carrossel da Home</span>
+          </label>
+          <span className="sd-note">
+            {hasBanner
+              ? 'Aparece em primeiro lugar no carrossel, antes dos banners cadastrados em Banners.'
+              : 'Carregue ao menos uma arte de banner acima para poder exibi-la na Home.'}
+          </span>
+        </div>
+      )}
 
       {/* Número da edição */}
       <label className="sd-field" style={{ maxWidth: '260px' }}>

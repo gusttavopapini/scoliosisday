@@ -22,6 +22,7 @@ import { db } from '../config/firebase.js';
 import { eventSlug } from '../utils/slugify.js';
 import { EVENT_STATUS } from '../utils/constants.js';
 import { translateRootFields, translateArrayFields } from '../utils/writeTimeTranslation.js';
+import { normalizeTextBlock } from '../utils/contentBlocks.js';
 import { deepNullifyUndefined } from '../utils/firestoreSanitize.js';
 
 const EVENTS_COLLECTION = 'events';
@@ -75,8 +76,23 @@ function withoutIdField(data) {
  * — por isso cada função de escrita abaixo aplica deepNullifyUndefined de
  * novo no payload FINAL, já com translations/status/slug mesclados.
  */
+/**
+ * Bloco de texto corrido opcional (textBlock): bloco vazio ou pela metade
+ * vira `null`, nunca um objeto de strings vazias — e nunca undefined.
+ *
+ * `null` e não "omitir a chave": todas as escritas usam setDoc(merge:true),
+ * onde a chave ausente PRESERVA o valor antigo — omitir seria ignorar o
+ * admin que acabou de esvaziar o bloco. Só entra no payload o bloco que
+ * veio no `data`: uma escrita parcial, sem essa chave, não apaga nada.
+ */
+function normalizeContentBlocks(data) {
+  const result = { ...data };
+  if ('textBlock' in data) result.textBlock = normalizeTextBlock(data.textBlock);
+  return result;
+}
+
 function sanitizeWrite(data) {
-  return deepNullifyUndefined(withoutIdField(withoutCurrentFlag(data)));
+  return deepNullifyUndefined(normalizeContentBlocks(withoutIdField(withoutCurrentFlag(data))));
 }
 
 // Campos de texto livre traduzidos ao salvar (Parte 2 do fix de tradução —
@@ -85,6 +101,8 @@ function sanitizeWrite(data) {
 const EVENT_ROOT_TRANSLATABLE_FIELDS = ['headline', 'subtitle', 'cta', 'archiveTitle', 'archiveSubtitle'];
 const PRESENTATION_TRANSLATABLE_FIELDS = ['title', 'description'];
 const ARCHIVE_STAT_TRANSLATABLE_FIELDS = ['title', 'description'];
+// Bloco de texto corrido: os dois campos de raiz do próprio bloco.
+const TEXT_BLOCK_TRANSLATABLE_FIELDS = ['title', 'body'];
 
 /**
  * Traduz pra inglês, uma vez, só o que mudou desde `previous` — devolve um
@@ -113,6 +131,18 @@ async function translateEventFields(data, previous) {
       previous?.archiveStats,
       ARCHIVE_STAT_TRANSLATABLE_FIELDS,
     );
+  }
+
+  // Bloco opcional: normalizado aqui pelo mesmo helper que sanitizeWrite
+  // usa, para não gastar chamada de API traduzindo bloco vazio/pela metade
+  // que não vai ser gravado. Bloco null não entra no result — sanitizeWrite
+  // já grava o null.
+  const textBlock = normalizeTextBlock(data.textBlock);
+  if (textBlock) {
+    result.textBlock = {
+      ...textBlock,
+      ...(await translateRootFields(textBlock, previous?.textBlock, TEXT_BLOCK_TRANSLATABLE_FIELDS)),
+    };
   }
 
   return result;

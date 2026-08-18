@@ -27,31 +27,43 @@ import EditionPresentation from './components/editions/EditionPresentation.jsx';
 import EditionSchedule from './components/editions/EditionSchedule.jsx';
 import EditionArchive from './components/editions/EditionArchive.jsx';
 import EditionLocation from './components/editions/EditionLocation.jsx';
+import EditionTextBlock from './components/editions/EditionTextBlock.jsx';
 
 export default function EditionsPage() {
   const { t, lang } = useLanguage();
   const { data: publishedEvents = [] } = usePublishedEvents();
   const { data: allCollaborators = [] } = useCollaborators();
 
-  // Abas em ordem decrescente de editionNumber — a edição mais recente
-  // (maior número) primeiro. O número é definido pelo admin no passo 1 do
+  // Abas em ordem CRESCENTE de editionNumber — a 1ª edição à esquerda, a
+  // mais recente à direita. O número é definido pelo admin no passo 1 do
   // wizard, não derivado de createdAt. Eventos sem número (os anteriores ao
   // campo) vão pro fim, entre si pelo mais recente primeiro, que é a ordem
   // em que usePublishedEvents já os entrega.
-  const orderedEvents = useMemo(() => {
+  //
+  // A ordenação é local, não na query: fetchPublishedEvents entrega mais
+  // recentes primeiro e AboutPage.jsx depende disso ([0] = edição mais
+  // recente). Inverter lá quebraria aquela página.
+  //
+  // defaultEvent preserva a aba aberta por padrão de antes da inversão — a
+  // edição mais recente (maior número, ou a mais nova por createdAt quando
+  // nenhuma tem número), não a primeira da fila, que agora é a 1ª edição.
+  const { orderedEvents, defaultEvent } = useMemo(() => {
     const numbered = publishedEvents
       .filter((event) => typeof event.editionNumber === 'number')
-      .sort((a, b) => b.editionNumber - a.editionNumber);
+      .sort((a, b) => a.editionNumber - b.editionNumber);
     const unnumbered = publishedEvents.filter(
       (event) => typeof event.editionNumber !== 'number',
     );
-    return [...numbered, ...unnumbered];
+    return {
+      orderedEvents: [...numbered, ...unnumbered],
+      defaultEvent: numbered[numbered.length - 1] ?? unnumbered[0],
+    };
   }, [publishedEvents]);
 
   const [activeEventId, setActiveEventId] = useState(null);
   const activeEvent = activeEventId
-    ? orderedEvents.find((event) => event.id === activeEventId) ?? orderedEvents[0]
-    : orderedEvents[0];
+    ? orderedEvents.find((event) => event.id === activeEventId) ?? defaultEvent
+    : defaultEvent;
 
   // Fade + seta na borda direita das abas só aparecem quando a lista de
   // fato não cabe na largura disponível (scrollWidth > clientWidth) — com
@@ -79,6 +91,28 @@ export default function EditionsPage() {
       el.removeEventListener('scroll', checkOverflow);
       window.removeEventListener('resize', checkOverflow);
     };
+  }, [orderedEvents.length]);
+
+  // Com as abas em ordem crescente, a edição aberta por padrão (a mais
+  // recente) fica na ponta DIREITA — fora da vista quando a lista passa da
+  // largura da tela. Traz ela pro campo de visão uma única vez, no primeiro
+  // render em que as abas já existem, sem tocar no scroll da página:
+  // scrollLeft no próprio container, não scrollIntoView. Depois disso o
+  // usuário manda no scroll — clique em aba não reposiciona nada.
+  const activeTabRef = useRef(null);
+  const didInitialTabScroll = useRef(false);
+
+  useEffect(() => {
+    const container = tabsScrollRef.current;
+    const tab = activeTabRef.current;
+    if (!container || !tab || didInitialTabScroll.current) return;
+    if (container.scrollWidth <= container.clientWidth + 1) return;
+
+    didInitialTabScroll.current = true;
+    // Delta por getBoundingClientRect (e não offsetLeft) porque o
+    // offsetParent do botão não é necessariamente o container de scroll.
+    const delta = tab.getBoundingClientRect().left - container.getBoundingClientRect().left;
+    container.scrollLeft += delta - (container.clientWidth - tab.offsetWidth) / 2;
   }, [orderedEvents.length]);
 
   /** Rótulo da aba/badge: "1ª Edição" quando há número, headline quando não. */
@@ -135,6 +169,7 @@ export default function EditionsPage() {
                 {orderedEvents.map((event) => (
                   <button
                     key={event.id}
+                    ref={event.id === activeEvent.id ? activeTabRef : undefined}
                     type="button"
                     className={`sdp-edition-tabs__tab${event.id === activeEvent.id ? ' sdp-edition-tabs__tab--active' : ''}${event.isCurrent ? ' sdp-edition-tabs__tab--current' : ''}`}
                     onClick={() => setActiveEventId(event.id)}
@@ -184,6 +219,13 @@ export default function EditionsPage() {
 
           <EditionPresentation event={activeEvent} />
 
+          {/* Bloco de texto corrido opcional, editado no MESMO passo 3 que
+              alimenta a apresentação acima — por isso sai logo depois
+              dela, no bloco imediatamente abaixo dos preços. Some sozinho
+              quando a edição não o tem (a maioria), sem deixar seção nem
+              espaçamento vazios. */}
+          <EditionTextBlock key={`text-${activeEvent.id}`} event={activeEvent} />
+
           <EditionSchedule
             key={`schedule-${activeEvent.id}`}
             event={activeEvent}
@@ -199,7 +241,14 @@ export default function EditionsPage() {
           <EditionLocation key={`location-${activeEvent.id}`} event={activeEvent} />
         </>
       ) : (
-        <EditionArchive key={`archive-${activeEvent.id}`} event={activeEvent} />
+        <>
+          <EditionArchive key={`archive-${activeEvent.id}`} event={activeEvent} />
+
+          {/* Mesmo bloco opcional da edição atual, no fim da página: aqui
+              ele é editado no passo 2 (o último do wizard reduzido), que
+              também é o que alimenta o arquivo acima. */}
+          <EditionTextBlock key={`text-${activeEvent.id}`} event={activeEvent} />
+        </>
       )}
     </>
   );

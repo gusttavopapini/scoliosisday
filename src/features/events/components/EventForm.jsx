@@ -41,6 +41,10 @@ const FULL_STEPS = [
 // conteúdo de arquivo. Os passos 2-4 do wizard completo ficam de fora: os
 // dados que já tinham sido preenchidos neles continuam salvos no Firestore,
 // só deixam de ser editáveis por aqui enquanto isCurrent for false.
+//
+// O bloco de texto corrido opcional (textBlock) vale igualmente para os
+// dois fluxos, mas NÃO ganha passo próprio: entra no Passo 3 do completo e
+// no Passo 2 daqui, pelo mesmo TextBlockFields.jsx.
 const REDUCED_STEPS = [
   { number: 1, label: 'Banner', id: 'step1Reduced' },
   { number: 2, label: 'Conteúdo de arquivo', id: 'step5Archive' },
@@ -88,6 +92,9 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     bannerTabletUrl: '',
     bannerMobileUrl: '',
     bannerOrder: null,
+    // false, nunca undefined: o banner da edição só vai pro carrossel da
+    // Home se o admin marcar (ver EventStep1.jsx/HomeHero.jsx).
+    showBannerOnHome: false,
     cta: '',
     ctaLink: '',
     // null, não '': igual a bannerOrder — string vazia falharia o regex de
@@ -125,7 +132,21 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     ],
     // O schema valida /^#[0-9A-F]{6}$/i — var(--token) nunca passaria.
     colors: { ...DEFAULT_EVENT_COLORS },
+    // Bloco de texto corrido opcional: objeto vazio, não null. No Firestore
+    // ele é null quando a edição não o tem (ver services/events.js), e um
+    // null aqui deixaria os inputs sem valor inicial — o React reclamaria
+    // da troca de não-controlado pra controlado na 1ª digitação.
+    textBlock: { title: '', body: '' },
     isCurrent: false,
+  };
+
+  // Mesmo motivo do comentário acima: o spread raso de initialData traria
+  // `textBlock: null` inteiro por cima do default. Ele volta ao objeto
+  // vazio quando vem null/ausente, preservando o que existir.
+  const initialValues = {
+    ...DEFAULT_VALUES,
+    ...initialData,
+    textBlock: { ...DEFAULT_VALUES.textBlock, ...(initialData?.textBlock ?? {}) },
   };
 
   const {
@@ -138,7 +159,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     formState: { errors, isSubmitting, isDirty },
   } = useForm({
     resolver: zodResolver(eventSchema),
-    defaultValues: { ...DEFAULT_VALUES, ...initialData },
+    defaultValues: initialValues,
   });
 
   // A estrutura do wizard reage ao isCurrent DESTE evento em tempo real, não

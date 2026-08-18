@@ -285,7 +285,17 @@ body.sd-body {
 .sd-display--2xl { font-size: var(--display-2xl); }
 .sd-display--xl { font-size: var(--display-xl); }
 .sd-display--lg { font-size: var(--display-lg); }
-.sd-display--md { font-size: var(--display-md); }
+/* Escala fluida no lugar dos 42px fixos: este é o tamanho de TODOS os
+   títulos de seção do site público (16 componentes), e em telas estreitas
+   42px empurrava um título longo para 4+ linhas, ocupando boa parte da
+   viewport antes do texto começar. O teto continua sendo --display-md, e é
+   atingido em 560px — abaixo de qualquer breakpoint de desktop, então nada
+   muda de 560px para cima. O piso de 26px fica fora da escala --display-*
+   porque --display-sm (32px) ainda dá 4 linhas em 320px.
+   O TOKEN --display-md segue 42px fixos de propósito: três media queries
+   de hero em public.css o usam como degrau de redução no mobile, e torná-lo
+   fluido encolheria os heroes junto. */
+.sd-display--md { font-size: clamp(26px, 7.5vw, var(--display-md)); }
 .sd-display--sm { font-size: var(--display-sm); }
 
 /* Manchete duo-tom: linha 1 herda, linha 2 laranja */
@@ -340,6 +350,11 @@ body.sd-body {
   .sd-grid--2, .sd-grid--3, .sd-grid--4 { grid-template-columns: 1fr; }
   .sd-display--2xl { font-size: var(--display-xl); }
   .sd-display--xl { font-size: var(--display-lg); }
+  /* --lh-display (0.92) é entrelinha de manchete grande: nos ~26-30px que
+     o clamp de .sd-display--md produz aqui, as linhas quase se tocam e os
+     acentos batem na linha de cima. 1 é o suficiente para separá-las sem
+     devolver a altura que a redução de tamanho economizou. */
+  .sd-display--md { line-height: 1; }
 }
            /* reset, tipografia, utilitários, régua, textura */
 /* ============================================================

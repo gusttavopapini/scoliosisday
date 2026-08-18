@@ -1,7 +1,14 @@
 // src/features/events/components/steps/EventStep3.jsx
-// Passo 3: Apresentação — 3 cards com ícone, título e descrição
+// Passo 3: Apresentação — os 3 cards com ícone, título e descrição
+// (obrigatórios) e, abaixo deles, o bloco de texto corrido opcional.
+//
+// Os dois são independentes: o bloco de texto em branco não impede
+// avançar, e os cards continuam obrigatórios como sempre foram. Só existe
+// neste passo do fluxo completo — a edição passada edita o mesmo bloco de
+// texto no Passo 2 (ver TextBlockFields.jsx).
 
 import { PRESENTATION_ICONS as AVAILABLE_ICONS } from '../../../../utils/constants.js';
+import TextBlockFields from './TextBlockFields.jsx';
 
 export default function EventStep3({ register, errors, watch }) {
   const presentation = watch('presentation') || [];
@@ -89,6 +96,8 @@ export default function EventStep3({ register, errors, watch }) {
           {errors.presentation.message}
         </div>
       )}
+
+      <TextBlockFields register={register} errors={errors} />
     </div>
   );
 }

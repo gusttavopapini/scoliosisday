@@ -91,13 +91,21 @@
 }
 
 /* Mesmo problema do .sd-body a, agora nos links de navegação (0,1,0).
-   font-size +5% sobre o 15px do kit (.sd-navbar__link, design-system.css) —
-   calc() em cima do valor de origem, não um número novo, pra ficar claro que
-   é um ajuste relativo e isolado a este componente. Cobre tanto a barra
-   desktop quanto a gaveta mobile: as duas reaproveitam .sd-navbar__link. */
+   Cobre tanto a barra desktop quanto a gaveta mobile: as duas reaproveitam
+   .sd-navbar__link.
+
+   17px, um degrau acima dos 15,75px anteriores (que eram calc(15px * 1.05)
+   sobre o 15px do kit). Fica fora da escala --text-* de propósito, como o
+   valor anterior já ficava: os degraus vizinhos não servem aqui — --text-md
+   (16px) seria +0,25px, imperceptível, e --text-lg (18px) deixaria só 17px
+   de folga em 901px, a largura mais apertada em que o menu ainda é
+   horizontal (abaixo de 900px vira gaveta). Com 17px a folga ali é 35px.
+
+   Não mexe no seletor PT/EN (.sdp-lang__btn, --text-xs) nem no CTA
+   (.sdp-navbar__cta), que têm classe e tamanho próprios. */
 .sdp-navbar .sd-navbar__link {
   color: var(--text-on-dark);
-  font-size: calc(15px * 1.05);
+  font-size: 17px;
 }
 
 .sdp-navbar .sd-navbar__link:hover,
@@ -1230,8 +1238,18 @@
   align-items: center;
   text-align: center;
   gap: var(--space-4);
-  padding: var(--space-8);
+  /* Lateral menor que a vertical só no mobile: os 32px de cada lado
+     comiam 20% de uma tela de 320px, apertando o valor (que é uma string
+     indivisível). O padding volta a ser uniforme a partir de 621px — ver
+     o media query adiante, e .sdp-pricing__price pelo cálculo. */
+  padding: var(--space-8) var(--space-6);
   border-radius: var(--radius-xl);
+}
+
+@media (min-width: 621px) {
+  .sdp-pricing__card {
+    padding: var(--space-8);
+  }
 }
 
 .sdp-pricing__card--teal {
@@ -1244,14 +1262,33 @@
   background: var(--grad-teal);
 }
 
-.sdp-pricing__price {
+/* (0,2,0) para vencer o .sd-display--lg do kit (0,1,0) no font-size sem
+   depender da ordem dos arquivos em main.jsx. */
+.sdp-pricing .sdp-pricing__price {
   margin: var(--space-0);
-  /* "R$1,200.00" (formatação en-US do Intl, sem espaço nenhum) é uma
-     string sem ponto de quebra — em --display-lg (56px) na Luxora
-     Grotesk (mais larga que a Barlow Condensed anterior), vazava a
-     largura do card no mobile. overflow-wrap garante que quebre em vez
-     de vazar, sem mudar o tamanho da fonte. */
-  overflow-wrap: anywhere;
+
+  /* O preço é UMA string indivisível ("R$ 1.800,00" vem inteiro do
+     formatPriceBRL/Intl, não em partes). Antes havia overflow-wrap:
+     anywhere aqui, para impedir que os 56px fixos de --display-lg
+     vazassem do card no mobile — mas isso trocava o vazamento por uma
+     quebra no meio do número, com os centavos sozinhos na linha de
+     baixo, colidindo com o texto seguinte (line-height 0.92).
+
+     A correção troca a quebra pelo tamanho: nowrap proíbe qualquer
+     quebra, e o clamp garante que ela nunca seja necessária.
+
+     8.7vw é calculado, não estimado: no pior caso real ("BRL 10,000.00",
+     en-US) o valor precisa de ~7,98× o tamanho da fonte em px, e a
+     largura útil do card é a viewport menos o gutter e o espaço
+     interno definido acima.
+     8.7vw com piso de 28px é o maior par que ainda deixa ≥8px de folga
+     em TODA largura de 320px a 1400px. O piso é 28px, fora da escala
+     --display-*, porque --display-sm (32px) já estoura em 320px.
+
+     Desktop intocado: o clamp chega ao teto (--display-lg, os mesmos
+     56px de antes) em 644px, bem antes do breakpoint de 901px. */
+  white-space: nowrap;
+  font-size: clamp(28px, 8.7vw, var(--display-lg));
 }
 
 .sdp-pricing__nav {
@@ -1571,6 +1608,17 @@
   max-width: 720px;
   margin-inline: auto;
   margin-bottom: var(--space-10);
+  text-align: center;
+}
+
+/* Parágrafo do bloco de texto corrido de uma edição
+   (EditionTextBlock.jsx). Mesma medida e centralização de
+   .sdp-about-intro__text, sem a margem inferior: ali o parágrafo é seguido
+   por uma grade de cards na MESMA seção; aqui ele fecha a seção, e o
+   espaçamento seguinte já vem de .sd-section. */
+.sdp-text-block__body {
+  max-width: 720px;
+  margin-inline: auto;
   text-align: center;
 }
 

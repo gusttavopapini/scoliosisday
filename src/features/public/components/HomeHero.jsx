@@ -2,11 +2,12 @@
 // Seção 1 da Home: carrossel do hero, combinando o banner do evento atual
 // (isCurrent:true) com os banners manuais ativos (/painel/banners).
 //
-// Um único array ordenado por posição (bannerOrder do evento, order dos
-// banners manuais, mesmo espaço numérico) alimenta slides do MESMO template
-// visual de antes — <picture> por breakpoint, scrim escuro, conteúdo
-// centrado na base. Sem evento atual e sem banner manual ativo, a seção
-// inteira some (convenção já usada noutras seções vazias do site).
+// O banner do evento é opcional e vem sempre primeiro: entra só quando o
+// admin marca showBannerOnHome no passo 1 do wizard de Edições. Depois dele
+// vêm os banners manuais ativos, por `order`. Todos usam o MESMO template
+// visual de sempre — <picture> por breakpoint, scrim escuro, conteúdo
+// centrado na base. Sem nenhum slide, a seção inteira some (convenção já
+// usada noutras seções vazias do site).
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
@@ -24,18 +25,23 @@ const MOBILE_MEDIA = '(max-width: 640px)';
 const AUTO_SLIDE_MS = 2000;
 
 /**
- * Combina o evento atual com os banners manuais ativos num único array de
- * slides, ordenado. Sem bannerOrder no evento (documentos antigos, de antes
- * deste campo existir), a posição vira 0 — o evento aparece primeiro, igual
- * ao comportamento de quando ele era o único slide possível.
+ * Combina o banner da edição atual com os banners manuais ativos.
+ *
+ * O banner da edição só entra se o admin marcar "Exibir este banner no
+ * carrossel da Home" (showBannerOnHome, passo 1 do wizard) E houver arte
+ * carregada — antes ele entrava sozinho, sempre que a edição atual tivesse
+ * banner. Marcado, é SEMPRE o primeiro slide: não disputa mais posição com
+ * os banners manuais (o antigo bannerOrder deixou de ser lido).
+ *
+ * Os manuais mantêm a ordenação de sempre, por `order` (a query já os
+ * entrega ordenados; o sort aqui é a mesma garantia que existia antes).
  */
 function buildSlides(event, banners) {
   const slides = [];
 
-  if (event) {
+  if (event?.showBannerOnHome === true && eventBannerUrl(event, 'desktop')) {
     slides.push({
       id: `event-${event.id}`,
-      order: event.bannerOrder ?? 0,
       headline: event.headline,
       headline_en: event.headline_en,
       subtitle: event.subtitle,
@@ -56,9 +62,10 @@ function buildSlides(event, banners) {
     });
   }
 
+  const bannerSlides = [];
   for (const banner of banners) {
     if (!banner.active) continue;
-    slides.push({
+    bannerSlides.push({
       id: `banner-${banner.id}`,
       order: banner.order ?? 0,
       headline: banner.headline,
@@ -77,7 +84,8 @@ function buildSlides(event, banners) {
     });
   }
 
-  return slides.sort((a, b) => a.order - b.order);
+  bannerSlides.sort((a, b) => a.order - b.order);
+  return [...slides, ...bannerSlides];
 }
 
 export default function HomeHero() {

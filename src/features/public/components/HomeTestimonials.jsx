@@ -3,15 +3,16 @@
 // (type: 'text') do Firestore que /depoimentos usa — sem nenhum
 // publicado, a seção inteira some (nunca mostra mock nem espaço vazio).
 //
-// usePublishedEvents só alimenta o contador "X Edições realizadas" ao
-// lado; os depoimentos em si não vêm mais do evento (bug corrigido: a
+// usePastEditionsCount só alimenta o contador "X Edições realizadas" ao
+// lado — publicadas menos a atual, que ainda não aconteceu; os
+// depoimentos em si não vêm mais do evento (bug corrigido: a
 // Home lia de um array legado embutido no documento do evento, com
 // fallback pra um mock estático — divergente da coleção real que o
 // painel /painel/depoimentos de fato gerencia).
 
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage.js';
-import { usePublishedEvents } from '../../../hooks/useEvents.js';
+import { usePastEditionsCount } from '../../../hooks/useEvents.js';
 import { useTestimonials } from '../../../hooks/useTestimonials.js';
 import { splitLastWord, splitOnBrand } from '../../../utils/splitLastWord.js';
 import AccentWord from '../../../components/public/AccentWord.jsx';
@@ -21,7 +22,7 @@ import TestimonialQuoteCard, { TestimonialQuoteCardGhost } from './testimonials/
 
 export default function HomeTestimonials() {
   const { t } = useLanguage();
-  const { data: publishedEvents = [] } = usePublishedEvents();
+  const pastEditionsCount = usePastEditionsCount();
   const { data: items = [] } = useTestimonials('text');
   const [index, setIndex] = useState(0);
   const count = items.length;
@@ -58,7 +59,7 @@ export default function HomeTestimonials() {
           </div>
 
           <div className="sd-stat sd-stat--orange">
-            <span className="sd-stat__value">{publishedEvents.length}</span>
+            <span className="sd-stat__value">{pastEditionsCount}</span>
             <span className="sd-stat__label sdp-stat__label">
               <span className="sdp-stat__label-line1">{t.site.editionsHeldLine1}</span>
               <span className="sdp-stat__label-line2">{t.site.editionsHeldLine2}</span>
