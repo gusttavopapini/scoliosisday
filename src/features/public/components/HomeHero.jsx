@@ -178,7 +178,18 @@ export default function HomeHero() {
               <picture>
                 {slide.bannerMobileUrl && <source media={MOBILE_MEDIA} srcSet={slide.bannerMobileUrl} />}
                 {slide.bannerTabletUrl && <source media={TABLET_MEDIA} srcSet={slide.bannerTabletUrl} />}
-                <img src={desktopUrl} alt="" />
+                {/* Só o slide ATIVO é renderizado (não há map aqui), e ele
+                    está sempre acima da dobra: é o LCP da Home. eager +
+                    fetchPriority alto tiram a imagem da fila normal e a
+                    baixam junto com o HTML. Sem efeito visual — muda
+                    quando a imagem chega, não como ela aparece. */}
+                <img
+                  src={desktopUrl}
+                  alt=""
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                />
               </picture>
             </div>
           )}

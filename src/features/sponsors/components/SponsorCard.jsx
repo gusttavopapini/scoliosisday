@@ -4,6 +4,7 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import t from '../../../i18n/pt-BR.js';
 import { SPONSOR_TYPES } from '../../../utils/constants.js';
+import SponsorLogo from '../../../components/SponsorLogo.jsx';
 
 const SPONSOR_TYPE_LABEL = {
   [SPONSOR_TYPES.SPONSOR]: 'Patrocinador',
@@ -22,7 +23,7 @@ export default function SponsorCard({ sponsor, onEdit, onDelete }) {
           fundo branco. Sem logo, cai no rótulo cinza de antes. */}
       <div className="sdaimg-logo">
         {sponsor.logoUrl ? (
-          <img className="sdaimg-logo__img" src={sponsor.logoUrl} alt={sponsor.name} />
+          <SponsorLogo src={sponsor.logoUrl} alt={sponsor.name} maxHeight={96} />
         ) : (
           <span className="sdaimg-logo__empty">Sem logo</span>
         )}

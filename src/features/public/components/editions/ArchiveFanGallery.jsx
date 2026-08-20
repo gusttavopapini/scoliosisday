@@ -37,7 +37,7 @@ export default function ArchiveFanGallery({ gallery, featured, title }) {
             onClick={() => openAt(item)}
             aria-label={t.site.archiveGalleryOpenLabel}
           >
-            <img src={item.url} alt="" />
+            <img loading="lazy" decoding="async" src={item.url} alt="" />
           </button>
         ))}
       </div>

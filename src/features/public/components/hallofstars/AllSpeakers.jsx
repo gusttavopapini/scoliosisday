@@ -1,17 +1,22 @@
 // src/features/public/components/hallofstars/AllSpeakers.jsx
-// Seção 2 de /hall-de-estrelas: todos os palestrantes vinculados a alguma
-// edição publicada, com busca por nome. Sem cadastro nenhum ainda, mostra
-// um estado vazio em vez de sumir — diferente da Seção 1 (que só existe
-// quando há destaque), esta é a lista completa e sempre faz sentido exibir
-// a seção, mesmo vazia.
+// Única seção de /hall-de-estrelas: todos os palestrantes cadastrados,
+// com busca por nome. Antes era a "Seção 2", abaixo de uma seção de
+// destaques que foi removida junto com a distinção que ela representava.
+//
+// Sem heading próprio: o título da página já vem do <SimpleHero>, e um
+// segundo título logo abaixo dele ("Todos os palestrantes") só fazia
+// sentido quando havia outra seção acima para contrastar.
+//
+// Sem cadastro nenhum, mostra um estado vazio em vez de sumir — esta é a
+// lista completa e sempre faz sentido exibir a seção, mesmo vazia.
 
 import { useState, useMemo } from 'react';
 import { Users } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
 import PeopleGrid from '../editions/PeopleGrid.jsx';
 
-/** @param {{ title: string, searchPlaceholder: string, emptyTitle: string, emptyBody: string, people: object[] }} props */
-export default function AllSpeakers({ title, searchPlaceholder, emptyTitle, emptyBody, people }) {
+/** @param {{ searchPlaceholder: string, emptyTitle: string, emptyBody: string, people: object[] }} props */
+export default function AllSpeakers({ searchPlaceholder, emptyTitle, emptyBody, people }) {
   const { t } = useLanguage();
   const [search, setSearch] = useState('');
 
@@ -24,13 +29,6 @@ export default function AllSpeakers({ title, searchPlaceholder, emptyTitle, empt
   return (
     <section className="sd-section sd-section--tight">
       <div className="sd-container">
-        <header className="sd-section-header sd-section-header--center sdp-section-header">
-          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">{title}</h2>
-          <div className="sd-rule" aria-hidden="true">
-            <i /><i /><i /><i /><i />
-          </div>
-        </header>
-
         {people.length > 0 && (
           <label className="sd-field sdp-hallofstars__search">
             <span className="sr-only">{searchPlaceholder}</span>

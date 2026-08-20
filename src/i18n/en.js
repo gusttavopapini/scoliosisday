@@ -310,8 +310,11 @@ const t = {
     // ── Home · O que é o Scoliosis Day ──
     // "Scoliosis Day" no heading é renderizado por <BrandWordmark />, não
     // por este texto — aboutTitleMain é só o que vem antes da marca.
+    //
+    // Mesmo par de consumidores do pt-BR: HomeAbout.jsx e
+    // EditionPresentation.jsx compartilham estas chaves.
     aboutTitleMain: 'What is',
-    aboutSubtitle: 'A gathering that unites science, clinical practice and professional training around scoliosis.',
+    aboutSubtitle: 'An ecosystem that unites science, clinical practice, professional training and high-level knowledge on spinal deformities.',
     aboutCard1Title: 'High-Level Education and Science',
     aboutCard1Text: 'A high scientific standard for scoliosis care in Brazil. It promotes ongoing evidence-based updates and connects health professionals to the most advanced discussions on treating spinal deformities.',
     aboutCard2Title: 'Multidisciplinary Debate',
@@ -392,7 +395,7 @@ const t = {
 
     // ── /hall-de-estrelas ──
     hallOfStarsPageHeroTitle: 'Hall of Stars',
-    hallOfStarsPageHeroSubtitle: 'The biggest names in scoliosis treatment gathered at Scoliosis Day.',
+    hallOfStarsPageHeroSubtitle: 'The world\'s leading authorities on scoliosis, gathered at Scoliosis Day.',
     hallOfStarsPageFeaturedTitle: 'Featured speakers',
     hallOfStarsPageAllTitle: 'All speakers',
     hallOfStarsPageSearchPlaceholder: 'Search by name…',

@@ -109,7 +109,7 @@ export default function PublicNavbar() {
     <header className="sd-navbar sdp-navbar">
       <div className="sdp-navbar__inner">
         <Link to="/" className="sdp-wordmark">
-          <img src={logoWhite} alt={t.site.brand} className="sdp-wordmark__logo" />
+          <img width="699" height="264" src={logoWhite} alt={t.site.brand} className="sdp-wordmark__logo" />
         </Link>
 
         <nav className="sd-navbar__nav" aria-label={t.site.brand}>

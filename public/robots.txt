@@ -1,0 +1,14 @@
+# https://scoliosisday.com/robots.txt
+
+User-agent: *
+Allow: /
+
+# Painel administrativo e fluxos de conta — nada aqui deve ser indexado.
+# O prefixo real do painel é /painel (não /admin).
+Disallow: /painel
+Disallow: /login
+Disallow: /cadastro
+Disallow: /esqueci-a-senha
+Disallow: /definir-senha
+
+Sitemap: https://scoliosisday.com/sitemap.xml

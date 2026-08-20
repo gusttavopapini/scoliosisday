@@ -3,7 +3,7 @@
 // Usado por todas as páginas do painel. Passa activeNav para destacar o item correto.
 // Integrado com AuthContext para avatar, logout e filtragem de nav por permissão.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, Users, Building2, Star,
@@ -35,6 +35,23 @@ const NAV_ITEMS = [
  * @param {{ activeNav: string, breadcrumb?: string, children: React.ReactNode }} props
  */
 export default function AppShell({ activeNav, breadcrumb, children }) {
+  // REFORÇO de noindex no painel. Quem de fato barra é o robots.txt
+  // (Disallow: /painel), porque o crawler nem chega a baixar a página —
+  // e num SPA o HTML servido é o mesmo do site público, então não há
+  // como ter a meta correta já no arquivo.
+  //
+  // Isto cobre o caso em que o Googlebot chega a uma rota do painel por
+  // um link e RENDERIZA o JS (ele faz, em segunda passada): a meta é
+  // trocada antes de ele avaliar a página. Restaura no desmonte para o
+  // site público não herdar o noindex ao sair do painel.
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="robots"]');
+    if (!meta) return undefined;
+    const previous = meta.getAttribute('content');
+    meta.setAttribute('content', 'noindex, nofollow');
+    return () => meta.setAttribute('content', previous);
+  }, []);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { userData, logout } = useAuth();

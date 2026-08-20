@@ -21,7 +21,7 @@ export default function AboutRecife() {
           <p className="sd-lead sd-on-dark">{t.site.aboutPageRecifeText}</p>
         </div>
         <div className="sdp-about-recife__media">
-          <img src={RECIFE_IMAGE_URL} alt={t.site.aboutPageRecifeImageAlt} />
+          <img loading="lazy" decoding="async" src={RECIFE_IMAGE_URL} alt={t.site.aboutPageRecifeImageAlt} />
         </div>
       </div>
     </section>

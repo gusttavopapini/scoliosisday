@@ -32,3 +32,21 @@ export function getVideoEmbedInfo(url) {
   // Nem YouTube nem Vimeo: só sobra o upload direto (MP4 no Storage).
   return { type: 'mp4', embedUrl: url };
 }
+
+/**
+ * A URL aponta para um vídeo de plataforma externa (YouTube ou Vimeo)?
+ *
+ * Distinto de getVideoEmbedInfo(), que NUNCA devolve null para uma string
+ * não vazia: lá, o que não casa YouTube/Vimeo cai no fallback 'mp4', porque
+ * depoimentos aceitam upload direto no Storage e o <video> reproduz
+ * qualquer URL. A seção de vídeo da edição (videoBlock) não aceita upload —
+ * ver EventStepVideo.jsx —, então precisa de uma checagem que REPROVE o
+ * que não for plataforma, em vez de assumir arquivo.
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+export function isPlatformVideoUrl(url) {
+  if (!url) return false;
+  return YOUTUBE_RE.test(url) || VIMEO_RE.test(url);
+}

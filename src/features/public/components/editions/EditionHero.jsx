@@ -41,7 +41,7 @@ export default function EditionHero({ event, editionBadge }) {
             <picture>
               {mobileUrl && <source media={MOBILE_MEDIA} srcSet={mobileUrl} />}
               {tabletUrl && <source media={TABLET_MEDIA} srcSet={tabletUrl} />}
-              <img src={desktopUrl} alt="" />
+              <img loading="eager" fetchPriority="high" decoding="async" src={desktopUrl} alt="" />
             </picture>
           </div>
         )}

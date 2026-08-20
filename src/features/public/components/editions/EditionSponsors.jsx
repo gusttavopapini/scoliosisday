@@ -2,6 +2,7 @@
 // Seção 6 de /edicoes: patrocinadores do evento, em .sd-logo-strip.
 
 import { useLanguage } from '../../../../hooks/useLanguage.js';
+import SponsorLogo from '../../../../components/SponsorLogo.jsx';
 
 /** @param {{ event: object, sponsorsById: Map<string, object> }} props */
 export default function EditionSponsors({ event, sponsorsById }) {
@@ -33,7 +34,7 @@ export default function EditionSponsors({ event, sponsorsById }) {
                 className="sdp-sponsors__link"
               >
                 {sponsor.logoUrl ? (
-                  <img className="sdp-sponsors__logo" src={sponsor.logoUrl} alt={sponsor.name} />
+                  <SponsorLogo src={sponsor.logoUrl} alt={sponsor.name} maxHeight={68} />
                 ) : (
                   <span className="sd-logo-strip__ph">{sponsor.name}</span>
                 )}

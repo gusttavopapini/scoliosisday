@@ -49,6 +49,19 @@ service firebase.storage {
       allow write: if isPanelUser() && underMB(5) && isImage('jpeg|png|webp');
     }
 
+    // ── Vídeo da seção de vídeo de uma edição (videoBlock) ──
+    // Subpasta própria, e declarada ANTES do curinga de banner
+    // (events/{eventId}/{fileName}), pelo mesmo motivo da galeria acima:
+    // sem ela o vídeo cairia na regra de banner, que exige imagem de até
+    // 5MB — e todo upload de vídeo seria recusado pelo servidor.
+    match /events/{eventId}/video/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser()
+                   && underMB(100)
+                   && (request.resource.contentType == 'video/mp4'
+                       || request.resource.contentType == 'video/webm');
+    }
+
     // ── Depoimentos em vídeo (MP4) — testimonials embutidos em um evento ──
     match /events/{eventId}/testimonials/{fileName} {
       allow read:  if true;

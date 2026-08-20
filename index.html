@@ -2,14 +2,101 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="index, follow" />
+
+    <!-- ============================================================
+         SEO e preview de link
+         ============================================================
+         Tudo aqui é ESTÁTICO de propósito. Os crawlers de preview
+         (WhatsApp, Facebook, LinkedIn, Discord, Slack, Telegram, X) NÃO
+         executam JavaScript: leem só o HTML que o servidor devolve.
+         Meta tag injetada em runtime (react-helmet, useEffect em
+         document.head) é invisível para eles — era por isso que o link
+         no WhatsApp não trazia miniatura.
+
+         As URLs são ABSOLUTAS por exigência dos mesmos crawlers: caminho
+         relativo em og:image não é resolvido, a imagem simplesmente não
+         aparece.
+
+         Este arquivo cobre a HOME. As demais rotas ganham os mesmos
+         campos com valores próprios em scripts/prerender-seo.mjs, que
+         roda depois do build — os textos vivem lá, num mapa único.
+         ============================================================ -->
+
+    <title>Scoliosis Day — O maior encontro sobre escoliose do Brasil</title>
     <meta
       name="description"
       content="O Scoliosis Day reúne cirurgiões, fisioterapeutas e profissionais da saúde para o maior encontro sobre escoliose do Brasil."
     />
-    <title>Scoliosis Day — O maior encontro sobre escoliose do Brasil</title>
+    <link rel="canonical" href="https://scoliosisday.com/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#14bac2" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Scoliosis Day" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:url" content="https://scoliosisday.com/" />
+    <meta property="og:title" content="Scoliosis Day — O maior encontro sobre escoliose do Brasil" />
+    <meta
+      property="og:description"
+      content="O Scoliosis Day reúne cirurgiões, fisioterapeutas e profissionais da saúde para o maior encontro sobre escoliose do Brasil."
+    />
+    <meta property="og:image" content="https://scoliosisday.com/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Scoliosis Day" />
+
+    <!-- Twitter/X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Scoliosis Day — O maior encontro sobre escoliose do Brasil" />
+    <meta
+      name="twitter:description"
+      content="O Scoliosis Day reúne cirurgiões, fisioterapeutas e profissionais da saúde para o maior encontro sobre escoliose do Brasil."
+    />
+    <meta name="twitter:image" content="https://scoliosisday.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Scoliosis Day" />
+
+    <!-- Ícones -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/og-image.png" />
+
+    <!-- Dados estruturados.
+         Organization e WebSite descrevem a MARCA, que não depende de
+         nenhum evento estar cadastrado — por isso são estáticos aqui.
+         O schema Event (o de maior ganho para este site) não entra por
+         enquanto: exige startDate, que hoje não existe no modelo de
+         dados de evento, e não há edição atual publicada. Preencher com
+         data suposta geraria rich result errado. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://scoliosisday.com/#organization",
+            "name": "Scoliosis Day",
+            "url": "https://scoliosisday.com/",
+            "logo": "https://scoliosisday.com/og-image.png",
+            "description": "O maior encontro multidisciplinar sobre escoliose do Brasil.",
+            "sameAs": [
+              "https://www.instagram.com/scoliosisday/",
+              "https://www.linkedin.com/company/scoliosis-day/",
+              "https://www.tiktok.com/@scoliosis.day"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://scoliosisday.com/#website",
+            "url": "https://scoliosisday.com/",
+            "name": "Scoliosis Day",
+            "inLanguage": "pt-BR",
+            "publisher": { "@id": "https://scoliosisday.com/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body class="sd-body">
     <div id="root"></div>

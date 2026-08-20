@@ -15,6 +15,7 @@
 import { useLanguage } from '../../../hooks/useLanguage.js';
 import { useSponsors } from '../../../hooks/useSponsors.js';
 import { SPONSOR_TYPES } from '../../../utils/constants.js';
+import SponsorLogo from '../../../components/SponsorLogo.jsx';
 
 const MIN_TRACK_ITEMS = 24;
 const MIN_REPEATS = 5;
@@ -59,7 +60,7 @@ export default function HomeSupporters() {
               aria-hidden={index < supporters.length ? undefined : true}
             >
               {sponsor.logoUrl ? (
-                <img className="sdp-supporters__logo" src={sponsor.logoUrl} alt={sponsor.name} />
+                <SponsorLogo src={sponsor.logoUrl} alt={sponsor.name} maxHeight={68} />
               ) : (
                 <span className="sd-logo-strip__ph">{sponsor.name}</span>
               )}

@@ -4,10 +4,15 @@
 // `testimonials` do Firestore. Um componente só pra esses dois lugares
 // não arriscarem divergir de novo (era exatamente esse o bug: a Home
 // tinha seu próprio card ligado a uma fonte de dados diferente).
+//
+// Sem avatar: o círculo de iniciais saiu da assinatura a pedido. O
+// componente AvatarInitials.jsx continua existindo e em uso em outros
+// cinco pontos do projeto (PersonCard, PersonModal, ScheduleSession,
+// CollaboratorsTable e CollaboratorCardSelect) — aqui só deixou de ser
+// chamado.
 
 import { useLanguage } from '../../../../hooks/useLanguage.js';
 import { formatTestimonialMonth } from '../../../../utils/formatTestimonialMonth.js';
-import AvatarInitials from '../../../../components/ui/AvatarInitials.jsx';
 
 /** @param {{ item: { id: string, quote: string, name: string, role: string, date: string|null } }} props */
 export default function TestimonialQuoteCard({ item }) {
@@ -17,8 +22,14 @@ export default function TestimonialQuoteCard({ item }) {
   return (
     <figure className="sd-quote">
       <blockquote>{item.quote}</blockquote>
+      {/* O <span> continua envolvendo nome e legenda mesmo sem o avatar
+          ao lado: .sd-quote figcaption é flex-row (design-system.css),
+          então com <b> e <small> soltos os dois virariam colunas lado a
+          lado. Com um filho só, o gap de 12px do figcaption não produz
+          espaço nenhum (gap só existe ENTRE filhos) e o
+          justify-content:center centraliza o bloco — o mesmo alinhamento
+          central já adotado no resto do card. */}
       <figcaption>
-        <AvatarInitials name={item.name} photoUrl={null} id={item.id} className="sdp-avatar sdp-avatar--sm" />
         <span>
           <b>{item.name}</b>
           <small>{[item.role, dateLabel].filter(Boolean).join(' · ')}</small>

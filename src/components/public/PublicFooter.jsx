@@ -39,7 +39,7 @@ export default function PublicFooter() {
         <div className="sd-footer__top">
           <div className="sd-footer__brand">
             <Link to="/" className="sdp-wordmark">
-              <img src={logoColor} alt={t.site.brand} className="sdp-wordmark__logo" />
+              <img width="699" height="264" src={logoColor} alt={t.site.brand} className="sdp-wordmark__logo" />
             </Link>
             <p>{t.site.footerTagline}</p>
           </div>

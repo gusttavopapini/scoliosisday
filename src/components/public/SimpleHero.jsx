@@ -4,7 +4,11 @@
 // página pública que não tem um hero dinâmico próprio — Sobre, Hall de
 // Estrelas, Patrocinadores, Depoimentos.
 
-/** @param {{ title: string, subtitle?: string }} props */
+/**
+ * `subtitle` aceita ReactNode, não só string: a página do Hall de
+ * Estrelas passa um fragmento com <BrandWordmark /> no meio da frase.
+ * @param {{ title: string, subtitle?: import('react').ReactNode }} props
+ */
 export default function SimpleHero({ title, subtitle }) {
   return (
     <section className="sdp-simple-hero sd-dots">

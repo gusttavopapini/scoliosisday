@@ -40,7 +40,12 @@ function VideoTestimonialCard({ item, isActive, onPlayingChange }) {
 
   return (
     <div className="sdp-video-testimonial-card">
-      <div className="sdp-video-embed">
+      {/* --portrait: os depoimentos são gravados em vertical (story). O
+          .sdp-video-embed base continua 16:9 e é compartilhado com o
+          vídeo das páginas de Edição (EditionVideo.jsx) e com a prévia do
+          wizard (EventStepVideo.jsx) — por isso a proporção vertical
+          entra como modificador aqui, e não na classe base. */}
+      <div className="sdp-video-embed sdp-video-embed--portrait">
         {embed?.type === 'mp4' ? (
           // eslint-disable-next-line jsx-a11y/media-has-caption -- vídeo enviado pelo admin, sem legendas geradas.
           <video

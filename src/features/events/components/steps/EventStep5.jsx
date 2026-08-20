@@ -6,6 +6,15 @@
 // Só existe no fluxo isCurrent: false (ver FULL_STEPS/REDUCED_STEPS em
 // EventForm.jsx) — uma edição atual não tem "arquivo" ainda.
 //
+// O aviso "Vídeos (MP4) — Storage pendente nesta versão" saiu daqui: era
+// um placeholder escrito quando não havia upload de vídeo em lugar nenhum
+// do projeto. Hoje há, em passo PRÓPRIO — o passo de Vídeo (EventStepVideo.jsx),
+// último dos dois fluxos, com upload MP4/WEBM para events/{id}/video/ e
+// regra de Storage própria. A galeria daqui é de FOTOS por desenho
+// (UPLOAD_PRESETS.eventGallery só aceita jpeg/png/webp, e EditionArchive
+// monta um leque com lightbox de imagem), então o aviso não descrevia mais
+// nenhuma pendência real.
+//
 // Depoimentos e Paleta de Cores saíram deste passo: nenhum dos dois tinha
 // leitura pública. Depoimentos era vestígio de antes do módulo dedicado em
 // /painel/depoimentos (coleção própria, alimenta os carrosséis da Home) —
@@ -29,13 +38,6 @@ export default function EventStep5({ register, errors, watch, control, eventId }
         <p className="sd-muted">
           Título, subtítulo, galeria de fotos e estatísticas exibidos em /edicoes para esta
           edição passada.
-        </p>
-      </div>
-
-      {/* ── Vídeos (placeholder) ── */}
-      <div style={{ padding: 'var(--space-4)', backgroundColor: 'var(--gray-050)', borderRadius: 'var(--radius-md)' }}>
-        <p className="sd-small" style={{ color: 'var(--text-muted)' }}>
-          📹 Vídeos (MP4) — Storage pendente nesta versão
         </p>
       </div>
 

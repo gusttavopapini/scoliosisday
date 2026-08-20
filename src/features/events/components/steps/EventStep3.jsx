@@ -1,6 +1,7 @@
 // src/features/events/components/steps/EventStep3.jsx
 // Passo 3: Apresentação — os 3 cards com ícone, título e descrição
-// (obrigatórios) e, abaixo deles, o bloco de texto corrido opcional.
+// (obrigatórios), o título/subtítulo OPCIONAIS da seção que os abriga, e
+// abaixo deles o bloco de texto corrido, também opcional.
 //
 // Os dois são independentes: o bloco de texto em branco não impede
 // avançar, e os cards continuam obrigatórios como sempre foram. Só existe
@@ -18,6 +19,55 @@ export default function EventStep3({ register, errors, watch }) {
       <div>
         <h2 className="sd-subtitle">Apresentação Visual</h2>
         <p className="sd-muted">Crie exatamente 3 cards que descrevem o evento</p>
+      </div>
+
+      {/* Cabeçalho da seção de cards no site. Os dois campos são
+          OPCIONAIS e independentes dos cards: em branco, a página usa o
+          texto institucional padrão — que é o que toda edição já criada
+          tem hoje, e por isso preencher não pode virar obrigação. */}
+      <div className="sd-card" style={{ padding: 'var(--space-6)' }}>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <h3 className="sd-subtitle">
+            Título da seção <span className="sd-muted">(opcional)</span>
+          </h3>
+          <p className="sd-note">
+            Aparece acima dos cards na página desta edição. Deixe em branco para usar o texto
+            padrão &ldquo;O que é o Scoliosis Day&rdquo;.
+          </p>
+        </div>
+
+        <label className="sd-field">
+          <span className="sd-label">Título</span>
+          <input
+            {...register('presentationTitle')}
+            className="sd-input"
+            type="text"
+            placeholder="O que é o Scoliosis Day"
+            maxLength={120}
+          />
+          {errors.presentationTitle && (
+            <span className="sd-error">{errors.presentationTitle.message}</span>
+          )}
+          <span className="sd-note">
+            Até 120 caracteres. Escrever &ldquo;Scoliosis Day&rdquo; no meio da frase aplica
+            automaticamente a tipografia da marca.
+          </span>
+        </label>
+
+        <label className="sd-field">
+          <span className="sd-label">Subtítulo</span>
+          <input
+            {...register('presentationSubtitle')}
+            className="sd-input"
+            type="text"
+            placeholder="Linha de apoio exibida abaixo do título."
+            maxLength={200}
+          />
+          {errors.presentationSubtitle && (
+            <span className="sd-error">{errors.presentationSubtitle.message}</span>
+          )}
+          <span className="sd-note">Até 200 caracteres.</span>
+        </label>
       </div>
 
       <div style={{ display: 'grid', gap: 'var(--space-6)' }}>

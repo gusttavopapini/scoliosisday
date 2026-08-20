@@ -39,6 +39,16 @@ export const UPLOAD_PRESETS = {
     maxSizeMB: 100,
     allowedTypes: ['video/mp4'],
   },
+  // Vídeo da seção de vídeo de uma edição (videoBlock, passo de vídeo do
+  // wizard). Mesmo teto de 100MB do depoimento em vídeo — o limite não é
+  // técnico, é de custo: o Storage no plano Blaze cobra banda por
+  // exibição. WEBM entra além do MP4 (o depoimento só aceita MP4) porque
+  // os dois tocam em <video> sem plugin em todo navegador atual, e o WEBM
+  // costuma sair bem menor no mesmo nível de qualidade.
+  eventVideo: {
+    maxSizeMB: 100,
+    allowedTypes: ['video/mp4', 'video/webm'],
+  },
 };
 
 /** Extensão canônica por MIME — não confia na extensão do nome original. */
@@ -48,6 +58,7 @@ const EXTENSION_BY_TYPE = {
   'image/webp': 'webp',
   'image/svg+xml': 'svg',
   'video/mp4': 'mp4',
+  'video/webm': 'webm',
 };
 
 /** Rótulo curto de um MIME, para a mensagem de erro ("JPG, PNG ou WEBP"). */
@@ -105,6 +116,24 @@ function buildStoragePath(basePath, file) {
  * @returns {Promise<string>} URL de download
  */
 export function uploadFile(basePath, file, onProgress) {
+  return uploadFileWithPath(basePath, file, onProgress).then((result) => result.url);
+}
+
+/**
+ * Igual a uploadFile, mas devolve `{ url, path }` em vez de só a URL.
+ *
+ * Existe porque o vídeo da edição grava o caminho no Storage num campo
+ * próprio do documento (videoBlock.videoStoragePath) — e o caminho é
+ * montado aqui dentro por buildStoragePath, com sufixo aleatório, então
+ * quem chama não teria como saber qual foi. Os outros uploads do projeto
+ * não precisam dele: apagam pela URL, via deleteFile.
+ *
+ * @param {string} basePath Caminho sem extensão. Ex: 'events/abc/video/main'
+ * @param {File} file
+ * @param {(percent: number) => void} [onProgress] Recebe 0–100.
+ * @returns {Promise<{ url: string, path: string }>}
+ */
+export function uploadFileWithPath(basePath, file, onProgress) {
   const fullPath = buildStoragePath(basePath, file);
   const fileRef = ref(storage, fullPath);
 
@@ -142,7 +171,7 @@ export function uploadFile(basePath, file, onProgress) {
       },
       () => {
         console.info('[storageService] upload concluído', fullPath);
-        getDownloadURL(task.snapshot.ref).then(resolve, (error) => {
+        getDownloadURL(task.snapshot.ref).then((url) => resolve({ url, path: fullPath }), (error) => {
           console.error('[storageService] getDownloadURL FALHOU', {
             code: error?.code,
             message: error?.message,

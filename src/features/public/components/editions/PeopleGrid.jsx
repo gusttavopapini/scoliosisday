@@ -1,10 +1,10 @@
 // src/features/public/components/editions/PeopleGrid.jsx
 // Grade de PersonCard, compartilhada por Presenças Confirmadas, Comissão
 // Organizadora, Curadoria Científica (Sobre e Edições) e Hall de Estrelas
-// (Destaque e Todos) — via PeopleSection.jsx/FeaturedSpeakers.jsx/
-// AllSpeakers.jsx, que só decidem QUEM aparece; este componente decide COMO
-// (grade centralizada no desktop, carrossel com autoplay no mobile). Uma
-// mudança aqui cobre as quatro seções de uma vez.
+// — via PeopleSection.jsx/AllSpeakers.jsx, que só decidem QUEM aparece;
+// este componente decide COMO (grade centralizada no desktop, carrossel
+// com autoplay no mobile). Uma mudança aqui cobre todas as seções de uma
+// vez — nunca houve card duplicado entre elas.
 //
 // Mobile (<=640px): scroll-snap horizontal nativo + setInterval chamando
 // track.scrollTo() — sem lib de carrossel (Swiper/Embla). Com 2 cards ou

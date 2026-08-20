@@ -322,8 +322,14 @@ const t = {
     // ── Home · O que é o Scoliosis Day ──
     // "Scoliosis Day" no heading é renderizado por <BrandWordmark />, não
     // por este texto — aboutTitleMain é só o que vem antes da marca.
+    //
+    // aboutTitleMain/aboutSubtitle alimentam DOIS componentes com o mesmo
+    // cabeçalho de seção: HomeAbout.jsx (Home) e EditionPresentation.jsx
+    // (/edicoes, edição atual). Editar aqui muda os dois de uma vez — que
+    // é o desejado: é a mesma seção institucional em duas páginas. Para
+    // fazê-los divergir seria preciso uma segunda chave.
     aboutTitleMain: 'O que é o',
-    aboutSubtitle: 'Um encontro que une ciência, prática clínica e formação profissional em torno da escoliose.',
+    aboutSubtitle: 'Um ecossistema que une ciência, prática clínica, formação profissional e conhecimento de alto nível sobre deformidades da coluna vertebral.',
     aboutCard1Title: 'Educação e Ciência de Alto Nível',
     aboutCard1Text: 'Alto padrão científico do cuidado à escoliose no Brasil. Promove atualização constante baseada em evidências e conecta profissionais da saúde às discussões mais avançadas sobre o tratamento das deformidades da coluna.',
     aboutCard2Title: 'Debate Multidisciplinar',
@@ -410,7 +416,7 @@ const t = {
 
     // ── /hall-de-estrelas ──
     hallOfStarsPageHeroTitle: 'Hall de Estrelas',
-    hallOfStarsPageHeroSubtitle: 'Os maiores nomes do tratamento da escoliose reunidos no Scoliosis Day.',
+    hallOfStarsPageHeroSubtitle: 'Grandes referências mundiais da escoliose reunidas no Scoliosis Day.',
     hallOfStarsPageFeaturedTitle: 'Palestrantes em destaque',
     hallOfStarsPageAllTitle: 'Todos os palestrantes',
     hallOfStarsPageSearchPlaceholder: 'Buscar por nome…',

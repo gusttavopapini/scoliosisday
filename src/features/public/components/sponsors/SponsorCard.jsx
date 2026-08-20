@@ -3,6 +3,8 @@
 // site do patrocinador. Distinto do SponsorCard do painel (outro arquivo,
 // outra finalidade: aquele edita, este só exibe).
 
+import SponsorLogo from '../../../../components/SponsorLogo.jsx';
+
 /** @param {{ sponsor: object }} props */
 export default function SponsorCard({ sponsor }) {
   return (
@@ -14,7 +16,7 @@ export default function SponsorCard({ sponsor }) {
     >
       <div className="sdp-sponsor-card__logo">
         {sponsor.logoUrl ? (
-          <img src={sponsor.logoUrl} alt={sponsor.name} />
+          <SponsorLogo src={sponsor.logoUrl} alt={sponsor.name} maxHeight={96} />
         ) : (
           <span className="sdp-sponsor-card__placeholder">{sponsor.name}</span>
         )}

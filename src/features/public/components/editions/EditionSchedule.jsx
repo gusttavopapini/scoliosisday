@@ -20,10 +20,15 @@ import ScheduleSession from './ScheduleSession.jsx';
 export default function EditionSchedule({ event, collaboratorsById }) {
   const { t, lang } = useLanguage();
   const { data: programming } = useProgramming(event.programming || null);
-  // O primeiro dia começa expandido (não há hoje um conceito de "dia
-  // atual" na programação — só a posição); os demais começam recolhidos.
-  // Cada dia é independente: mais de um pode ficar aberto ao mesmo tempo.
-  const [openDays, setOpenDays] = useState(() => new Set([0]));
+  // Todos os dias começam recolhidos: o Set nasce VAZIO. Antes ele nascia
+  // como new Set([0]), abrindo o primeiro dia por padrão — não havia
+  // critério por trás disso (não existe conceito de "dia atual" na
+  // programação, só a posição no array), e a seção abria alta demais.
+  //
+  // Só o estado INICIAL mudou. Cada dia continua independente e mais de
+  // um pode ficar aberto ao mesmo tempo — é o que o Set (em vez de um
+  // índice único) garante, junto com toggleDay abaixo.
+  const [openDays, setOpenDays] = useState(() => new Set());
 
   if (!event.programming || !programming) return null;
 

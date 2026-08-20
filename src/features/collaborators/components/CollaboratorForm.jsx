@@ -20,7 +20,7 @@ import { collaboratorSchema } from '../schemas/collaboratorSchema.js';
 import { COLLABORATOR_TYPES, AVATAR_COLORS } from '../../../utils/constants.js';
 import { avatarColorIndex } from '../../../utils/initials.js';
 import RichTextEditor from './RichTextEditor.jsx';
-import { COUNTRIES, countryFlagEmoji } from '../../../utils/countryFlags.js';
+import CountryCombobox from '../../../components/form/CountryCombobox.jsx';
 import t from '../../../i18n/pt-BR.js';
 
 const COLLABORATOR_TYPE_OPTIONS = [
@@ -249,21 +249,31 @@ export default function CollaboratorForm({ initialData, isEditMode = false, onSu
           <span className="sd-note">Sem foto, o avatar é gerado a partir das iniciais.</span>
         </div>
 
-        {/* ── Bandeira / País (opcional) ── */}
-        <label className="sd-field">
-          <span className="sd-label">Bandeira <span className="sd-muted">(opcional)</span></span>
-          <span className="sd-select-wrap">
-            <select {...register('flag')} className="sd-select">
-              <option value="">Nenhuma</option>
-              {COUNTRIES.map((country) => (
-                <option key={country.code} value={country.code}>
-                  {countryFlagEmoji(country.code)} {country.name}
-                </option>
-              ))}
-            </select>
+        {/* ── Bandeira / País (opcional) ──
+            <div>, não <label>: um <label> em volta faria qualquer clique
+            dentro do combobox (inclusive nas opções da lista) voltar o
+            foco pro input, atrapalhando a seleção. O rótulo aponta pro
+            campo por htmlFor/id. */}
+        <div className="sd-field">
+          <label className="sd-label" htmlFor="collaborator-flag">
+            Bandeira <span className="sd-muted">(opcional)</span>
+          </label>
+          <Controller
+            name="flag"
+            control={control}
+            render={({ field }) => (
+              <CountryCombobox
+                id="collaborator-flag"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+              />
+            )}
+          />
+          <span className="sd-note">
+            Exibida ao lado do nome no card do site público. Busque por nome, sigla (BR, NL) ou
+            apelido — &ldquo;Holanda&rdquo; encontra Países Baixos.
           </span>
-          <span className="sd-note">Exibida ao lado do nome no card do site público.</span>
-        </label>
+        </div>
 
         {/* ── Currículo (TipTap) ── */}
         <label className="sd-field">

@@ -2,6 +2,8 @@
 // Schema Zod para validação de eventos
 
 import { z } from 'zod';
+import { isPlatformVideoUrl } from '../../../utils/videoEmbed.js';
+import { VIDEO_TYPES } from '../../../utils/contentBlocks.js';
 
 /** '' para campo em branco, inclusive quando só tem espaço. */
 const trimmed = (value) => value?.trim() ?? '';
@@ -29,6 +31,64 @@ const textBlockSchema = z
     }
     if (!body) {
       ctx.addIssue({ code: 'custom', path: ['body'], message: 'Texto obrigatório quando há título' });
+    }
+  });
+
+/**
+ * Validação all-or-nothing do bloco de vídeo opcional (Passo 5, os dois
+ * fluxos do wizard). Mesmo desenho de textBlockSchema, com duas
+ * diferenças:
+ *
+ *  · `subtitle` NÃO entra na regra — é opcional mesmo com o bloco
+ *    preenchido, então nunca vira obrigatório nem obriga os outros.
+ *    Um subtítulo sozinho também não "acende" o bloco: sem título e sem
+ *    vídeo, o bloco continua vazio e não é gravado.
+ *  · a URL tem validação de FORMATO além da de preenchimento, para o
+ *    admin não conseguir avançar com um link que o player não sabe
+ *    embutir (ver isPlatformVideoUrl em utils/videoEmbed.js).
+ */
+const videoBlockSchema = z
+  .object({
+    title: z.string().max(120, 'Máximo 120 caracteres').optional().default(''),
+    subtitle: z.string().max(200, 'Máximo 200 caracteres').nullable().optional().default(''),
+    // Sem .default(URL) aqui: o default vive no formulário (EventForm.jsx),
+    // e um bloco antigo sem o campo é normalizado como 'url' na leitura
+    // (normalizeVideoBlock) — o schema só precisa aceitar os dois valores.
+    videoType: z.enum([VIDEO_TYPES.URL, VIDEO_TYPES.UPLOAD]).optional(),
+    videoUrl: z.string().optional().default(''),
+    videoStoragePath: z.string().nullable().optional(),
+  })
+  .superRefine((block, ctx) => {
+    const title = trimmed(block.title);
+    const videoUrl = trimmed(block.videoUrl);
+    if (!title && !videoUrl) return;
+
+    if (!title) {
+      ctx.addIssue({ code: 'custom', path: ['title'], message: 'Título obrigatório quando há vídeo' });
+    }
+
+    if (!videoUrl) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['videoUrl'],
+        message: block.videoType === VIDEO_TYPES.UPLOAD
+          ? 'Envie um arquivo de vídeo quando há título'
+          : 'Vídeo obrigatório quando há título',
+      });
+      return;
+    }
+
+    // O formato só é cobrado no modo URL: no modo upload a `videoUrl` é a
+    // URL de download do Storage, que não casa (nem deve casar) o padrão
+    // de YouTube/Vimeo. O arquivo em si já foi validado antes de subir,
+    // por tipo e tamanho (UPLOAD_PRESETS.eventVideo) e de novo pelas
+    // regras do Storage no servidor.
+    if (block.videoType !== VIDEO_TYPES.UPLOAD && !isPlatformVideoUrl(videoUrl)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['videoUrl'],
+        message: 'Use um link do YouTube ou do Vimeo',
+      });
     }
   });
 
@@ -108,6 +168,13 @@ const sharedEventFields = {
       occupation: z.string(),
     })
   ).optional().default([]),
+  // LEGADO: nasceu com o placeholder de "Vídeos (MP4)" do passo de
+  // Conteúdo de Arquivo, que nunca chegou a ter formulário — nada escreve
+  // nem lê este campo hoje (o vídeo da edição vive em videoBlock, ver
+  // EventStepVideo.jsx). Fica no schema pela mesma razão de
+  // testimonials/colors/bannerOrder: removê-lo faria o Zod descartar a
+  // chave no parse, e um evento antigo que a tenha gravada perderia o
+  // valor no próximo salvamento. Não é editável em lugar nenhum.
   videos: z.array(z.string()).optional().default([]),
   // Galeria da "página de arquivo" (corpo exibido em /edicoes quando o
   // evento NÃO é o atual — ver EditionArchive.jsx). `featured` marca até 3
@@ -120,6 +187,19 @@ const sharedEventFields = {
       featured: z.boolean().optional().default(false),
     })
   ).max(20, 'Máximo 20 fotos').optional().default([]),
+  // Título e subtítulo do bloco de CARDS (a seção "O que é o Scoliosis
+  // Day" da edição atual). Campos de raiz, e não um objeto `cardsBlock`,
+  // pelo mesmo desenho de archiveTitle/archiveSubtitle logo abaixo: os
+  // cards em si já vivem em `presentation`, e enfiá-los num objeto novo
+  // exigiria migrar dado histórico — o que este projeto não faz.
+  //
+  // Opcionais mesmo com os cards preenchidos: vazio significa "usar o
+  // texto institucional padrão" (ver EditionPresentation.jsx), que é o
+  // que toda edição já criada tem hoje. Por isso NÃO entram na regra
+  // all-or-nothing dos blocos opcionais — os cards não deixam de ser
+  // obrigatórios por causa deles, nem o contrário.
+  presentationTitle: z.string().max(120, 'Máximo 120 caracteres').optional(),
+  presentationSubtitle: z.string().max(200, 'Máximo 200 caracteres').optional(),
   // Título/subtítulo da página de arquivo — distintos de headline/subtitle
   // (esses são do hero, sempre visíveis; archiveTitle só aparece no corpo
   // condicional de edição passada).
@@ -148,6 +228,13 @@ const sharedEventFields = {
   // que não o preencheu — o site público simplesmente não renderiza a
   // seção (ver EditionTextBlock.jsx e utils/contentBlocks.js).
   textBlock: textBlockSchema.nullable().optional(),
+  // Bloco de vídeo opcional — como o textBlock, vale igualmente nos dois
+  // modos do wizard (por isso vive aqui, e não numa branch da união), mas
+  // ao contrário dele tem PASSO PRÓPRIO: o Passo 5 do fluxo completo e o
+  // Passo 3 do reduzido, o último dos dois nos dois casos. Ausente/null
+  // numa edição que não o preencheu — o site não renderiza a seção (ver
+  // EditionVideo.jsx e utils/contentBlocks.js).
+  videoBlock: videoBlockSchema.nullable().optional(),
   colors: z.object({
     background: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório'),
     text: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório'),
@@ -216,7 +303,7 @@ export const STEP_FIELDS = {
   step2: ['priceInPerson', 'priceOnline', 'location'],
   // O bloco de texto corrido divide o Passo 3 com os 3 cards de
   // apresentação, e é validado junto deles ao avançar.
-  step3: ['presentation', 'textBlock'],
+  step3: ['presentation', 'presentationTitle', 'presentationSubtitle', 'textBlock'],
   step4: ['speakers', 'starSpeakerIds', 'organizerIds', 'curatorIds', 'programming', 'sponsors'],
   // Único passo que ainda existe do antigo "Passo 5": o wizard completo
   // (isCurrent: true) não tem mais passo de conteúdo de arquivo — só o
@@ -227,4 +314,9 @@ export const STEP_FIELDS = {
   // Último passo do fluxo reduzido — abriga o mesmo bloco de texto
   // corrido do Passo 3 do fluxo completo (ver TextBlockFields.jsx).
   step5Archive: ['gallery', 'archiveTitle', 'archiveSubtitle', 'archiveStats', 'textBlock'],
+  // Passo de vídeo — id ÚNICO compartilhado pelos dois fluxos, porque os
+  // campos são exatamente os mesmos nos dois (diferente de step1/
+  // step1Reduced, que divergem no CTA). O número do passo muda (5 no
+  // completo, 3 no reduzido); o id, não.
+  stepVideo: ['videoBlock'],
 };

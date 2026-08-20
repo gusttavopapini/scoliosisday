@@ -1,5 +1,5 @@
 // src/features/events/components/EventForm.jsx
-// Wizard de criar/editar eventos — 4 passos (edição atual) ou 2 (edição
+// Wizard de criar/editar eventos — 5 passos (edição atual) ou 3 (edição
 // passada), conforme isCurrent (ver FULL_STEPS/REDUCED_STEPS abaixo).
 
 import { useState, useEffect, useRef } from 'react';
@@ -16,6 +16,7 @@ import {
 } from '../../../hooks/useEvents.js';
 import { newEventId } from '../../../services/events.js';
 import { DEFAULT_EVENT_COLORS } from '../constants/defaultPalette.js';
+import { VIDEO_TYPES } from '../../../utils/contentBlocks.js';
 import { useCollaborators } from '../../../hooks/useCollaborators.js';
 import { useProgrammings } from '../../../hooks/useProgrammings.js';
 import EventStep1 from './steps/EventStep1.jsx';
@@ -23,18 +24,22 @@ import EventStep2 from './steps/EventStep2.jsx';
 import EventStep3 from './steps/EventStep3.jsx';
 import EventStep4 from './steps/EventStep4.jsx';
 import EventStep5 from './steps/EventStep5.jsx';
+import EventStepVideo from './steps/EventStepVideo.jsx';
 import DiscardChangesModal from '../../../components/ui/DiscardChangesModal.jsx';
 import { useDiscardGuard } from '../../../hooks/useDiscardGuard.js';
 
-// Wizard completo: edição atual (isCurrent: true) — só os passos 1 a 4. O
-// Passo 5 (Conteúdo de Arquivo) é exclusivo do wizard reduzido: uma edição
-// atual não tem "arquivo" ainda, então esse passo nem existe aqui, nem como
-// item navegável nem como conteúdo acessível por outra via.
+// Wizard completo: edição atual (isCurrent: true) — passos 1 a 5. O
+// "Conteúdo de Arquivo" (EventStep5.jsx) continua exclusivo do wizard
+// reduzido: uma edição atual não tem "arquivo" ainda, então esse passo não
+// existe aqui, nem como item navegável nem por outra via. O Passo 5 desta
+// lista é OUTRA coisa — a seção de vídeo (EventStepVideo.jsx), que existe
+// nos dois fluxos.
 const FULL_STEPS = [
   { number: 1, label: 'Identidade', id: 'step1' },
   { number: 2, label: 'Modalidade', id: 'step2' },
   { number: 3, label: 'Apresentação', id: 'step3' },
   { number: 4, label: 'Pessoas', id: 'step4' },
+  { number: 5, label: 'Vídeo', id: 'stepVideo' },
 ];
 
 // Wizard reduzido: edição passada (isCurrent: false) — só banner (sem CTA) e
@@ -45,9 +50,14 @@ const FULL_STEPS = [
 // O bloco de texto corrido opcional (textBlock) vale igualmente para os
 // dois fluxos, mas NÃO ganha passo próprio: entra no Passo 3 do completo e
 // no Passo 2 daqui, pelo mesmo TextBlockFields.jsx.
+//
+// A seção de vídeo (videoBlock) é o caso oposto e deliberado: também vale
+// para os dois fluxos, mas TEM passo próprio — o último dos dois, aqui
+// como Passo 3 e no completo como Passo 5, pelo mesmo EventStepVideo.jsx.
 const REDUCED_STEPS = [
   { number: 1, label: 'Banner', id: 'step1Reduced' },
   { number: 2, label: 'Conteúdo de arquivo', id: 'step5Archive' },
+  { number: 3, label: 'Vídeo', id: 'stepVideo' },
 ];
 
 const AUTOSAVE_INTERVAL_MS = 30000; // 30 segundos
@@ -62,6 +72,10 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [visitedSteps, setVisitedSteps] = useState([1]);
+  // Upload de vídeo em andamento (passo de vídeo). Trava publicar/salvar
+  // enquanto o arquivo sobe: gravar agora salvaria a edição apontando pra
+  // uma URL que ainda não existe, e sair da página aborta o envio.
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
 
   // Instâncias separadas: o rascunho automático e o botão manual não devem
   // marcar o submit final (nem um ao outro) como pendente.
@@ -108,6 +122,9 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     modality: 'hybrid',
     priceInPerson: null,
     priceOnline: null,
+    // '' e não null: inputs controlados. Vazio = usa o texto padrão.
+    presentationTitle: '',
+    presentationSubtitle: '',
     presentation: [
       { icon: '', title: '', description: '' },
       { icon: '', title: '', description: '' },
@@ -137,6 +154,17 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     // null aqui deixaria os inputs sem valor inicial — o React reclamaria
     // da troca de não-controlado pra controlado na 1ª digitação.
     textBlock: { title: '', body: '' },
+    // Mesmo motivo do textBlock acima: objeto vazio e não null, para os
+    // inputs do Passo de vídeo nascerem controlados. `subtitle` é '' aqui
+    // (e null no Firestore) — o input é uma string, o documento não.
+    videoBlock: {
+      title: '',
+      subtitle: '',
+      // 'url' é o padrão: não hospeda nada, não custa banda do Blaze.
+      videoType: VIDEO_TYPES.URL,
+      videoUrl: '',
+      videoStoragePath: null,
+    },
     isCurrent: false,
   };
 
@@ -147,6 +175,16 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     ...DEFAULT_VALUES,
     ...initialData,
     textBlock: { ...DEFAULT_VALUES.textBlock, ...(initialData?.textBlock ?? {}) },
+    videoBlock: {
+      ...DEFAULT_VALUES.videoBlock,
+      ...(initialData?.videoBlock ?? {}),
+      // O subtítulo é null no Firestore quando vazio; o spread acima
+      // traria esse null para o input, que voltaria a ser não-controlado.
+      subtitle: initialData?.videoBlock?.subtitle ?? '',
+      // Bloco salvo antes de videoType existir só podia ser link — mesmo
+      // fallback de normalizeVideoBlock, pro formulário abrir na aba certa.
+      videoType: initialData?.videoBlock?.videoType ?? VIDEO_TYPES.URL,
+    },
   };
 
   const {
@@ -154,6 +192,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     control,
     watch,
     trigger,
+    setValue,
     getValues,
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
@@ -188,7 +227,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   const draftIdRef = useRef(initialData?.id ?? newEventId());
 
   // Cancelar aparece em todos os passos e descarta o wizard inteiro, não só o
-  // passo atual — isDirty cobre os cinco passos porque todos escrevem no mesmo
+  // passo atual — isDirty cobre todos os passos porque todos escrevem no mesmo
   // formulário do React Hook Form.
   const discard = useDiscardGuard({
     isDirty,
@@ -203,6 +242,8 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
       const values = getValues();
       // Sem headline não há rascunho que valha a pena persistir.
       if (!values.headline?.trim()) return;
+      // Nem no meio de um upload: a URL do vídeo ainda não existe.
+      if (isVideoUploading) return;
       if (!draftIdRef.current) draftIdRef.current = newEventId();
 
       try {
@@ -217,6 +258,78 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     const timer = setInterval(() => saveDraftRef.current?.(), AUTOSAVE_INTERVAL_MS);
     return () => clearInterval(timer);
   }, []);
+
+  // ── [SD-WIZARD] Guarda de submit ───────────────────────────────────
+  //
+  // CAUSA RAIZ do submit automático ao chegar no último passo: o botão
+  // "Avançar" e o botão de publicar ocupavam a MESMA posição na árvore do
+  // JSX (os dois ramos do mesmo ternário, sem `key`). O React reconcilia
+  // isso como UM ÚNICO elemento <button> e só troca o atributo `type` de
+  // "button" para "submit" — o nó do DOM continua sendo o mesmo que o
+  // usuário acabou de clicar.
+  //
+  // handleNextStep é async: o `await trigger(...)` devolve o controle ao
+  // browser, o microtask resolve, o React re-renderiza e o `type` vira
+  // "submit" ANTES de o browser executar a ação padrão daquele clique. O
+  // clique em "Avançar" acaba ativando um botão que virou submit no meio
+  // do caminho, e o formulário publica sozinho.
+  //
+  // Por isso o bug só aparecia na transição para o ÚLTIMO passo (era o
+  // 3→4 quando o wizard tinha 4 passos; virou 4→5 com o passo de vídeo) —
+  // é a única transição em que o botão troca de type.
+  //
+  // A correção principal está no JSX (`key` distinta em cada ramo, o que
+  // faz o React desmontar um botão e montar outro). Esta guarda é a
+  // segunda camada, independente dela: só deixa passar o submit que
+  // realmente veio do botão de publicar E estando no último passo.
+  // Qualquer outra origem (Enter, botão que trocou de type, submit
+  // programático) é barrada aqui.
+  function handleFormSubmit(event) {
+    const submitter = event.nativeEvent?.submitter;
+    const fromPublishButton = submitter?.dataset?.wizardSubmit === 'true';
+    const isLastStep = currentStep === STEPS.length;
+
+    // TEMPORÁRIO — diagnóstico do submit automático. Remover junto com os
+    // demais logs [SD-WIZARD] depois da validação manual.
+    console.debug('[SD-WIZARD] submit disparado', {
+      origem: submitter ? `<${submitter.tagName.toLowerCase()}> "${submitter.textContent?.trim()}"` : 'SEM submitter (Enter ou submit programático)',
+      ehBotaoPublicar: fromPublishButton,
+      passoAtual: currentStep,
+      totalPassos: STEPS.length,
+      noUltimoPasso: isLastStep,
+    });
+
+    if (!fromPublishButton || !isLastStep) {
+      event.preventDefault();
+      console.warn('[SD-WIZARD] submit BLOQUEADO — não veio do botão de publicar no último passo. Nada foi salvo nem publicado.');
+      return;
+    }
+
+    // Publicar agora gravaria a edição apontando para uma URL que o
+    // Storage ainda não terminou de criar.
+    if (isVideoUploading) {
+      event.preventDefault();
+      toast.error('Aguarde o envio do vídeo terminar antes de publicar.');
+      console.warn('[SD-WIZARD] submit BLOQUEADO — upload de vídeo em andamento.');
+      return;
+    }
+
+    console.debug('[SD-WIZARD] submit LIBERADO — publicando.');
+    return handleSubmit(onSubmit, onInvalid)(event);
+  }
+
+  // Enter em campo de texto submete o formulário por padrão. Num wizard de
+  // vários passos isso publica a edição a partir de qualquer passo, então
+  // o Enter é neutralizado — exceto em <textarea>, onde ele é quebra de
+  // linha e nunca submeteu, e em botões/links, onde Enter é o "clique" que
+  // a acessibilidade por teclado exige.
+  function handleFormKeyDown(event) {
+    if (event.key !== 'Enter') return;
+    const tag = event.target.tagName;
+    if (tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'A') return;
+    event.preventDefault();
+    console.debug('[SD-WIZARD] Enter ignorado em', tag, '— use o botão para avançar/publicar.');
+  }
 
   async function onSubmit(data) {
     try {
@@ -248,7 +361,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   }
 
   // Rede de segurança: se a validação final falhar, leva o usuário ao primeiro
-  // passo com erro em vez de falhar silenciosamente no passo 5.
+  // passo com erro em vez de falhar silenciosamente no último passo.
   function onInvalid(formErrors) {
     const errorKeys = Object.keys(formErrors);
     const stepWithError = STEPS.find((step) =>
@@ -265,7 +378,20 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   }
 
   async function handleNextStep() {
+    // TEMPORÁRIO — ver [SD-WIZARD] acima.
+    console.debug('[SD-WIZARD] avançar', {
+      de: currentStep,
+      para: currentStep + 1,
+      totalPassos: STEPS.length,
+      fluxo: isCurrentValue ? 'edição atual (5 passos)' : 'edição passada (3 passos)',
+    });
+
     if (currentStep >= STEPS.length) return;
+
+    if (isVideoUploading) {
+      toast.error('Aguarde o envio do vídeo terminar antes de avançar.');
+      return;
+    }
 
     // Valida apenas os campos do passo atual, conforme STEP_FIELDS.
     const isStepValid = await trigger(fieldsOfStep(STEPS, currentStep));
@@ -287,7 +413,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     }
   }
 
-  // Salva o estado atual sem exigir o passo 4/5 nem forçar 'published' —
+  // Salva o estado atual sem exigir os últimos passos nem forçar 'published' —
   // mesma gravação do rascunho automático, só que sob controle do usuário e
   // com feedback (toast, loading). Não valida: um evento em progresso pode
   // ter passos futuros incompletos, e travar o salvamento nisso frustraria
@@ -298,6 +424,11 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
   // isCurrent nem o `status: 'published'` de onSubmit — aqueles continuam
   // exclusivos do submit completo, que exige o wizard inteiro válido.
   async function handleManualSave() {
+    if (isVideoUploading) {
+      toast.error('Aguarde o envio do vídeo terminar antes de salvar.');
+      return;
+    }
+
     const values = getValues();
     if (!draftIdRef.current) draftIdRef.current = newEventId();
 
@@ -324,7 +455,7 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="sd-form--panel">
+      <form onSubmit={handleFormSubmit} onKeyDown={handleFormKeyDown} className="sd-form--panel">
       {/* ── Progress steps ── */}
       <div className="sda-steps" style={{ marginBottom: 'var(--space-8)' }}>
         {STEPS.map((step) => {
@@ -352,9 +483,12 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
       </div>
 
       {/* ── Steps content ──
-          isCurrentValue decide a forma do wizard: atual (4 passos) ou
-          passada (2 passos — banner sem CTA + conteúdo de arquivo). O Passo
-          5 (EventStep5) só existe no modo reduzido, como passo 2. */}
+          isCurrentValue decide a forma do wizard: atual (5 passos) ou
+          passada (3 passos — banner sem CTA + conteúdo de arquivo +
+          vídeo). EventStep5 ("Conteúdo de arquivo") só existe no modo
+          reduzido, como passo 2; EventStepVideo existe nos dois, sempre
+          como último passo, e por isso é o único bloco abaixo que testa o
+          COMPRIMENTO do wizard em vez de um número fixo. */}
       <div style={{ minHeight: '400px', marginBottom: 'var(--space-8)' }}>
         {currentStep === 1 && (
           <EventStep1
@@ -389,6 +523,16 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
             errors={errors}
             watch={watch}
             eventId={draftIdRef.current}
+          />
+        )}
+        {currentStep === STEPS.length && (
+          <EventStepVideo
+            register={register}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+            eventId={draftIdRef.current}
+            onUploadingChange={setIsVideoUploading}
           />
         )}
       </div>
@@ -434,15 +578,23 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
             type="button"
             className="sd-btn sd-btn--outline"
             onClick={handleManualSave}
-            disabled={manualSaveMutation.isPending}
+            disabled={manualSaveMutation.isPending || isVideoUploading}
           >
             {manualSaveMutation.isPending
               ? 'Salvando…'
               : isEditMode ? 'Salvar alterações' : 'Salvar rascunho'}
           </button>
 
+          {/* key distinta em cada ramo: sem ela o React vê os dois <button>
+              na mesma posição da árvore, reaproveita o MESMO nó do DOM e
+              só troca `type="button"` por `type="submit"` — e o clique em
+              "Avançar" acaba ativando o botão já convertido em submit,
+              publicando a edição sozinho (ver handleFormSubmit). Com keys
+              diferentes o React desmonta um e monta o outro, então o nó
+              clicado deixa de existir antes de virar submit. */}
           {currentStep < STEPS.length ? (
             <button
+              key="wizard-next"
               type="button"
               className="sd-btn sd-btn--primary"
               onClick={handleNextStep}
@@ -452,9 +604,11 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
             </button>
           ) : (
             <button
+              key="wizard-submit"
               type="submit"
+              data-wizard-submit="true"
               className="sd-btn sd-btn--primary"
-              disabled={isSubmitting || saveMutation.isPending}
+              disabled={isSubmitting || saveMutation.isPending || isVideoUploading}
             >
               {isEditMode ? 'Atualizar' : 'Publicar'} Edição
             </button>

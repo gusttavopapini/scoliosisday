@@ -896,6 +896,131 @@
 }
 
 /* ============================================================
+   15.1 COMBOBOX DE PAÍS (CountryCombobox.jsx)
+   Campo de busca + lista rolável. Substituiu o <select> nativo do
+   formulário de Colaboradores, que só casava digitação pelo começo do
+   rótulo (por isso "Holanda" nunca achava "Países Baixos").
+   ============================================================ */
+
+.sda-combobox {
+  position: relative;
+}
+
+.sda-combobox__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* A moldura é do .sd-input que está DENTRO; este wrapper só posiciona
+     a bandeira e os botões por cima dele, sem uma segunda borda. */
+  position: relative;
+}
+
+/* Espaço à direita pros dois botões (limpar + abrir) não cobrirem o
+   texto digitado; à esquerda, pra bandeira do país selecionado. */
+.sda-combobox__input {
+  width: 100%;
+  padding-right: var(--space-16);
+}
+
+.sda-combobox__control > img + .sda-combobox__input {
+  padding-left: var(--space-10);
+}
+
+.sda-combobox__control > img {
+  position: absolute;
+  left: var(--space-3);
+  border-radius: var(--radius-pill);
+  pointer-events: none;
+}
+
+.sda-combobox__clear,
+.sda-combobox__toggle {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: var(--space-0);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+
+.sda-combobox__clear { right: var(--space-8); }
+.sda-combobox__toggle { right: var(--space-2); }
+
+.sda-combobox__clear:hover,
+.sda-combobox__toggle:hover {
+  background: var(--gray-100);
+  color: var(--text-heading);
+}
+
+.sda-combobox__list {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  /* Acima do resto do formulário, abaixo de modais (.sda-modal usa 100+)
+     — a lista não pode cobrir um diálogo aberto por cima dela. */
+  z-index: 20;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: var(--space-0);
+  padding: var(--space-1);
+  list-style: none;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.sda-combobox__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-body);
+}
+
+/* Um estado visual só para teclado e mouse: activeIndex acompanha tanto
+   as setas quanto o hover, então não há "duas seleções" concorrendo. */
+.sda-combobox__option--active {
+  background: var(--teal-050);
+  color: var(--teal-700);
+}
+
+.sda-combobox__option > img {
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+}
+
+.sda-combobox__option-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sda-combobox__option-code {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.sda-combobox__empty {
+  padding: var(--space-4) var(--space-3);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* ============================================================
    16. CAMPO DE COR
    ============================================================ */
 
@@ -1906,11 +2031,10 @@
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 }
 
-.sdaimg-logo__img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
+/* O <img> do logo agora é o SponsorLogo (components/SponsorLogo.jsx),
+   com width/height inline por área ótica — as antigas max-width/
+   max-height:100% saíram porque limitariam pela caixa e desfariam a
+   normalização. O xadrez e a altura de 120px do .sdaimg-logo continuam. */
 
 .sdaimg-logo__empty {
   font-family:var(--font-text);
@@ -1963,7 +2087,55 @@
 }
 
 /* ============================================================
-   22. RESPONSIVIDADE — AJUSTES ADICIONAIS
+   22. ABA DE PÍLULA COM ÍCONE (.sd-tabs__tab + este modificador)
+
+   .sd-tabs__tab (design-system.css) nasceu para aba de TEXTO PURO: não
+   declara display, então o <button> fica inline-block e um <svg> dentro
+   dele vira conteúdo inline — sem espaço nenhum até o texto (não há gap
+   em fluxo inline) e alinhado pela BASELINE da fonte, que deixa o ícone
+   visivelmente alto. É o que acontecia no seletor de origem do vídeo
+   (EventStepVideo.jsx), o único lugar do projeto que põe ícone numa aba;
+   as outras seis (Depoimentos, Equipe, Programação) são só texto e por
+   isso nunca expuseram a falta.
+
+   Os valores não são novos: são exatamente o contrato que .sd-btn
+   (design-system.css:370) já usa para botão-com-ícone — inline-flex,
+   align-items:center, gap de 8px e line-height:1. Aqui eles entram como
+   MODIFICADOR opcional, e não direto em .sd-tabs__tab, para as abas de
+   texto puro já existentes não mudarem de caixa (inline-flex e
+   line-height:1 alterariam a altura delas) — e porque o kit é a camada
+   que este projeto não edita.
+   ============================================================ */
+
+.sda-tabs__tab--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  /* line-height:1 é o que tira o ícone da baseline; sem ele, o alinhamento
+     vertical continua torto mesmo com align-items:center, porque a caixa
+     de linha do texto fica maior que a glifo.
+
+     Em troca, a pílula encolheria: o recuo vertical de .sd-tabs__tab foi
+     dimensionado sobre o line-height herdado de 1.6, chegando a cerca de
+     40 de altura total. Com line-height:1 o conteúdo passa a medir o
+     maior filho (o ícone) e --space-3 devolve 12 + 15 + 12 = 39, dentro
+     de um pixel do original. Fica aproximado de propósito: as duas abas
+     deste seletor têm ícone e são do mesmo tamanho entre si, e não há
+     aba de texto puro ao lado delas para denunciar a diferença. */
+  line-height: 1;
+  padding-block: var(--space-3);
+}
+
+/* O <svg> do lucide já vem com width/height do atributo `size`, mas como
+   item de flex ele ainda pode ser espremido por um rótulo longo — em
+   telas estreitas o ícone viraria uma elipse. */
+.sda-tabs__tab--icon > svg {
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   23. RESPONSIVIDADE — AJUSTES ADICIONAIS
    Sidebar-gaveta, tabela-em-cards e o hambúrguer já existem (seções 4 e
    19). Aqui entra o que faltava numa auditoria em 375px: cabeçalho de
    página, modal, passos do wizard, grade de 4 colunas e abas de dias.

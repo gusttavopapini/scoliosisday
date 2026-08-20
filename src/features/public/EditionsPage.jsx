@@ -28,6 +28,7 @@ import EditionSchedule from './components/editions/EditionSchedule.jsx';
 import EditionArchive from './components/editions/EditionArchive.jsx';
 import EditionLocation from './components/editions/EditionLocation.jsx';
 import EditionTextBlock from './components/editions/EditionTextBlock.jsx';
+import EditionVideo from './components/editions/EditionVideo.jsx';
 
 export default function EditionsPage() {
   const { t, lang } = useLanguage();
@@ -209,28 +210,33 @@ export default function EditionsPage() {
           edições). */}
       {activeEvent.isCurrent ? (
         <>
+          {/* ── Ordem das seções da edição ATUAL ──
+              Banner (acima, fora deste bloco) · Presenças · Texto · Cards ·
+              Vídeo · Programação · Preços · Curadoria · Localização.
+
+              Os blocos de CONTEÚDO (texto, cards, vídeo) vêm agrupados e
+              cedo na página; o comercial (preços) fecha antes das pessoas
+              e do mapa. Cada bloco opcional some sozinho quando a edição
+              não o tem — a ordem vale só para o que existe, sem buraco. */}
           <PeopleSection
             title={t.site.starsTitle}
             people={starCollaborators}
             headingClassName="sdp-heading--regular"
           />
 
-          <EditionPricing key={`pricing-${activeEvent.id}`} event={activeEvent} />
+          <EditionTextBlock key={`text-${activeEvent.id}`} event={activeEvent} />
 
           <EditionPresentation event={activeEvent} />
 
-          {/* Bloco de texto corrido opcional, editado no MESMO passo 3 que
-              alimenta a apresentação acima — por isso sai logo depois
-              dela, no bloco imediatamente abaixo dos preços. Some sozinho
-              quando a edição não o tem (a maioria), sem deixar seção nem
-              espaçamento vazios. */}
-          <EditionTextBlock key={`text-${activeEvent.id}`} event={activeEvent} />
+          <EditionVideo key={`video-${activeEvent.id}`} event={activeEvent} />
 
           <EditionSchedule
             key={`schedule-${activeEvent.id}`}
             event={activeEvent}
             collaboratorsById={collaboratorsById}
           />
+
+          <EditionPricing key={`pricing-${activeEvent.id}`} event={activeEvent} />
 
           <PeopleSection
             title={t.site.curatorsTitle}
@@ -248,6 +254,11 @@ export default function EditionsPage() {
               ele é editado no passo 2 (o último do wizard reduzido), que
               também é o que alimenta o arquivo acima. */}
           <EditionTextBlock key={`text-${activeEvent.id}`} event={activeEvent} />
+
+          {/* Mesma seção opcional da edição atual, aqui como ÚLTIMA da
+              página: edições passadas não têm bloco de Localização. É
+              editada no Passo 3 (o último do wizard reduzido). */}
+          <EditionVideo key={`video-${activeEvent.id}`} event={activeEvent} />
         </>
       )}
     </>

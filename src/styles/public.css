@@ -346,6 +346,50 @@
     display: inline-flex;
   }
 
+  /* ---- Logo centralizado na viewport (só no mobile) ----
+     Com o nav e o CTA escondidos acima, sobram dois filhos no __inner:
+     o logo e o cluster do hambúrguer. Com o space-between original, o
+     logo encosta na borda esquerda.
+
+     Centralizar via flex (justify-content:center, ou espaçador+grid) não
+     resolve o que se pede: o logo ficaria no centro do espaço QUE SOBRA
+     depois do hambúrguer, deslocado para a esquerda do centro real da
+     tela. Tirar o logo do fluxo resolve, porque aí ele não divide espaço
+     com ninguém.
+
+     Escolhido o position:absolute em vez do grid de 3 colunas porque o
+     grid exigiria um espaçador vazio NOVO no JSX (um <div> sem
+     conteúdo, só para equilibrar a largura do botão) e uma redefinição
+     das colunas — o nav do meio é display:none aqui, então os slots do
+     grid não bateriam com os três filhos do markup. Esta versão é só
+     CSS, sem elemento novo.
+
+     left:50% é medido sobre o padding box do __inner, que no mobile
+     ocupa a viewport inteira (--content-max só limita em telas largas) e
+     tem recuo lateral simétrico — então esse 50% É o centro da tela, e
+     não o centro da área útil. translate(-50%,-50%) ancora o CENTRO do
+     logo nesse ponto; sem o eixo Y explícito, a posição vertical de um
+     absoluto dentro de flex container fica a cargo da "static position",
+     que varia entre navegadores.
+
+     Escopado em .sdp-navbar__inner: .sdp-wordmark é o MESMO link do
+     rodapé (ver .sdp-page .sdp-wordmark acima), que deve continuar no
+     fluxo normal. */
+  .sdp-navbar__inner .sdp-wordmark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .sdp-navbar__inner {
+    /* Referência para o absoluto acima. */
+    position: relative;
+    /* O logo saiu do fluxo: com um filho só, space-between encostaria o
+       hambúrguer à ESQUERDA (space-between com um item = flex-start). */
+    justify-content: flex-end;
+  }
+
   .sdp-navbar__drawer--open {
     display: flex;
   }
@@ -1084,13 +1128,15 @@
   }
 }
 
-/* ---- Variante "Todos os palestrantes" (Hall de Estrelas) — 4 colunas ----
-   Só essa seção (PeopleGrid.jsx recebe columns={4} em AllSpeakers.jsx) —
-   "Hall de Estrelas" (destaque, FeaturedSpeakers.jsx) e as demais seções
-   que reaproveitam PeopleGrid.jsx continuam nas 3 colunas padrão acima,
-   sem tocar em nada. Mesma lógica de largura fixa calculada da grade base,
-   só com um card a mais por linha — e os MESMOS breakpoints (900/640) do
-   card em si, não muda. */
+/* ---- Variante Hall de Estrelas — 4 colunas ----
+   Só essa página (PeopleGrid.jsx recebe columns={4} em AllSpeakers.jsx);
+   as demais seções que reaproveitam PeopleGrid.jsx continuam nas 3
+   colunas padrão acima, sem tocar em nada. Mesma lógica de largura fixa
+   calculada da grade base, só com um card a mais por linha — e os MESMOS
+   breakpoints (900/640) do card em si, não muda.
+
+   A centralização de linha incompleta vem de .sdp-people-grid (flex com
+   justify-content:center), não daqui — vale para as duas variantes. */
 .sdp-people-grid--cols-4 .sdp-people-card {
   flex-basis: calc((100% - 3 * var(--space-5)) / 4);
   max-width: calc((100% - 3 * var(--space-5)) / 4);
@@ -1508,13 +1554,6 @@
 /* Kit define .sd-logo-strip__items img a 34px de altura, com
    especificidade (0,1,1). Ancorar em .sdp-sponsors sobe para (0,2,0)
    e vence, sem precisar editar design-system.css. */
-.sdp-sponsors .sdp-sponsors__logo {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-  opacity: 1;
-}
-
 /* ============================================================
    17. HOME · APOIADORES (esteira de logos)
    HomeSupporters.jsx repete a lista real N vezes (--sdp-marquee-repeats,
@@ -1563,9 +1602,24 @@
   flex: none;
 }
 
-.sdp-supporters .sdp-supporters__logo {
-  height: 48px;
-  width: auto;
+/* ---- Logo de marca: peso visual equivalente (SponsorLogo.jsx) ----
+   width/height vêm INLINE do componente, calculados por área ótica a
+   partir da proporção real de cada arquivo — por isso aqui não há mais
+   `height: 48px; width: auto`, que era justamente o que fazia um logo
+   vertical ocupar 24% da área de um horizontal.
+
+   Uma classe só para os quatro contextos (esteira da Home, página da
+   edição, /patrocinadores e a listagem do painel): antes eram quatro
+   regras independentes que só coincidiam por acaso — duas com a mesma
+   altura de 48px escrita duas vezes, e duas com caixas de proporção
+   fixa. Editar uma sem as outras fazia a mesma marca aparecer com pesos
+   diferentes em páginas diferentes.
+
+   object-fit: contain é redundante (as dimensões inline já respeitam a
+   proporção), mas fica como garantia: se um dia a imagem falhar em
+   medir, ela encolhe em vez de distorcer. */
+.sd-sponsor-logo {
+  display: block;
   object-fit: contain;
 }
 
@@ -1820,11 +1874,10 @@
   height: 96px;
 }
 
-.sdp-sponsor-card__logo img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
+/* O container de 96px continua definindo a caixa (é ele que dá o
+   maxHeight passado ao SponsorLogo); as dimensões do <img> vêm inline.
+   As antigas max-width/max-height:100% saíram porque limitariam de novo
+   pela caixa — desfazendo a normalização por área. */
 
 .sdp-sponsor-card__placeholder {
   display: flex;
@@ -1863,6 +1916,25 @@
   font-style: normal;
 }
 
+/* Conteúdo centralizado, no mesmo par align-items + text-align dos
+   outros cards do site. Override aqui (e não no kit) porque .sd-quote
+   vive em design-system.css mas só o site público o usa
+   (TestimonialQuoteCard.jsx) — public.css carrega depois e vence sem
+   precisar de seletor mais específico.
+
+   O figcaption precisa de justify-content próprio: é um flex-row aninhado
+   (avatar + nome/cargo), e nem o align-items nem o text-align do pai
+   movem os itens no eixo principal DELE. As aspas decorativas (::before)
+   acompanham por serem filho direto da coluna. */
+.sd-quote {
+  align-items: center;
+  text-align: center;
+}
+
+.sd-quote figcaption {
+  justify-content: center;
+}
+
 .sdp-carousel__dots {
   display: flex;
   justify-content: center;
@@ -1889,12 +1961,18 @@
   background: var(--teal-600);
 }
 
-/* Player 16:9 — vale tanto para o <iframe> do YouTube/Vimeo quanto para o
-   <video> do upload direto, mesmo wrapper para os dois. Sem max-width
-   próprio: preenche 100% do .sdp-video-testimonial-card que o embrulha,
-   que por sua vez já é limitado pela largura da pilha
-   (.sdp-quote-stack--horizontal, em torno de 860px) — duplicar o limite
-   aqui só deixaria uma faixa vazia sobrando dos lados do player. */
+/* Player 16:9 — vale tanto para o <iframe> do YouTube/Vimeo quanto para
+   o <video> do upload direto, mesmo wrapper para os dois. Sem max-width
+   próprio: preenche 100% do container que o embrulha, que já define a
+   medida.
+
+   TRÊS consumidores, e um deles diverge:
+     · EditionVideo.jsx      (site, página da edição)  → 16:9, esta base
+     · EventStepVideo.jsx    (prévia no wizard)        → 16:9, esta base
+     · VideoTestimonials.jsx (depoimento em vídeo)     → 9:16, pelo
+       modificador --portrait logo abaixo
+   Alterar a proporção AQUI muda os três de uma vez — o vertical do
+   depoimento é modificador justamente por isso. */
 .sdp-video-embed {
   position: relative;
   width: 100%;
@@ -1911,6 +1989,43 @@
   width: 100%;
   height: 100%;
   border: none;
+}
+
+/* ---- Variante vertical (story 9:16) — SÓ depoimento em vídeo ----
+   Os depoimentos são gravados no celular, em vertical. No container 16:9
+   da classe base o <video> não era esticado (object-fit já é `contain`
+   por padrão): ele encolhia até caber na ALTURA e ficava uma faixa
+   estreita no meio, com tarjas enormes dos lados — e os controles
+   nativos, que se ancoram na base do ELEMENTO e não na da imagem
+   visível, apareciam soltos, longe do vídeo. Daí a impressão de
+   achatamento e sobreposição.
+
+   Escopado como modificador de propósito: .sdp-video-embed é
+   compartilhado com EditionVideo.jsx e EventStepVideo.jsx, que continuam
+   em 16:9 — mexer na base quebraria os dois.
+
+   A largura é `min()` de dois limites:
+     · 360px — um story em desktop; acima disso a altura (16/9 da
+       largura) passa de 640px e o card domina a página;
+     · 70vh convertido em largura (× 9/16) — teto de ALTURA expresso
+       como largura, porque com aspect-ratio quem manda é a largura: um
+       max-height solto seria ignorado (width venceria) e deformaria a
+       proporção. Assim a altura nunca passa de 70vh e a razão 9:16
+       continua exata em qualquer viewport. */
+.sdp-video-embed--portrait {
+  aspect-ratio: 9 / 16;
+  max-width: min(360px, calc(70vh * 9 / 16));
+  margin-inline: auto;
+}
+
+/* Explícito, embora `contain` já seja o padrão de <video>: deixa
+   registrado que o conteúdo não pode ser cortado (`cover`) nem
+   distorcido. Com o container agora em 9:16, um vídeo 9:16 preenche
+   exatamente — sem tarja. Se algum depoimento vier em 16:9, ele aparece
+   inteiro com tarja em cima e embaixo, que é o comportamento correto.
+   Não se aplica a <iframe>: ali quem enquadra é o player da plataforma. */
+.sdp-video-embed--portrait video {
+  object-fit: contain;
 }
 
 .sdp-video-testimonial__caption {
@@ -1945,6 +2060,24 @@
      etc.), que ficou mais larga com a Luxora Grotesk (não condensada
      como a Barlow Condensed era) e vazava a coluna no mobile. */
   min-width: 0;
+
+  /* Conteúdo centralizado (ícone, título e texto). O par
+     align-items + text-align é o MESMO já usado por .sdp-sponsor-card e
+     .sdp-archive-stat — os dois são necessários e não se substituem:
+     .sd-card é flex-column, então align-items posiciona o
+     .sd-icon-badge (item flex de largura fixa, que o stretch padrão não
+     move do início), e text-align centraliza as LINHAS dentro do título
+     e do parágrafo, que align-items sozinho não alcança.
+
+     Vale de uma vez para as três implementações deste mesmo card —
+     HomeAbout.jsx e AboutIntro.jsx (inline) e PresentationCard.jsx
+     (componente) —, que divergem no JSX mas compartilham esta classe.
+
+     Título de uma ou duas linhas não desalinha o resto: cada filho é
+     centralizado por si, não ancorado na altura do vizinho, e o gap da
+     coluna flex é o mesmo de antes. */
+  align-items: center;
+  text-align: center;
 }
 
 /* Linha fina separando o texto do link "saiba mais", empurrada pro fim
@@ -2069,7 +2202,13 @@
 .sdp-quote-stack--horizontal {
   flex: none;
   width: 100%;
-  max-width: 860px;
+  /* 408px = os 360px do player vertical mais o recuo interno dos dois
+     lados do .sdp-video-testimonial-card (--space-6 em cada). Era 860px,
+     medida pensada para um player 16:9 — mantida, o card viraria uma
+     faixa branca larga com um vídeo estreito perdido no meio. A pilha
+     inteira (card ativo e os de trás) acompanha a proporção do
+     conteúdo. */
+  max-width: 408px;
 }
 
 .sdp-quote-stack__card {
@@ -2210,8 +2349,11 @@
    --surface-page — sem contorno, a espiada da pilha horizontal (mais
    larga, com menos altura de página ao redor pra contrastar) quase
    desaparecia contra o fundo da seção. */
+/* Mesma proporção do card ativo: com 16/9 aqui, os cards de trás
+   ficariam bem mais baixos que o da frente e a "espiada" lateral da
+   pilha sairia torta. */
 .sdp-video-stack-ghost {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 9 / 16;
   border-radius: var(--radius-lg);
   background: var(--surface-sunken);
   border: var(--border-width) solid var(--border-subtle);
@@ -2433,7 +2575,34 @@
 }
 
 /* ============================================================
-   31. EDIÇÕES · LOCALIZAÇÃO (EditionLocation.jsx)
+   31. EDIÇÕES · VÍDEO (EditionVideo.jsx)
+   Seção opcional: na edição atual fica logo acima da Localização; na
+   passada é a última da página. O player em si não tem estilo próprio —
+   reaproveita .sdp-video-embed (16:9 responsivo) dos depoimentos em
+   vídeo. Aqui só a medida e a centralização do bloco.
+   ============================================================ */
+
+.sdp-edition-video {
+  /* Mesma largura de leitura do .sdp-text-block__body e do
+     .sdp-about-intro__text, para o vídeo não ficar mais largo que o texto
+     das seções vizinhas. Como .sdp-video-embed é width:100%, é este
+     wrapper que define a medida — sem ele o player ocuparia o container
+     inteiro. */
+  max-width: var(--content-narrow);
+  margin-inline: auto;
+
+  /* Cria um stacking context próprio, prendendo o iframe ao plano 0 da
+     página. O <iframe> de embed não declara z-index (diferente do Leaflet
+     em .sdp-location__map, que aplica 400/1000 por conta própria), então
+     hoje ele já ficaria abaixo do navbar sticky (z-index 50) — isto é
+     garantia estrutural: nada que o player venha a sobrepor por conta
+     própria, agora ou depois, escapa deste contexto e passa por cima do
+     menu fixo ao rolar. */
+  isolation: isolate;
+}
+
+/* ============================================================
+   32. EDIÇÕES · LOCALIZAÇÃO (EditionLocation.jsx)
    Última seção de /edicoes para a edição atual, só quando event.location
    existe. Mapa Leaflet somente leitura (zoom/pan livres, sem marcador
    arrastável — ver LocationPickerModal.jsx pro editável, no admin).
@@ -2463,5 +2632,39 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
+
+  /* O mapa passava POR CIMA do menu ao rolar. O Leaflet aplica z-index
+     alto por conta própria (leaflet.css: panes 400, .leaflet-control 800,
+     .leaflet-top/.leaflet-bottom 1000) e o navbar sticky é z-index 50
+     (design-system.css) — como nenhum ancestral do mapa criava stacking
+     context, os dois competiam direto na raiz e o mapa ganhava por
+     números maiores.
+
+     isolation:isolate cria o contexto de empilhamento AQUI. Tudo que o
+     Leaflet desenha passa a ser resolvido dentro dele, e o container
+     inteiro vale como um único plano 0 lá fora — que perde para os 50 do
+     navbar, qualquer que seja o número interno. Cobre também popup,
+     tooltip e o que a lib venha a acrescentar depois, sem precisar
+     enumerar classe por classe.
+
+     NÃO se rebaixa .leaflet-pane aqui, e isso é deliberado: os sub-panes
+     (.leaflet-tile-pane 200, .leaflet-marker-pane 600, .leaflet-popup-pane
+     700…) têm a MESMA especificidade (0,1,0) de .leaflet-pane, então um
+     `.sdp-location__map .leaflet-pane { z-index: 1 }` — (0,2,0) — venceria
+     todos eles de uma vez e achataria a ordem interna do mapa: o marcador
+     cairia no mesmo plano dos tiles e poderia sumir atrás deles. O
+     stacking context resolve o problema sem tocar nessa hierarquia. */
+  isolation: isolate;
 }
+
+/* Os controles de zoom (.leaflet-top/.leaflet-bottom, z-index 1000)
+   também NÃO são rebaixados, pelo mesmo tipo de motivo dos panes: eles
+   são IRMÃOS de .leaflet-pane (400) dentro de .leaflet-container, então
+   baixá-los para perto de 0 os jogaria ATRÁS dos tiles — os botões +/−
+   sumiriam sob o mapa e parariam de receber clique.
+
+   Com o stacking context do container, nenhum desses números precisa
+   mudar: os 1000 dos controles só valem DENTRO do mapa, competindo com
+   os panes como o Leaflet projetou, e o conjunto todo continua sendo um
+   plano 0 para o resto da página. */
 

@@ -22,7 +22,7 @@ import { db } from '../config/firebase.js';
 import { eventSlug } from '../utils/slugify.js';
 import { EVENT_STATUS } from '../utils/constants.js';
 import { translateRootFields, translateArrayFields } from '../utils/writeTimeTranslation.js';
-import { normalizeTextBlock } from '../utils/contentBlocks.js';
+import { normalizeTextBlock, normalizeVideoBlock } from '../utils/contentBlocks.js';
 import { deepNullifyUndefined } from '../utils/firestoreSanitize.js';
 
 const EVENTS_COLLECTION = 'events';
@@ -77,8 +77,9 @@ function withoutIdField(data) {
  * novo no payload FINAL, já com translations/status/slug mesclados.
  */
 /**
- * Bloco de texto corrido opcional (textBlock): bloco vazio ou pela metade
- * vira `null`, nunca um objeto de strings vazias — e nunca undefined.
+ * Blocos de conteúdo opcionais da edição (textBlock e videoBlock): bloco
+ * vazio ou pela metade vira `null`, nunca um objeto de strings vazias — e
+ * nunca undefined.
  *
  * `null` e não "omitir a chave": todas as escritas usam setDoc(merge:true),
  * onde a chave ausente PRESERVA o valor antigo — omitir seria ignorar o
@@ -88,6 +89,7 @@ function withoutIdField(data) {
 function normalizeContentBlocks(data) {
   const result = { ...data };
   if ('textBlock' in data) result.textBlock = normalizeTextBlock(data.textBlock);
+  if ('videoBlock' in data) result.videoBlock = normalizeVideoBlock(data.videoBlock);
   return result;
 }
 
@@ -98,11 +100,16 @@ function sanitizeWrite(data) {
 // Campos de texto livre traduzidos ao salvar (Parte 2 do fix de tradução —
 // ver utils/writeTimeTranslation.js). presentation/archiveStats são
 // arrays de posição fixa (3 itens cada); os demais são campos de raiz.
-const EVENT_ROOT_TRANSLATABLE_FIELDS = ['headline', 'subtitle', 'cta', 'archiveTitle', 'archiveSubtitle'];
+const EVENT_ROOT_TRANSLATABLE_FIELDS = ['headline', 'subtitle', 'cta', 'archiveTitle', 'archiveSubtitle', 'presentationTitle', 'presentationSubtitle'];
 const PRESENTATION_TRANSLATABLE_FIELDS = ['title', 'description'];
 const ARCHIVE_STAT_TRANSLATABLE_FIELDS = ['title', 'description'];
 // Bloco de texto corrido: os dois campos de raiz do próprio bloco.
 const TEXT_BLOCK_TRANSLATABLE_FIELDS = ['title', 'body'];
+// Bloco de vídeo: só os textos. `videoUrl` nunca é traduzido — é um
+// endereço, não conteúdo. `subtitle` pode ser null (opcional mesmo com o
+// bloco preenchido) e translateTextForStorage já devolve null nesse caso,
+// sem gastar chamada de API.
+const VIDEO_BLOCK_TRANSLATABLE_FIELDS = ['title', 'subtitle'];
 
 /**
  * Traduz pra inglês, uma vez, só o que mudou desde `previous` — devolve um
@@ -142,6 +149,15 @@ async function translateEventFields(data, previous) {
     result.textBlock = {
       ...textBlock,
       ...(await translateRootFields(textBlock, previous?.textBlock, TEXT_BLOCK_TRANSLATABLE_FIELDS)),
+    };
+  }
+
+  // Mesmo tratamento do bloco acima, pelo mesmo motivo.
+  const videoBlock = normalizeVideoBlock(data.videoBlock);
+  if (videoBlock) {
+    result.videoBlock = {
+      ...videoBlock,
+      ...(await translateRootFields(videoBlock, previous?.videoBlock, VIDEO_BLOCK_TRANSLATABLE_FIELDS)),
     };
   }
 
