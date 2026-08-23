@@ -13,6 +13,10 @@ const ALLOWLIST = [
   // Paleta padrão do evento: hex são dados de conteúdo gravados no Firestore
   // (validados por regex hex no eventSchema), não estilo do painel.
   'src/features/events/constants/defaultPalette.js',
+  // Mesmo motivo do arquivo acima: as cores de fallback da tag de cada
+  // modalidade são DADO (o ColorPicker abre nelas e o eventSchema exige hex
+  // literal), não estilo do painel. Ver utils/pricingCards.js.
+  'src/utils/pricingCards.js',
 ];
 
 const RULES = [

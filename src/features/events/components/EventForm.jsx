@@ -62,6 +62,23 @@ const REDUCED_STEPS = [
 
 const AUTOSAVE_INTERVAL_MS = 30000; // 30 segundos
 
+/**
+ * Card de modalidade pronto para o formulário: preserva as chaves extras já
+ * salvas (as traduções `_en`) e garante que os três campos de texto cheguem
+ * como string, nunca null — inputs controlados. `tagColor` é o único que
+ * mantém o null, que é o "sem cor customizada" do ColorPicker.
+ */
+function mergePricingCard(defaults, saved) {
+  const card = { ...defaults, ...(saved ?? {}) };
+  return {
+    ...card,
+    tagLabel: card.tagLabel ?? '',
+    subtitle: card.subtitle ?? '',
+    ctaLabel: card.ctaLabel ?? '',
+    tagColor: card.tagColor ?? null,
+  };
+}
+
 /** Campos do passo `stepNumber` do array de passos ativo. */
 function fieldsOfStep(steps, stepNumber) {
   const { id } = steps[stepNumber - 1];
@@ -122,6 +139,16 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
     modality: 'hybrid',
     priceInPerson: null,
     priceOnline: null,
+    // Personalização opcional de cada card de modalidade (Passo 2). Objeto
+    // vazio e não null, mesmo motivo do textBlock/videoBlock abaixo: os
+    // inputs precisam nascer controlados. No Firestore o card é null quando
+    // não tem nenhum dos campos (ver utils/pricingCards.js).
+    //
+    // '' nos três textos (inputs controlados) e null em tagColor: null é
+    // "sem cor customizada" para o ColorPicker, que mostra o padrão da
+    // modalidade só como preview — igual a ctaButtonBg/separatorColor.
+    inPersonCard: { tagLabel: '', tagColor: null, subtitle: '', ctaLabel: '' },
+    onlineCard: { tagLabel: '', tagColor: null, subtitle: '', ctaLabel: '' },
     // '' e não null: inputs controlados. Vazio = usa o texto padrão.
     presentationTitle: '',
     presentationSubtitle: '',
@@ -185,6 +212,14 @@ export default function EventForm({ initialData, isEditMode = false, onSuccess }
       // fallback de normalizeVideoBlock, pro formulário abrir na aba certa.
       videoType: initialData?.videoBlock?.videoType ?? VIDEO_TYPES.URL,
     },
+    // Mesmo cuidado do textBlock acima — o spread raso traria o card
+    // inteiro como null por cima do default. Cada campo de texto também
+    // precisa do ?? '' individual: no Firestore eles são null quando
+    // vazios (utils/pricingCards.js grava null, não ''), e um null no
+    // input o tornaria não-controlado. tagColor mantém o null de
+    // propósito: é o valor que o ColorPicker entende como "sem cor".
+    inPersonCard: mergePricingCard(DEFAULT_VALUES.inPersonCard, initialData?.inPersonCard),
+    onlineCard: mergePricingCard(DEFAULT_VALUES.onlineCard, initialData?.onlineCard),
   };
 
   const {

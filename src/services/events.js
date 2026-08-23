@@ -23,6 +23,10 @@ import { eventSlug } from '../utils/slugify.js';
 import { EVENT_STATUS } from '../utils/constants.js';
 import { translateRootFields, translateArrayFields } from '../utils/writeTimeTranslation.js';
 import { normalizeTextBlock, normalizeVideoBlock } from '../utils/contentBlocks.js';
+import {
+  normalizePricingCard,
+  PRICING_CARD_TRANSLATABLE_FIELDS,
+} from '../utils/pricingCards.js';
 import { deepNullifyUndefined } from '../utils/firestoreSanitize.js';
 
 const EVENTS_COLLECTION = 'events';
@@ -90,6 +94,13 @@ function normalizeContentBlocks(data) {
   const result = { ...data };
   if ('textBlock' in data) result.textBlock = normalizeTextBlock(data.textBlock);
   if ('videoBlock' in data) result.videoBlock = normalizeVideoBlock(data.videoBlock);
+  // Cards de modalidade: mesma mecânica dos blocos acima — card sem nenhum
+  // dos quatro campos preenchidos vira null, nunca um objeto de strings
+  // vazias, e nunca undefined. A diferença é interna ao normalizador (os
+  // campos são independentes entre si, não all-or-nothing); daqui pra fora
+  // o contrato é o mesmo.
+  if ('inPersonCard' in data) result.inPersonCard = normalizePricingCard(data.inPersonCard);
+  if ('onlineCard' in data) result.onlineCard = normalizePricingCard(data.onlineCard);
   return result;
 }
 
@@ -158,6 +169,24 @@ async function translateEventFields(data, previous) {
     result.videoBlock = {
       ...videoBlock,
       ...(await translateRootFields(videoBlock, previous?.videoBlock, VIDEO_BLOCK_TRANSLATABLE_FIELDS)),
+    };
+  }
+
+  // Cards de modalidade: mesmo desenho dos dois blocos acima. `tagColor`
+  // fica de fora da lista de traduzíveis pelo mesmo motivo de videoUrl —
+  // é um hex, não conteúdo.
+  //
+  // Esvaziar um campo NÃO deixa tradução velha para trás: o texto de
+  // origem mudou, então translateRootFields chama a API de novo e
+  // translateTextForStorage devolve null para texto vazio, sobrescrevendo
+  // o `_en` anterior na mesma escrita. Sem isso o site em inglês mostraria
+  // o texto antigo em vez de cair no padrão.
+  for (const key of ['inPersonCard', 'onlineCard']) {
+    const card = normalizePricingCard(data[key]);
+    if (!card) continue;
+    result[key] = {
+      ...card,
+      ...(await translateRootFields(card, previous?.[key], PRICING_CARD_TRANSLATABLE_FIELDS)),
     };
   }
 

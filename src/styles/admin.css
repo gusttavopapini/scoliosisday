@@ -1819,6 +1819,40 @@
 }
 
 /* ============================================================
+   CARDS DE MODALIDADE (Passo 2 do wizard — EventStep2.jsx)
+   Um agrupamento por modalidade: o valor e a personalização opcional do
+   card que a página pública renderiza (EditionPricing.jsx).
+   ============================================================ */
+
+/* <fieldset> tem borda, padding e margin próprios do user agent, e uma
+   min-width:min-content implícita que impede o conteúdo de encolher em
+   telas estreitas — por isso o reset explícito antes de aplicar o visual
+   do painel. */
+.sda-modality-card {
+  min-width: 0;
+  margin: var(--space-0);
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* <legend> participa do fluxo do fieldset de um jeito próprio (fica
+   recortada na borda). Sem padding lateral ela encosta na moldura. */
+.sda-modality-card > legend {
+  padding-inline: var(--space-2);
+}
+
+.sda-modality-card__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ============================================================
    LOCATIONPICKER (campo "Local do evento" — EventStep2.jsx) e o modal de
    mapa que ele abre (LocationPickerModal.jsx). Fora do fluxo numerado por
    ser tão recente quanto o bloco COLORPICKER acima.

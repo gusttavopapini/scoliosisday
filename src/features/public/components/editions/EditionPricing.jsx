@@ -10,7 +10,9 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
+import { useStoredTranslation } from '../../../../hooks/useStoredTranslation.js';
 import { formatPriceBRL } from '../../../../utils/formatCurrency.js';
+import { PRICING_CARD_TRANSLATABLE_FIELDS } from '../../../../utils/pricingCards.js';
 
 const AUTO_SLIDE_MS = 5000;
 
@@ -20,23 +22,50 @@ export default function EditionPricing({ event }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
+  // Personalização opcional de cada card, vinda do Passo 2 do wizard
+  // (EventStep2.jsx). Duas chamadas fixas e no topo porque são hooks — não
+  // dá pra iterar sobre os cards aqui. Card ausente (o caso de toda edição
+  // publicada antes deste recurso) devolve undefined e cai inteiro nos
+  // padrões abaixo.
+  const inPersonCard = useStoredTranslation(event.inPersonCard, PRICING_CARD_TRANSLATABLE_FIELDS);
+  const onlineCard = useStoredTranslation(event.onlineCard, PRICING_CARD_TRANSLATABLE_FIELDS);
+
   const hasInPerson = typeof event.priceInPerson === 'number';
   const hasOnline = typeof event.priceOnline === 'number';
 
+  // Rótulo do botão quando o card não tem um próprio: o CTA da edição
+  // (Passo 1, compartilhado com o banner) e, sem ele, o padrão do site.
+  // A personalização por card entra na FRENTE dessa cadeia, sem substituí-la
+  // — é granularidade nova, não troca de fonte.
+  const defaultCtaLabel = event.cta?.trim() || t.site.cta;
+
+  // Cada campo cai no seu próprio padrão de forma independente: trocar só a
+  // cor da tag não afeta o subtítulo nem o botão. `||` e não `??` de
+  // propósito — string vazia tem que cair no padrão igual a null (embora
+  // normalizePricingCard já grave null, dado antigo/manual pode ter '').
+  //
+  // `tagColor` fica null quando não há cor customizada, e é isso que faz o
+  // card manter EXATAMENTE a aparência de antes: sem estilo inline, quem
+  // pinta a tag continua sendo a classe do kit (.sd-tag--solid, com
+  // .sd-tag--orange no card online).
   const cards = [
     hasInPerson && {
       key: 'in-person',
       modifier: 'teal',
-      badge: t.site.pricingInPersonBadge,
+      badge: inPersonCard?.tagLabel || t.site.pricingInPersonBadge,
+      tagColor: inPersonCard?.tagColor || null,
       price: formatPriceBRL(event.priceInPerson, lang),
-      text: t.site.pricingInPersonText,
+      text: inPersonCard?.subtitle || t.site.pricingInPersonText,
+      ctaLabel: inPersonCard?.ctaLabel || defaultCtaLabel,
     },
     hasOnline && {
       key: 'online',
       modifier: 'brand',
-      badge: t.site.pricingOnlineBadge,
+      badge: onlineCard?.tagLabel || t.site.pricingOnlineBadge,
+      tagColor: onlineCard?.tagColor || null,
       price: formatPriceBRL(event.priceOnline, lang),
-      text: t.site.pricingOnlineText,
+      text: onlineCard?.subtitle || t.site.pricingOnlineText,
+      ctaLabel: onlineCard?.ctaLabel || defaultCtaLabel,
     },
   ].filter(Boolean);
 
@@ -59,7 +88,6 @@ export default function EditionPricing({ event }) {
 
   if (cards.length === 0) return null;
 
-  const ctaLabel = event.cta?.trim() || t.site.cta;
   const ctaLink = event.ctaLink?.trim() || '';
 
   function step(delta) {
@@ -84,7 +112,10 @@ export default function EditionPricing({ event }) {
                   cardIndex === index ? ' sdp-pricing__card--active' : ''
                 }`}
               >
-                <span className={`sd-tag sd-tag--solid${card.modifier === 'brand' ? ' sd-tag--orange' : ''}`}>
+                <span
+                  className={`sd-tag sd-tag--solid${card.modifier === 'brand' ? ' sd-tag--orange' : ''}`}
+                  style={card.tagColor ? { backgroundColor: card.tagColor } : undefined}
+                >
                   {card.badge}
                 </span>
                 <p className="sd-display sd-display--lg sd-display--on-dark sdp-pricing__price">
@@ -98,7 +129,7 @@ export default function EditionPricing({ event }) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {ctaLabel}
+                    {card.ctaLabel}
                   </a>
                 )}
               </article>

@@ -92,6 +92,31 @@ const videoBlockSchema = z
     }
   });
 
+/**
+ * Personalização opcional de UM card de modalidade (presencial ou online)
+ * — Passo 2 do wizard, ver EventStep2.jsx/EditionPricing.jsx.
+ *
+ * Ao contrário de textBlockSchema e videoBlockSchema acima, NÃO há regra
+ * all-or-nothing aqui: os quatro campos são independentes, cada um cai no
+ * seu próprio padrão quando vazio, e por isso nenhum torna o outro
+ * obrigatório. Não há superRefine — só limites de tamanho e o formato do
+ * hex. A regra de "o card inteiro está vazio?" (e portanto vira null no
+ * Firestore) vive em normalizePricingCard, utils/pricingCards.js,
+ * compartilhada com a escrita e a leitura pública.
+ *
+ * O VALOR da modalidade não entra aqui: continua em
+ * priceInPerson/priceOnline, chaves de raiz, com obrigatoriedade que varia
+ * por isCurrent (ver eventSchema no fim do arquivo).
+ */
+const pricingCardSchema = z.object({
+  tagLabel: z.string().max(30, 'Máximo 30 caracteres').nullable().optional().default(''),
+  // Mesmo regex de ctaButtonBg/separatorColor: o ColorPicker só emite hex
+  // de 6 dígitos, isto barra dado antigo ou escrito à mão pelo console.
+  tagColor: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
+  subtitle: z.string().max(300, 'Máximo 300 caracteres').nullable().optional().default(''),
+  ctaLabel: z.string().max(40, 'Máximo 40 caracteres').nullable().optional().default(''),
+});
+
 const presentationItemSchema = z.object({
   icon: z.string().min(1, 'Ícone obrigatório'),
   title: z.string().min(1, 'Título obrigatório').max(60, 'Máximo 60 caracteres'),
@@ -139,6 +164,18 @@ const sharedEventFields = {
   // ainda tem separador no banner (ver EditionHero.jsx). null = laranja
   // padrão do design system.
   separatorColor: z.string().regex(/^#[0-9A-F]{6}$/i, 'Hex válido obrigatório').nullable().optional(),
+  // Personalização opcional dos dois cards de modalidade (Passo 2). Ficam
+  // em sharedEventFields pelo mesmo motivo de ctaButtonBg e location: a
+  // seção de modalidades só é exibida quando isCurrent (ver
+  // EditionsPage.jsx), mas uma edição que já foi a atual preserva o que
+  // tinha ao virar passada, mesmo sem poder editar por aqui.
+  //
+  // null = sem personalização nenhuma; o site cai nos padrões de cada
+  // campo (ver EditionPricing.jsx). Chave ausente é o estado de TODA
+  // edição publicada antes deste recurso, e o resultado renderizado é
+  // idêntico ao de antes.
+  inPersonCard: pricingCardSchema.nullable().optional(),
+  onlineCard: pricingCardSchema.nullable().optional(),
   // Local do evento (Passo 2, EventStep2.jsx) — só editável/exibido quando
   // isCurrent (edições passadas não têm este campo no wizard por ora), mas
   // fica em sharedEventFields pelo mesmo motivo de ctaButtonBg: preserva o
@@ -300,7 +337,7 @@ export const STEP_FIELDS = {
     'bannerDesktopUrl', 'bannerTabletUrl', 'bannerMobileUrl',
     'separatorColor', 'isCurrent',
   ],
-  step2: ['priceInPerson', 'priceOnline', 'location'],
+  step2: ['priceInPerson', 'priceOnline', 'location', 'inPersonCard', 'onlineCard'],
   // O bloco de texto corrido divide o Passo 3 com os 3 cards de
   // apresentação, e é validado junto deles ao avançar.
   step3: ['presentation', 'presentationTitle', 'presentationSubtitle', 'textBlock'],
