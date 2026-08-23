@@ -1,8 +1,16 @@
 // src/features/settings/SettingsPage.jsx
-// Redes sociais do rodapé público (settings/socialMedia) — edição inline,
-// sem modal, no mesmo padrão visual de listagem da página de Marcas
-// (SponsorsPage.jsx): header com título/subtítulo/ação, itens em
-// sd-card individuais, sem card-wrapper externo.
+// Configurações globais do site, em duas partes independentes:
+//
+//   · redes sociais do rodapé público (settings/socialMedia) — edição
+//     inline, sem modal, no mesmo padrão visual de listagem da página de
+//     Marcas (SponsorsPage.jsx): header com título/subtítulo/ação, itens em
+//     sd-card individuais, sem card-wrapper externo;
+//   · imagem de preview de link (settings/seo) — ver OgImageCard.jsx.
+//
+// O nome da página no menu continua "Redes Sociais" por decisão de
+// produto: ela já foi renomeada uma vez e um campo novo não justifica mais
+// churn ali. Os dois documentos do Firestore são separados de propósito —
+// ver services/seoSettings.js.
 
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
@@ -14,6 +22,7 @@ import { newSocialLinkId } from '../../services/settings.js';
 import { SOCIAL_PLATFORMS, getSocialPlatform } from '../../utils/socialPlatforms.js';
 import ConfirmModal from '../../components/ui/ConfirmModal.jsx';
 import SocialLinkRow from './components/SocialLinkRow.jsx';
+import OgImageCard from './components/OgImageCard.jsx';
 
 export default function SettingsPage() {
   const { data: socialLinks = [], isLoading } = useSocialLinks();
@@ -206,6 +215,12 @@ export default function SettingsPage() {
               ))}
             </div>
           )}
+
+          {/* Segunda seção da página, independente da lista acima: nada
+              aqui compartilha estado com as redes sociais. */}
+          <div className="sda-settings__section">
+            <OgImageCard />
+          </div>
         </div>
       </AppShell>
 

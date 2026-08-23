@@ -89,5 +89,22 @@ service firebase.storage {
       allow read:  if true;
       allow write: if isPanelUser() && underMB(5) && isImage('jpeg|png|webp');
     }
+
+    // ── Imagem de preview de link (og:image) ──
+    // Configuração global do site, editada em /painel/redes-sociais e lida
+    // pelo scripts/prerender-seo.mjs na hora do build.
+    //
+    // A leitura pública aqui não é só "o site exibe": são os crawlers de
+    // WhatsApp, Facebook e LinkedIn que buscam este arquivo direto, sem
+    // sessão nenhuma. Sem `allow read: if true` o preview não apareceria.
+    //
+    // O teto de 2MB é o limite DURO, o que de fato barra. O aviso de 600KB
+    // (acima disso o WhatsApp deixa de exibir a miniatura grande) é só no
+    // cliente e não bloqueia: uma imagem de 700KB continua sendo escolha
+    // válida do administrador, ver UPLOAD_PRESETS.ogImage.
+    match /settings/og/{fileName} {
+      allow read:  if true;
+      allow write: if isPanelUser() && underMB(2) && isImage('jpeg|png|webp');
+    }
   }
 }

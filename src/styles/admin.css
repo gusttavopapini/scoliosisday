@@ -1819,6 +1819,79 @@
 }
 
 /* ============================================================
+   IMAGEM DE COMPARTILHAMENTO (og:image — OgImageCard.jsx)
+   Segunda seção da página de Redes Sociais.
+   ============================================================ */
+
+/* Separa da lista de redes sociais acima sem introduzir wrapper novo. */
+.sda-settings__section {
+  margin-top: var(--space-8);
+}
+
+.sda-ogimage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sda-ogimage__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* A proporção vem inline do componente (OG_IMAGE_ASPECT_RATIO), e não
+   daqui, porque é DADO — o mesmo 1200/630 que alimenta as meta tags e o
+   aviso de recorte. Repetir o número no CSS criaria uma segunda fonte da
+   verdade que poderia divergir em silêncio. */
+.sda-ogimage__preview {
+  width: 100%;
+  max-width: 480px;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+/* cover, não contain: o card do WhatsApp RECORTA em 1,91:1. Mostrar a
+   imagem inteira aqui esconderia justamente o corte que o administrador
+   precisa ver antes de publicar. */
+.sda-ogimage__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sda-ogimage__empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+}
+
+/* Aviso, não erro: o envio não foi bloqueado, então não usa --danger. */
+.sda-ogimage__warning {
+  margin: var(--space-0);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--orange-100);
+  color: var(--orange-700);
+  font-size: var(--text-sm);
+  line-height: var(--lh-body);
+}
+
+.sda-ogimage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* ============================================================
    CARDS DE MODALIDADE (Passo 2 do wizard — EventStep2.jsx)
    Um agrupamento por modalidade: o valor e a personalização opcional do
    card que a página pública renderiza (EditionPricing.jsx).

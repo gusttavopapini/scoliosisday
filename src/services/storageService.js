@@ -49,6 +49,16 @@ export const UPLOAD_PRESETS = {
     maxSizeMB: 100,
     allowedTypes: ['video/mp4', 'video/webm'],
   },
+  // Imagem de preview de link (og:image). 2MB é o limite duro, espelhado em
+  // storage.rules. O número que importa na prática é outro e menor — acima
+  // de ~600KB o WhatsApp para de exibir a miniatura grande —, mas esse é
+  // AVISO, não bloqueio: fica em OG_IMAGE_GUIDELINES (utils/ogImage.js),
+  // fora do preset, justamente porque validateFile lança erro e aqui não se
+  // quer impedir o envio.
+  ogImage: {
+    maxSizeMB: 2,
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+  },
 };
 
 /** Extensão canônica por MIME — não confia na extensão do nome original. */
