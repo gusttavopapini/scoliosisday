@@ -738,6 +738,29 @@
     /* Empilhado, o vão volta a ser vertical e menor. */
     gap: var(--space-10);
   }
+
+  /* Empilhado, o cabeçalho passa a ser centralizado.
+     .sd-section-header do kit é flex-column com align-items:flex-start, e
+     esta seção é a ÚNICA do site que o usa sem o modificador --center —
+     de propósito: no desktop ela é a coluna ESQUERDA de duas, e alinhar
+     o texto à esquerda é o correto ali. Abaixo de 900px não há mais duas
+     colunas, e o alinhamento à esquerda deixava de fazer sentido: era o
+     que empurrava a pill, o título, o divisor e o contador de edições
+     todos para a borda.
+
+     Uma regra no container cobre os quatro de uma vez, sem repetir
+     alinhamento em cada elemento. align-items centraliza os itens flex
+     (pill, .sd-rule e o bloco .sd-stat, que encolhem ao próprio
+     conteúdo); text-align centraliza as LINHAS dentro do título e do
+     rótulo de duas linhas do contador — os dois são necessários e não se
+     substituem.
+
+     Escopado em .sdp-testimonials: o desktop não muda, e nenhuma outra
+     seção é afetada (as demais já usam --center). */
+  .sdp-testimonials .sd-section-header {
+    align-items: center;
+    text-align: center;
+  }
 }
 
 .sdp-carousel {
@@ -1043,6 +1066,33 @@
   max-width: calc((100% - 2 * var(--space-5)) / 3);
   padding: var(--space-5);
   gap: var(--space-3);
+}
+
+/* Card de pessoa sem sombra, no mobile e no desktop. A sombra vinha de uma
+   origem única — .sd-card (design-system.css), box-shadow:var(--shadow-md)
+   — e não de nenhuma regra daqui: .sdp-people-card não declara box-shadow
+   em lugar nenhum, não tem :hover nem :focus-visible, e nenhuma das media
+   queries do card (900px, 640px, e as equivalentes da variante de 4
+   colunas) reaplica sombra. Por isso uma linha só cobre todos os casos.
+
+   .sd-card fica intocada de propósito: é o card base do kit, e no site
+   público ela também veste o .sdp-feature-card (cards com ícone da Home,
+   da Sobre Nós e da apresentação da edição), além de todo o painel.
+
+   O ancestral .sdp-people-grid não é decorativo — é o que dá (0,2,0) e
+   vence o (0,1,0) de .sd-card por especificidade. Só `.sdp-people-card`
+   empataria em (0,1,0) e passaria a depender da ordem de import dos
+   arquivos (public.css depois de design-system.css, ver main.jsx), o que
+   funciona hoje mas quebra silenciosamente se a ordem mudar. O card vive
+   sempre dentro dessa grade — nas duas variantes de coluna e no carrossel
+   mobile — então o ancestral está sempre presente.
+
+   Só a sombra sai: border e border-radius continuam vindo de .sd-card. E
+   nada de afordância se perde junto — o card nunca teve efeito de hover; o
+   que é clicável é o botão "Ver detalhes" (.sdp-people-card__more), que
+   mantém o hover próprio do kit. */
+.sdp-people-grid .sdp-people-card {
+  box-shadow:none;
 }
 
 /* ---- Foto grande, sem pill de nome sobreposto ----
@@ -1642,16 +1692,61 @@
   align-items: center;
   text-align: center;
   gap: var(--space-5);
+  /* Piso de 24px no respiro lateral. --gutter é clamp(20px, 5vw, 64px), que
+     só passa de 24px acima de 480px de viewport; abaixo disso ele fica
+     travado nos 20px mínimos, e 20px é pouco para um hero cujo texto é
+     centralizado e chega perto das duas bordas ao mesmo tempo. max() só
+     pode AUMENTAR o valor: de 480px para cima o resultado é o próprio
+     --gutter, então tablet e desktop ficam byte a byte como estavam.
+
+     O número não é arbitrário: em 375px ele deixa 327px de caixa de
+     conteúdo, e o subtítulo de /patrocinadores mede 328,5px em uma linha
+     (Giuconda Regular 18px). Com os 20px de antes a linha cabia por 3px e
+     ficava colada nas bordas; com 24px ela quebra em duas e passa a ter
+     margem de verdade. */
+  padding-inline: max(var(--gutter), var(--space-6));
 }
 
 .sdp-simple-hero .sd-lead {
   color: var(--text-on-dark);
 }
 
+/* Escala fluida no lugar do degrau 56px → 42px que existia no media query
+   de 640px. Mesmo padrão já adotado em .sd-display--md (design-system.css),
+   e aqui ele resolve um estouro real: o título deste hero é uma única
+   palavra em várias páginas, e palavra única NÃO QUEBRA. "PATROCINADORES"
+   em Luxora Grotesk HeavyItalic mede 9,73px de largura por px de
+   font-size — ou seja 408,8px nos 42px que o mobile usava, contra 335px de
+   caixa de conteúdo numa viewport de 375px. O texto vazava ~37px para cada
+   lado (align-items:center faz o overflow sair pelos DOIS lados), e era
+   essa sobra à direita que dava rolagem horizontal à página inteira.
+   "HALL DE ESTRELAS" é até mais largo (414,3px), mas tem espaços e quebra
+   em duas linhas — por isso o sintoma só aparecia em /patrocinadores.
+
+   Os dois pontos que ancoram a reta:
+     · 320px de viewport → 26px de fonte (253px de título, ~33px livres de
+       cada lado). O piso 26px é o mesmo já usado por .sd-display--md.
+     · 640px de viewport → 56px, exatamente --display-lg.
+   Inclinação (56-26)/(640-320) = 0,09375 → 9.375vw; intercepto
+   26 - 0,09375×320 = -4px.
+
+   Encostar o teto justamente em 640px é o que mantém o desktop intacto E
+   elimina o salto: de 641px para cima o clamp já está travado em 56px (o
+   valor de sempre), e no caminho para baixo não há mais o degrau de 14px
+   que o media query antigo criava na fronteira. */
+.sdp-simple-hero .sd-display--lg {
+  font-size: clamp(26px, 9.375vw - 4px, 56px);
+}
+
 @media (max-width: 640px) {
   .sdp-simple-hero { padding-block: var(--space-16) var(--space-12); }
 
-  .sdp-simple-hero .sd-display--lg { font-size: var(--display-md); }
+  /* Mesmo motivo documentado em .sd-display--md (design-system.css): nos
+     26-40px que o clamp produz aqui, --lh-display (0,92) cola as linhas e
+     os acentos batem na linha de cima — visível em "SOBRE NÓS" e "HALL DE
+     ESTRELAS", que quebram em duas linhas. O título grande de desktop
+     continua em 0,92. */
+  .sdp-simple-hero .sd-display--lg { line-height: 1; }
 }
 
 /* ============================================================
@@ -1722,9 +1817,38 @@
 }
 
 @media (max-width: 900px) {
+  /* Empilhado, o conteúdo passa a ser centralizado. No desktop esta seção
+     é duas colunas — texto à ESQUERDA, foto à direita — e o alinhamento à
+     esquerda é o correto ali: é a borda que casa o texto com a foto ao
+     lado. A partir de 900px a grade vira uma coluna só, a foto deixa de
+     estar ao lado e nada mais justifica aquela borda; o texto ficava
+     encostado à esquerda sem nenhum par visual.
+
+     Mesmo par de propriedades já usado no cabeçalho de Depoimentos, e
+     pelo mesmo motivo — as duas são necessárias e não se substituem:
+
+     · text-align no .sdp-about-recife__grid centraliza as LINHAS dentro
+       do h2 e do parágrafo. Vale para os dois de uma vez por herança, sem
+       repetir a regra em cada elemento. Não mexe com a foto:
+       .sdp-about-recife__media img é display:block com width:100%, então
+       já ocupa a largura inteira da coluna — não há o que centralizar
+       ali, e text-align não desloca bloco. (Se a imagem externa falhar em
+       carregar, o texto alternativo também sai centralizado.)
+
+     · align-items no .sdp-about-recife__text centraliza a CAIXA do
+       parágrafo. Ele é .sd-lead, que tem max-width: 640px; num flex
+       column com o `stretch` padrão, uma caixa mais estreita que a coluna
+       encosta à esquerda e o texto sairia centralizado dentro de um bloco
+       descentralizado. Isso aparece entre 640px e 900px de viewport, onde
+       a coluna já é única mas ainda passa dos 640px. */
   .sdp-about-recife__grid {
     grid-template-columns: 1fr;
     gap: var(--space-8);
+    text-align: center;
+  }
+
+  .sdp-about-recife__text {
+    align-items: center;
   }
 
   .sdp-about-recife__media img { min-height: 260px; }
@@ -2425,8 +2549,43 @@
      o conjunto inteiro proporcionalmente sem tocar em rotação,
      sobreposição ou recuo vertical. */
   max-width: 576px;
-  aspect-ratio: 4 / 3;
-  margin: var(--space-12) auto var(--space-16);
+  /* Altura EXATA do leque, não um valor folgado. As fotos são absolutas e
+     rotacionadas, então não empurram o pai — a altura tem que vir daqui.
+     Como toda a geometria é % da largura do container, uma razão fixa
+     serve a qualquer breakpoint sem recalcular nada.
+
+     Altura de cada peça, em fração da largura do container:
+       · central (--0): 42% × 5/4                      = 52,50%
+       · laterais:      0,9 × (42%·sen8° + 52,5%·cos8°) = 52,05%
+     A central é a mais alta, então a altura necessária é 52,5% da largura
+     — ou seja, razão 1/0,525 = 40/21.
+
+     Era 4/3 (75% da largura), que reservava 432px para um conteúdo de
+     302,4px: 129,6px de vazio, metade acima e metade abaixo das fotos,
+     porque as três compartilham top:50% + translate(-50%,-50%). Esse
+     vazio era o grosso do buraco entre esta seção e a seguinte.
+
+     Colar a caixa nas fotos não aperta o layout: o respiro vem da margem
+     abaixo e do padding-block de .sd-section. O scale(1.04) do hover e a
+     box-shadow passam a pintar por fora da caixa, o que é inofensivo —
+     transform e sombra não ocupam espaço de layout, e não há overflow
+     hidden em nenhum ancestral (.sd-container e .sd-section só declaram
+     max-width/margin/padding). */
+  aspect-ratio: 40 / 21;
+  /* Sem margem inferior: a separação para as estatísticas passou a viver
+     em .sdp-archive-stats (margin-top, mesmo --space-16 de antes). O
+     motivo é que a grade de estatísticas é CONDICIONAL — some quando a
+     edição não tem nenhuma preenchida (ver EditionArchive.jsx) — e a
+     margem daqui ficava órfã nesse caso, empilhando 64px em cima do
+     padding-bottom da seção sem separar coisa nenhuma.
+
+     Pôr o espaço em quem chega, e não em quem fica, resolve os dois
+     casos com uma regra só e sem seletor condicional. :last-child seria
+     frágil aqui: o lightbox da galeria é irmão do leque no mesmo
+     container (não há portal no projeto), então abrir o modal faria o
+     leque deixar de ser o último filho e a margem voltaria, deslocando a
+     página por trás do overlay. */
+  margin: var(--space-12) auto var(--space-0);
 }
 
 .sdp-archive-fan__photo {
@@ -2508,6 +2667,11 @@
 
 /* ---- Estatísticas (3 colunas, sem botão) ---- */
 .sdp-archive-stats {
+  /* Separação do leque acima — era margin-bottom no próprio leque, e
+     mudou de lado para não sobrar quando esta grade não existe (ver o
+     comentário em .sdp-archive-fan). Mesmo valor de antes: o vão entre
+     leque e estatísticas continua igual quando as duas coisas aparecem. */
+  margin-top: var(--space-16);
   text-align: center;
   justify-items: center;
 }
