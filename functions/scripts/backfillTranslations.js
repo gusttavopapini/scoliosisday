@@ -285,6 +285,13 @@ outer: for (const item of plan.slice(0, LIMIT)) {
 
     if (translated) {
       consecutiveFailures = 0;
+      // Sai da lista de falhas: o campo pode estar ali por uma execução
+      // anterior que a cota derrubou, e sem isto o relatório final
+      // continuaria acusando como pendente um campo já traduzido.
+      const stale = failures.findIndex(
+        (f) => f.collection === item.collection && f.id === item.id && f.field === field,
+      );
+      if (stale !== -1) failures.splice(stale, 1);
     } else {
       consecutiveFailures += 1;
       docHadFailure = true;

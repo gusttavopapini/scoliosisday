@@ -18,6 +18,30 @@
 
 const CACHE_PREFIX = 'sd_translation_';
 
+// ── Teto de uso da MyMemory ───────────────────────────────────────────
+//
+// Anônima, a API libera ~5.000 palavras/dia por IP; identificando um
+// e-mail de contato no parâmetro `de`, o teto sobe para ~50.000. A
+// retroação dos registros antigos estourou o limite anônimo no meio dos
+// currículos, e o mesmo teto vale quando alguém salva um currículo longo
+// pelo painel — por isso o parâmetro entra aqui, no ÚNICO ponto que monta
+// a URL, e vale de uma vez para o fluxo de save e para o script de
+// migração (functions/scripts/backfillTranslations.js importa este mesmo
+// módulo).
+//
+// NÃO é credencial: é um identificador de contato que a MyMemory usa para
+// contabilizar uso. Qualquer VITE_* acaba embutida no bundle público de
+// qualquer forma, então guardá-la em variável de ambiente não a esconderia
+// — a variável existe para poder trocar o endereço sem editar código, e o
+// padrão abaixo mantém o script rodando sem exigir configuração nenhuma.
+//
+// A leitura é defensiva porque este módulo roda nos DOIS mundos:
+// `import.meta.env` só existe sob o Vite, `process.env` só existe no Node.
+const CONTACT_EMAIL =
+  import.meta.env?.VITE_TRANSLATION_CONTACT_EMAIL ||
+  (typeof process !== 'undefined' ? process.env?.TRANSLATION_CONTACT_EMAIL : '') ||
+  'scoliosisday@gmail.com';
+
 // A MyMemory às vezes devolve HTTP 200 com o aviso de cota estourada
 // EMPACOTADO dentro do próprio translatedText (não só via responseStatus
 // != 200) — ex: "MYMEMORY WARNING: YOU USED ALL AVAILABLE FREE
@@ -40,7 +64,10 @@ function looksLikeApiError(text) {
  */
 async function fetchValidTranslation(text, targetLang) {
   try {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=pt|${targetLang}`;
+    const url =
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}` +
+      `&langpair=pt|${targetLang}` +
+      `&de=${encodeURIComponent(CONTACT_EMAIL)}`;
     const res = await fetch(url);
     const data = await res.json();
     const translated = data?.responseData?.translatedText;
