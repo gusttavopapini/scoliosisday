@@ -14,11 +14,12 @@ import { useState } from 'react';
 import { CircleFlag } from 'react-circle-flags';
 import AvatarInitials from '../../../../components/ui/AvatarInitials.jsx';
 import { useLanguage } from '../../../../hooks/useLanguage.js';
+import { displayName } from '../../../../utils/honorifics.js';
 import PersonModal from './PersonModal.jsx';
 
 /** @param {{ person: object }} props */
 export default function PersonCard({ person }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   // "Ver detalhes" abre o modal — não há página de detalhe por colaborador
   // no site ainda, então não há pra onde linkar.
   const [showModal, setShowModal] = useState(false);
@@ -37,7 +38,10 @@ export default function PersonCard({ person }) {
       </div>
 
       <div className="sdp-people-card__row">
-        <span className="sdp-people-card__name">{person.fullName}</span>
+        {/* "Dra." não existe em inglês — ver utils/honorifics.js. Vale para
+            os colaboradores já cadastrados, sem migração: é conversão
+            local, não tradução via API. */}
+        <span className="sdp-people-card__name">{displayName(person.fullName, lang)}</span>
         {person.flag && (
           <CircleFlag
             countryCode={person.flag.toLowerCase()}

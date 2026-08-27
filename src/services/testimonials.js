@@ -25,9 +25,26 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '../config/firebase.js';
+import { translateRootFields } from '../utils/writeTimeTranslation.js';
+import { translatePlainForStorage } from '../utils/translateForStorage.js';
 
 const TESTIMONIALS_COLLECTION = 'testimonials';
 const PAGE_SIZE = 50;
+
+// Campos traduzidos ao SALVAR (Parte 2 do fix de tradução — ver
+// utils/writeTimeTranslation.js). Esta coleção nunca havia entrado nesse
+// fluxo: o corpo do depoimento e o cargo do depoente apareciam em
+// português na versão em inglês do site porque nunca existiu um `_en`
+// para o site público ler.
+//
+// `name` fica DE FORA de propósito: nome próprio não se traduz, e mandar
+// um para a API devolveria uma versão adulterada do nome da pessoa. O
+// ajuste de "Dra." para "Dr." no nome é feito na leitura, sem API — ver
+// utils/honorifics.js.
+//
+// `date` também fica de fora: já é formatado por idioma em tempo de
+// leitura por utils/formatTestimonialMonth.js, com Intl, sem API.
+const TESTIMONIAL_TRANSLATABLE_FIELDS = ['quote', 'role'];
 
 /**
  * "YYYY-MM-DD" (valor cru do <input type="date">) → Timestamp à meia-noite
@@ -102,6 +119,10 @@ export function newTestimonialId() {
 export async function createTestimonial(data, createdBy, explicitId) {
   const payload = {
     ...data,
+    // Criação: sem documento anterior, tudo conta como "mudou" e é
+    // traduzido agora. Falha de tradução grava `_en: null` e não impede o
+    // depoimento de ser salvo — o site cai no português, como antes.
+    ...(await translateRootFields(data, null, TESTIMONIAL_TRANSLATABLE_FIELDS, translatePlainForStorage)),
     date: toDateTimestamp(data.date),
     createdBy,
     createdAt: new Date(),
@@ -118,8 +139,17 @@ export async function createTestimonial(data, createdBy, explicitId) {
 
 export async function updateTestimonial(id, data) {
   const docRef = doc(db, TESTIMONIALS_COLLECTION, id);
+
+  // Lê o documento atual só para o diff de tradução: se o texto de origem
+  // não mudou, translateRootFields reaproveita o `_en` que já está lá e
+  // não gasta chamada de API. Um depoimento antigo (sem `_en` nenhum) tem
+  // previousEn undefined em todos os campos, então cai na tradução — é
+  // por isso que reabrir e salvar no painel retroage o registro.
+  const previous = await fetchTestimonialById(id);
+
   await updateDoc(docRef, {
     ...data,
+    ...(await translateRootFields(data, previous, TESTIMONIAL_TRANSLATABLE_FIELDS, translatePlainForStorage)),
     date: toDateTimestamp(data.date),
     updatedAt: new Date(),
   });

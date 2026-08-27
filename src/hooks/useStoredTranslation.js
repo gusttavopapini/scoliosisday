@@ -4,12 +4,14 @@
 // em vez de chamar a MyMemory em tempo de leitura a cada visita — é isso
 // que elimina o consumo de cota pra quem só está LENDO o site.
 //
-// Substitui useTranslatedContent (hooks/useTranslatedContent.js) só para
-// conteúdo cujo fluxo de escrita já foi migrado (eventos, banners — ver
-// services/events.js/banners.js). Outro conteúdo (depoimentos, sessões de
-// programação) ainda não migrou e continua no hook antigo, que chama a
-// API ao vivo — os dois hooks convivem até essa migração ser concluída em
-// todo lugar.
+// Substitui useTranslatedContent (hooks/useTranslatedContent.js) para
+// conteúdo cujo fluxo de escrita já foi migrado: eventos, banners,
+// depoimentos (quote/role) e o currículo do colaborador — ver
+// services/events.js, banners.js, testimonials.js e collaborators.js.
+//
+// FALTA MIGRAR: as sessões de programação (ScheduleSession.jsx), o único
+// ponto que ainda chama a API ao vivo no pageview. Os dois hooks convivem
+// até essa última migração.
 //
 // Sem chamada assíncrona, sem estado de "traduzindo": o dado já está no
 // documento, isso aqui só escolhe qual campo mostrar.

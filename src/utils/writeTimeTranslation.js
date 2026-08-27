@@ -21,9 +21,15 @@ import { translateTextForStorage } from '../services/translationService.js';
  * @param {object|null|undefined} previous Documento anterior (null/undefined
  *   em criação — tudo conta como "mudou").
  * @param {string[]} fields Nomes dos campos a traduzir (sem o sufixo `_en`).
+ * @param {(text: string) => Promise<string|null>} [translate] Tradutor a
+ *   usar. O padrão trata o valor como TEXTO PURO. Campos que não são texto
+ *   puro passam o seu: currículo do colaborador é HTML do editor rico e usa
+ *   translateHtmlForStorage (utils/translateForStorage.js), que traduz nó a
+ *   nó para não destruir as tags. Qualquer tradutor aqui precisa respeitar o
+ *   mesmo contrato: null em falha, nunca o texto original.
  * @returns {Promise<object>} Objeto parcial com as chaves `${field}_en`.
  */
-export async function translateRootFields(data, previous, fields) {
+export async function translateRootFields(data, previous, fields, translate = translateTextForStorage) {
   const result = {};
 
   await Promise.all(
@@ -40,7 +46,7 @@ export async function translateRootFields(data, previous, fields) {
         return;
       }
 
-      result[`${field}_en`] = await translateTextForStorage(current);
+      result[`${field}_en`] = await translate(current);
     }),
   );
 

@@ -19,6 +19,8 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { db } from '../config/firebase.js';
+import { translateRootFields } from '../utils/writeTimeTranslation.js';
+import { translateHtmlForStorage } from '../utils/translateForStorage.js';
 import { COLLABORATOR_TYPES } from '../utils/constants.js';
 
 const COLLABORATORS_COLLECTION = 'collaborators';
@@ -120,6 +122,22 @@ export async function fetchCollaboratorsByType(type) {
  * (collaborators/{id}/photo), e ele acontece antes de o formulário ser
  * salvo. Mesmo padrão de newEventId em services/events.js.
  */
+// Campos traduzidos ao SALVAR (Parte 2 do fix de tradução — ver
+// utils/writeTimeTranslation.js). Esta coleção nunca havia entrado no
+// fluxo: o currículo aparecia em português na versão em inglês do site.
+//
+// Só `curriculum`. `fullName`/`firstName`/`lastName` não se traduzem —
+// nome próprio mandado pra API volta adulterado; o ajuste de "Dra." para
+// "Dr." acontece na leitura, sem API (utils/honorifics.js). `flag` é
+// código ISO e `type` é enum, nenhum dos dois é conteúdo.
+const COLLABORATOR_TRANSLATABLE_FIELDS = ['curriculum'];
+
+// O currículo é HTML do editor rico (TipTap), não texto puro: vai com o
+// tradutor que percorre os nós de texto e preserva as tags. Traduzir a
+// string inteira devolveria as tags escapadas — era a razão documentada
+// em PersonModal.jsx para esse campo nunca ter sido traduzido.
+const COLLABORATOR_TRANSLATOR = translateHtmlForStorage;
+
 export function newCollaboratorId() {
   return doc(collection(db, COLLABORATORS_COLLECTION)).id;
 }
@@ -132,7 +150,14 @@ export function newCollaboratorId() {
  * @returns {Promise<string>} ID do novo documento
  */
 export async function createCollaborator(data, explicitId) {
-  const payload = { ...data, createdAt: new Date() };
+  const payload = {
+    ...data,
+    // Criação: sem documento anterior, o currículo é traduzido agora.
+    // Falha grava `curriculum_en: null` e não impede o salvamento — o
+    // site cai no português, como antes.
+    ...(await translateRootFields(data, null, COLLABORATOR_TRANSLATABLE_FIELDS, COLLABORATOR_TRANSLATOR)),
+    createdAt: new Date(),
+  };
 
   if (explicitId) {
     await setDoc(doc(db, COLLABORATORS_COLLECTION, explicitId), payload);
@@ -151,8 +176,16 @@ export async function createCollaborator(data, explicitId) {
  */
 export async function updateCollaborator(id, data) {
   const docRef = doc(db, COLLABORATORS_COLLECTION, id);
+
+  // Lê o documento atual só para o diff: currículo inalterado reaproveita
+  // o `curriculum_en` existente e não gasta chamada de API. Colaborador
+  // antigo (sem `_en`) tem previousEn undefined e cai na tradução — é o
+  // que faz reabrir e salvar no painel retroagir o registro.
+  const previous = await fetchCollaboratorById(id);
+
   await updateDoc(docRef, {
     ...data,
+    ...(await translateRootFields(data, previous, COLLABORATOR_TRANSLATABLE_FIELDS, COLLABORATOR_TRANSLATOR)),
     updatedAt: new Date(),
   });
 }

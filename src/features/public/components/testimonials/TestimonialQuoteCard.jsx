@@ -12,16 +12,27 @@
 // chamado.
 
 import { useLanguage } from '../../../../hooks/useLanguage.js';
+import { useStoredTranslation } from '../../../../hooks/useStoredTranslation.js';
+import { displayName } from '../../../../utils/honorifics.js';
 import { formatTestimonialMonth } from '../../../../utils/formatTestimonialMonth.js';
+
+/** Campos com versão `_en` gravada ao salvar no painel — ver
+ *  services/testimonials.js. `name` não entra: nome próprio não se traduz. */
+const TRANSLATABLE_FIELDS = ['quote', 'role'];
 
 /** @param {{ item: { id: string, quote: string, name: string, role: string, date: string|null } }} props */
 export default function TestimonialQuoteCard({ item }) {
   const { lang } = useLanguage();
+  // Leitura SÍNCRONA do `_en` já gravado, sem chamar a API no pageview —
+  // era esse o buraco: o card lia item.quote/item.role crus, então em
+  // inglês o depoimento e o cargo continuavam em português. Depoimento
+  // antigo (sem `_en`) cai no texto em português, como antes.
+  const translated = useStoredTranslation(item, TRANSLATABLE_FIELDS);
   const dateLabel = formatTestimonialMonth(item.date, lang);
 
   return (
     <figure className="sd-quote">
-      <blockquote>{item.quote}</blockquote>
+      <blockquote>{translated.quote}</blockquote>
       {/* O <span> continua envolvendo nome e legenda mesmo sem o avatar
           ao lado: .sd-quote figcaption é flex-row (design-system.css),
           então com <b> e <small> soltos os dois virariam colunas lado a
@@ -31,8 +42,8 @@ export default function TestimonialQuoteCard({ item }) {
           central já adotado no resto do card. */}
       <figcaption>
         <span>
-          <b>{item.name}</b>
-          <small>{[item.role, dateLabel].filter(Boolean).join(' · ')}</small>
+          <b>{displayName(item.name, lang)}</b>
+          <small>{[translated.role, dateLabel].filter(Boolean).join(' · ')}</small>
         </span>
       </figcaption>
     </figure>

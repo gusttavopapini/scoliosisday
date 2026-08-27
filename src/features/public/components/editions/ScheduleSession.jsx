@@ -5,6 +5,8 @@
 // variável.
 
 import { useTranslatedContent } from '../../../../hooks/useTranslatedContent.js';
+import { useLanguage } from '../../../../hooks/useLanguage.js';
+import { displayName } from '../../../../utils/honorifics.js';
 import AvatarInitials from '../../../../components/ui/AvatarInitials.jsx';
 
 /** "HH:mm" + "HH:mm"|null → "HH:mm–HH:mm" ou só "HH:mm". */
@@ -15,7 +17,10 @@ function formatTimeRange(startTime, endTime) {
 /** @param {{ session: object, speakers: object[] }} props */
 export default function ScheduleSession({ session, speakers }) {
   // title/theme são texto livre do admin; nome de palestrante é nome
-  // próprio e nunca passa pela tradução.
+  // próprio e nunca passa pela tradução — só pela normalização local de
+  // "Dra." para "Dr." em inglês (utils/honorifics.js), que é função pura
+  // justamente por ser chamada dentro do .map() de palestrantes abaixo.
+  const { lang } = useLanguage();
   const { translated, isTranslating } = useTranslatedContent(session, ['title', 'theme']);
 
   return (
@@ -45,7 +50,7 @@ export default function ScheduleSession({ session, speakers }) {
                 id={speaker.id}
                 className="sdp-avatar sdp-avatar--sm"
               />
-              <span className="sdp-session__speaker-name">{speaker.fullName}</span>
+              <span className="sdp-session__speaker-name">{displayName(speaker.fullName, lang)}</span>
             </span>
           ))}
         </div>

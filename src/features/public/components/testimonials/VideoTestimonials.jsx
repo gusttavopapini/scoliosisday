@@ -5,6 +5,9 @@
 // fallback para vídeo.
 
 import { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../../../../hooks/useLanguage.js';
+import { useStoredTranslation } from '../../../../hooks/useStoredTranslation.js';
+import { displayName } from '../../../../utils/honorifics.js';
 import { useTestimonials } from '../../../../hooks/useTestimonials.js';
 import { useEmbedPlaybackState } from '../../../../hooks/useEmbedPlaybackState.js';
 import { getVideoEmbedInfo } from '../../../../utils/videoEmbed.js';
@@ -20,6 +23,10 @@ import TestimonialStack from './TestimonialStack.jsx';
  * carregado fica fora de vista e não é interativo.
  */
 function VideoTestimonialCard({ item, isActive, onPlayingChange }) {
+  // Mesmo tratamento do card textual: `role` tem `_en` gravado ao salvar,
+  // o nome é normalizado localmente. `quote` não existe neste tipo.
+  const { lang } = useLanguage();
+  const translated = useStoredTranslation(item, ['role']);
   const embed = getVideoEmbedInfo(item.videoUrl);
   const iframeRef = useRef(null);
 
@@ -67,8 +74,8 @@ function VideoTestimonialCard({ item, isActive, onPlayingChange }) {
       </div>
 
       <div className="sdp-video-testimonial__caption">
-        <span className="sdp-video-testimonial__name">{item.name}</span>
-        <span className="sdp-video-testimonial__role">{item.role}</span>
+        <span className="sdp-video-testimonial__name">{displayName(item.name, lang)}</span>
+        <span className="sdp-video-testimonial__role">{translated.role}</span>
       </div>
     </div>
   );
