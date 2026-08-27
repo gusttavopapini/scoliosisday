@@ -1,24 +1,17 @@
 // src/features/public/components/HomeSupporters.jsx
 // Seção da Home, logo antes de Depoimentos: esteira infinita de logos dos
 // patrocinadores com type === 'apoiador' (mesma coleção `sponsors` do painel
-// de Patrocinadores — ver SPONSOR_TYPES em utils/constants.js). Sem nenhum
-// apoiador, a seção inteira some (mesma convenção de toda seção sem dado).
+// de Patrocinadores — ver SPONSOR_TYPES em utils/constants.js).
 //
-// A lista é repetida N vezes no JSX pra formar um loop CSS contínuo (ver
-// .sdp-marquee__track em public.css — o keyframe lê N de
-// --sdp-marquee-repeats via calc(), então qualquer N fecha o loop sem
-// salto). N cresce quando há poucos apoiadores: com 1 logo só, 5 cópias
-// fixas deixavam buraco visual em telas largas (testado até 2560px) — o
-// mínimo de itens abaixo garante densidade suficiente pra cobrir qualquer
-// largura razoável, sem depender de cálculo de timing (a duração da
-// animação continua fixa, só a contagem de repetição muda).
+// Só o FILTRO mora aqui. A esteira em si (repetição, rolagem automática,
+// arrasto, inércia, normalização de logo) é de LogoMarquee, compartilhado
+// com a esteira de Patrocinadores da edição atual — ver
+// components/editions/EditionSponsorsMarquee.jsx. Sem nenhum apoiador,
+// LogoMarquee não renderiza nada, nem o título nem o espaçamento.
 import { useLanguage } from '../../../hooks/useLanguage.js';
 import { useSponsors } from '../../../hooks/useSponsors.js';
 import { SPONSOR_TYPES } from '../../../utils/constants.js';
-import SponsorLogo from '../../../components/SponsorLogo.jsx';
-
-const MIN_TRACK_ITEMS = 24;
-const MIN_REPEATS = 5;
+import LogoMarquee from '../../../components/LogoMarquee.jsx';
 
 export default function HomeSupporters() {
   const { t } = useLanguage();
@@ -30,44 +23,5 @@ export default function HomeSupporters() {
     (sponsor) => (sponsor.type ?? SPONSOR_TYPES.SPONSOR) === SPONSOR_TYPES.SUPPORTER,
   );
 
-  if (supporters.length === 0) return null;
-
-  const repeats = Math.max(MIN_REPEATS, Math.ceil(MIN_TRACK_ITEMS / supporters.length));
-  const track = Array.from({ length: repeats }, () => supporters).flat();
-
-  return (
-    <section className="sd-section sd-section--tight sdp-supporters">
-      <div className="sd-container">
-        <header className="sd-section-header sd-section-header--center sdp-section-header">
-          <h2 className="sd-display sd-display--md sd-display--upright sd-display--teal sdp-heading--regular">
-            {t.site.supportersTitle}
-          </h2>
-        </header>
-      </div>
-
-      <div className="sdp-marquee">
-        <div className="sdp-marquee__track" style={{ '--sdp-marquee-repeats': repeats }}>
-          {track.map((sponsor, index) => (
-            <a
-              key={`${sponsor.id}-${index}`}
-              href={sponsor.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="sdp-marquee__item"
-              // Só a primeira cópia da lista é navegável por teclado/leitor
-              // de tela — as repetições seguintes existem só pro loop visual.
-              tabIndex={index < supporters.length ? 0 : -1}
-              aria-hidden={index < supporters.length ? undefined : true}
-            >
-              {sponsor.logoUrl ? (
-                <SponsorLogo src={sponsor.logoUrl} alt={sponsor.name} maxHeight={68} />
-              ) : (
-                <span className="sd-logo-strip__ph">{sponsor.name}</span>
-              )}
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <LogoMarquee brands={supporters} title={t.site.supportersTitle} />;
 }

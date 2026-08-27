@@ -29,6 +29,7 @@ import EditionArchive from './components/editions/EditionArchive.jsx';
 import EditionLocation from './components/editions/EditionLocation.jsx';
 import EditionTextBlock from './components/editions/EditionTextBlock.jsx';
 import EditionVideo from './components/editions/EditionVideo.jsx';
+import EditionSponsorsMarquee from './components/editions/EditionSponsorsMarquee.jsx';
 
 export default function EditionsPage() {
   const { t, lang } = useLanguage();
@@ -212,7 +213,8 @@ export default function EditionsPage() {
         <>
           {/* ── Ordem das seções da edição ATUAL ──
               Banner (acima, fora deste bloco) · Presenças · Texto · Cards ·
-              Vídeo · Programação · Preços · Curadoria · Localização.
+              Vídeo · Programação · Preços · Curadoria · Localização ·
+              Patrocinadores.
 
               Os blocos de CONTEÚDO (texto, cards, vídeo) vêm agrupados e
               cedo na página; o comercial (preços) fecha antes das pessoas
@@ -245,6 +247,11 @@ export default function EditionsPage() {
           />
 
           <EditionLocation key={`location-${activeEvent.id}`} event={activeEvent} />
+
+          {/* Fecha a página. Sem key por evento: a lista de patrocinadores
+              é global (coleção `sponsors`), não muda com a aba — remontar
+              a cada troca só reiniciaria a esteira do zero à toa. */}
+          <EditionSponsorsMarquee />
         </>
       ) : (
         <>

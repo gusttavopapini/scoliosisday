@@ -1605,16 +1605,29 @@
    especificidade (0,1,1). Ancorar em .sdp-sponsors sobe para (0,2,0)
    e vence, sem precisar editar design-system.css. */
 /* ============================================================
-   17. HOME · APOIADORES (esteira de logos)
-   HomeSupporters.jsx repete a lista real N vezes (--sdp-marquee-repeats,
-   inline no track) — N cresce quando há poucos apoiadores, pra nunca
-   deixar buraco visual em telas largas (testado até 2560px com 1 logo só;
-   5 repetições fixas não bastavam). translateX(-100%/N) desloca sempre
-   exatamente uma cópia da lista, então o reset do loop cai num frame
-   idêntico ao inicial — sem salto visível, qualquer N.
+   17. ESTEIRA DE LOGOS (LogoMarquee.jsx)
+   Duas seções usam isto, com a MESMA aparência e o mesmo gesto:
+   Apoiadores na Home e Patrocinadores no fim da edição atual. O
+   componente repete a lista real N vezes — N cresce quando há poucas
+   marcas, pra nunca deixar buraco visual em telas largas (testado até
+   2560px com 1 logo só; 5 repetições fixas não bastavam).
+
+   O MOVIMENTO NÃO É MAIS CSS. A esteira passou a ser arrastável, e o
+   transform do arrasto disputava a mesma propriedade do keyframe — as
+   duas não compõem. Rolagem automática, arrasto e inércia agora são um
+   único offset em px escrito por requestAnimationFrame em
+   hooks/useDraggableMarquee.js (o porquê completo está lá).
+
+   O que sobrou aqui é só o desenho e a affordance do gesto. O token
+   --sdp-marquee-duration continua sendo o controle da velocidade: o hook
+   lê o valor computado e deriva px/s dele.
    ============================================================ */
 
-.sdp-supporters {
+/* Nome neutro de propósito: era .sdp-supporters, o que passou a mentir
+   quando a mesma seção virou também a de Patrocinadores da edição. Não
+   colide com .sdp-sponsors (seção 16), que é a faixa estática de
+   EditionSponsors.jsx em /sobre — outro componente, outro modelo de dado. */
+.sdp-marquee-section {
   padding-block: var(--space-20);
   background: var(--surface-sunken);
   overflow: hidden;
@@ -1623,6 +1636,23 @@
 .sdp-marquee {
   margin-top: var(--space-10);
   overflow: hidden;
+
+  /* pan-y entrega o gesto HORIZONTAL ao componente e deixa o VERTICAL
+     com o navegador: sem isto, o dedo em cima da esteira não rolaria a
+     página no celular. Também elimina a espera que o browser usaria pra
+     decidir sozinho a direção do gesto. */
+  touch-action: pan-y;
+
+  /* O arrasto é do desktop também, então o cursor precisa anunciar isso. */
+  cursor: grab;
+}
+
+/* Enquanto arrasta: mão fechada e nada de seleção de texto. Sem o
+   user-select, arrastar sobre um logo sem imagem (o placeholder textual
+   .sd-logo-strip__ph) selecionaria o nome do apoiador no meio do gesto. */
+.sdp-marquee--dragging {
+  cursor: grabbing;
+  user-select: none;
 }
 
 .sdp-marquee__track {
@@ -1630,26 +1660,24 @@
   align-items: center;
   gap: var(--space-10);
   width: max-content;
-  animation: sdp-marquee-scroll var(--sdp-marquee-duration) linear infinite;
-}
 
-.sdp-marquee:hover .sdp-marquee__track {
-  animation-play-state: paused;
-}
-
-@keyframes sdp-marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(calc(-100% / var(--sdp-marquee-repeats, 5))); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sdp-marquee__track { animation: none; }
+  /* O transform vem inline do hook, a cada frame. will-change mantém o
+     track em camada própria de composição: arrastar não repinta os logos.
+     Sem animation aqui — nem no @media de reduced-motion, que agora é
+     tratado no hook (a rolagem automática desliga, o arrasto continua). */
+  will-change: transform;
 }
 
 .sdp-marquee__item {
   display: inline-flex;
   align-items: center;
   flex: none;
+
+  /* O <a> e o <img> são arrastáveis nativamente: o browser iniciaria seu
+     próprio drag-and-drop com a imagem fantasma e roubaria o gesto. O
+     handler onDragStart do hook já barra isso; aqui é a segunda camada,
+     pra Firefox, que ignora draggable={false} em alguns casos. */
+  -webkit-user-drag: none;
 }
 
 /* ---- Logo de marca: peso visual equivalente (SponsorLogo.jsx) ----

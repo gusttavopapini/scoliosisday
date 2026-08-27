@@ -184,9 +184,13 @@
    ============================================================ */
 
 :root {
-  /* Duração de uma volta completa da esteira de Apoiadores da Home (ver
-     .sdp-marquee__track em public.css). Fixa, não depende da quantidade
-     de logos — só da lista repetida no JSX. */
+  /* Duração de uma volta completa da esteira de Apoiadores da Home. Fixa,
+     não depende da quantidade de logos — só da lista repetida no JSX.
+
+     Continua sendo O controle da velocidade da esteira, mas quem lê o
+     token agora é JS, não um keyframe: hooks/useDraggableMarquee.js pega
+     o valor computado e deriva px/s dele (a esteira virou arrastável, e
+     transform de arrasto não compõe com transform de animação CSS). */
   --sdp-marquee-duration: 32s;
 
   /* Duração zero, só pra dar nome a "sem transição" — usado no truque de
