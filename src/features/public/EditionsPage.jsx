@@ -1,7 +1,11 @@
 // src/features/public/EditionsPage.jsx
 // Página de edições: uma aba por evento publicado, na ordem de editionNumber
-// (decrescente — a mais recente primeiro). Trocar de aba troca todo o
+// (crescente — a 1ª edição à esquerda). Trocar de aba troca todo o
 // conteúdo das seções abaixo.
+//
+// ABA ABERTA POR PADRÃO: a edição atual (isCurrent:true) quando existir;
+// se nenhuma estiver marcada, a PRIMEIRA da lista ordenada — a 1ª edição,
+// a mais antiga. Ver defaultEvent abaixo.
 //
 // O número da edição é definido pelo admin no passo 1 do wizard — não é
 // derivado de createdAt. Eventos anteriores ao campo ficam sem número: vão
@@ -46,9 +50,25 @@ export default function EditionsPage() {
   // recentes primeiro e AboutPage.jsx depende disso ([0] = edição mais
   // recente). Inverter lá quebraria aquela página.
   //
-  // defaultEvent preserva a aba aberta por padrão de antes da inversão — a
-  // edição mais recente (maior número, ou a mais nova por createdAt quando
-  // nenhuma tem número), não a primeira da fila, que agora é a 1ª edição.
+  // ── defaultEvent: qual aba abre selecionada ──
+  //
+  //   1. A edição marcada como atual (isCurrent:true), onde quer que ela
+  //      esteja na fila — não é necessariamente a de maior número.
+  //   2. Sem nenhuma marcada, a PRIMEIRA da lista já ordenada: a 1ª
+  //      edição, a mais antiga, a aba mais à esquerda.
+  //
+  // Antes isto não olhava isCurrent: abria sempre a de MAIOR
+  // editionNumber. Coincidia com a atual na maioria dos casos, mas errava
+  // sempre que a atual não fosse a de número mais alto — e, sem nenhuma
+  // atual, abria a ÚLTIMA edição em vez da primeira.
+  //
+  // `=== true`, e não `event.isCurrent`: documento anterior ao campo não
+  // tem a chave, find devolve undefined e o `??` cobre. A comparação
+  // estrita também impede que um valor truthy gravado à mão no console
+  // vire "edição atual" sem ser booleano.
+  //
+  // Lista vazia: ordered[0] é undefined, activeEvent fica undefined e o
+  // early return mais abaixo mostra o placeholder. Não quebra.
   const { orderedEvents, defaultEvent } = useMemo(() => {
     const numbered = publishedEvents
       .filter((event) => typeof event.editionNumber === 'number')
@@ -56,9 +76,10 @@ export default function EditionsPage() {
     const unnumbered = publishedEvents.filter(
       (event) => typeof event.editionNumber !== 'number',
     );
+    const ordered = [...numbered, ...unnumbered];
     return {
-      orderedEvents: [...numbered, ...unnumbered],
-      defaultEvent: numbered[numbered.length - 1] ?? unnumbered[0],
+      orderedEvents: ordered,
+      defaultEvent: ordered.find((event) => event.isCurrent === true) ?? ordered[0],
     };
   }, [publishedEvents]);
 
@@ -95,12 +116,13 @@ export default function EditionsPage() {
     };
   }, [orderedEvents.length]);
 
-  // Com as abas em ordem crescente, a edição aberta por padrão (a mais
-  // recente) fica na ponta DIREITA — fora da vista quando a lista passa da
-  // largura da tela. Traz ela pro campo de visão uma única vez, no primeiro
-  // render em que as abas já existem, sem tocar no scroll da página:
-  // scrollLeft no próprio container, não scrollIntoView. Depois disso o
-  // usuário manda no scroll — clique em aba não reposiciona nada.
+  // A aba aberta por padrão pode nascer fora da vista quando a lista passa
+  // da largura da tela — a edição atual costuma ficar à direita. Centraliza
+  // a aba ATIVA, qualquer que seja ela (com o fallback da 1ª edição o
+  // scroll já está no início e nada se move), uma única vez, no primeiro
+  // render em que as abas existem, sem tocar no scroll da página: scrollLeft
+  // no próprio container, não scrollIntoView. Depois disso o usuário manda
+  // no scroll — clique em aba não reposiciona nada.
   const activeTabRef = useRef(null);
   const didInitialTabScroll = useRef(false);
 
