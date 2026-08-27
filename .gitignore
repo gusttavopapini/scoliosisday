@@ -28,3 +28,6 @@ emulator-data
 
 # Firebase service account key (NUNCA commite)
 functions/scripts/service-account-key.json
+
+# Artefatos locais da retroação de tradução (backup e progresso)
+functions/scripts/.backfill-translations-*.json

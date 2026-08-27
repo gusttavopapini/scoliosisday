@@ -13,6 +13,8 @@
     "seed:admin": "node functions/scripts/seedAdmin.js",
     "audit:backfill": "node functions/scripts/backfillIndexes.js",
     "backfill": "node functions/scripts/backfillIndexes.js --apply",
+    "audit:translations": "node functions/scripts/backfillTranslations.js",
+    "backfill:translations": "node functions/scripts/backfillTranslations.js --apply",
     "audit:orphans": "node functions/scripts/purgeOrphanAuthUsers.js",
     "purge:orphans": "node functions/scripts/purgeOrphanAuthUsers.js --apply"
   },

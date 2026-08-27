@@ -31,11 +31,15 @@ import { toEnglishHonorifics } from './honorifics.js';
 const MAX_CHUNK_CHARS = 480;
 
 /**
+ * Exportada para o script de migração contar, com a MESMA lógica do
+ * fluxo de save, quantas chamadas de API um texto vai custar — sem
+ * chamar a API e sem reimplementar o fatiamento.
+ *
  * Fatia um texto longo em pedaços abaixo do teto da API, preferindo
  * cortar em fim de frase e, se não houver, em espaço — nunca no meio de
  * uma palavra. Texto curto sai como pedaço único, sem custo.
  */
-function splitIntoChunks(text) {
+export function splitIntoChunks(text) {
   if (text.length <= MAX_CHUNK_CHARS) return [text];
 
   const chunks = [];
@@ -43,13 +47,18 @@ function splitIntoChunks(text) {
 
   while (rest.length > MAX_CHUNK_CHARS) {
     const window = rest.slice(0, MAX_CHUNK_CHARS);
-    // Da melhor pra pior fronteira de corte.
+    // Da melhor pra pior fronteira de corte: quebra de parágrafo, fim de
+    // frase, e por último qualquer espaço em branco. O \s cobre \n, que
+    // um lastIndexOf(' ') não acharia — texto de depoimento é cheio de
+    // parágrafo, e cortar dentro de um deles é pior que cortar entre eles.
+    const paragraphEnd = window.lastIndexOf('\n');
     const sentenceEnd = Math.max(
-      window.lastIndexOf('. '),
+      window.search(/\.\s(?=[^.]*$)/),
       window.lastIndexOf('! '),
       window.lastIndexOf('? '),
     );
-    const cut = sentenceEnd > 0 ? sentenceEnd + 1 : window.lastIndexOf(' ');
+    const lastSpace = window.search(/\s(?=\S*$)/);
+    const cut = paragraphEnd > 0 ? paragraphEnd : sentenceEnd > 0 ? sentenceEnd + 1 : lastSpace;
     // Sem espaço nenhum na janela (palavra gigante, URL colada): corta no
     // teto mesmo, para o laço não travar.
     const at = cut > 0 ? cut : MAX_CHUNK_CHARS;
@@ -79,9 +88,23 @@ async function translateLongText(text) {
   const out = [];
 
   for (const chunk of chunks) {
-    const translated = await translateTextForStorage(chunk);
+    // O espaço das BORDAS do pedaço é preservado à mão. A API apara o que
+    // recebe, e o corte entre pedaços deixa justamente um espaço (ou uma
+    // quebra de parágrafo) no início do pedaço seguinte: sem isto, duas
+    // frases se colavam no ponto do corte — "…sociais.No Brasil…".
+    const leading = chunk.slice(0, chunk.length - chunk.trimStart().length);
+    const trailing = chunk.slice(chunk.trimEnd().length);
+    const core = chunk.trim();
+
+    // Pedaço só de espaço não é conteúdo: preserva sem gastar chamada.
+    if (!core) {
+      out.push(chunk);
+      continue;
+    }
+
+    const translated = await translateTextForStorage(core);
     if (!translated) return null;
-    out.push(translated);
+    out.push(`${leading}${translated}${trailing}`);
   }
 
   return out.join('');
@@ -97,6 +120,31 @@ export async function translatePlainForStorage(text) {
   if (!text?.trim()) return null;
   const translated = await translateLongText(text);
   return translated ? toEnglishHonorifics(translated) : null;
+}
+
+/** nodeType de um nó de texto. Constante literal em vez de Node.TEXT_NODE:
+ *  o script de migração (functions/scripts/backfillTranslations.js) roda em
+ *  Node, onde `Node` não existe como global. */
+const TEXT_NODE = 3;
+
+/**
+ * Junta, em ordem de documento, os nós de texto com conteúdo de verdade.
+ *
+ * Recursão sobre childNodes em vez de createTreeWalker: o TreeWalker existe
+ * no browser, mas não em toda implementação de DOM usada fora dele. Esta
+ * varredura funciona nas duas, o que permite ao script de migração
+ * reaproveitar EXATAMENTE este tradutor em vez de reimplementá-lo — que era
+ * o jeito garantido de a migração divergir do fluxo de save.
+ */
+export function collectTextNodes(root, out = []) {
+  for (const node of Array.from(root.childNodes ?? [])) {
+    if (node.nodeType === TEXT_NODE) {
+      if (node.nodeValue.trim()) out.push(node);
+    } else {
+      collectTextNodes(node, out);
+    }
+  }
+  return out;
 }
 
 /**
@@ -118,12 +166,7 @@ export async function translateHtmlForStorage(html) {
   // DOMParser em vez de innerHTML num elemento solto: não executa script
   // nem dispara carregamento de <img> durante a análise.
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
-
-  const nodes = [];
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (node.nodeValue.trim()) nodes.push(node);
-  }
+  const nodes = collectTextNodes(doc.body);
 
   if (nodes.length === 0) return null;
 
