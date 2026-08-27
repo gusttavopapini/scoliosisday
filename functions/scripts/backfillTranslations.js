@@ -274,6 +274,11 @@ let stoppedAt = null;
 
 outer: for (const item of plan.slice(0, LIMIT)) {
   const update = {};
+  // Um documento só entra no progresso se TODOS os campos dele traduziram.
+  // Sem isto, um documento que gravou null seria marcado como concluído e a
+  // execução seguinte o PULARIA — o null nunca seria recuperado, que é o
+  // contrário do motivo de null contar como pendente em pendingFields().
+  let docHadFailure = false;
 
   for (const field of item.fields) {
     const translated = await translatorFor(item.kind)(item.data[field]);
@@ -282,6 +287,7 @@ outer: for (const item of plan.slice(0, LIMIT)) {
       consecutiveFailures = 0;
     } else {
       consecutiveFailures += 1;
+      docHadFailure = true;
       nulls += 1;
       failures.push({ collection: item.collection, id: item.id, field });
       console.warn(`  ⚠️  ${item.collection}/${item.id} · ${field} → null`);
@@ -304,7 +310,7 @@ outer: for (const item of plan.slice(0, LIMIT)) {
   // update com APENAS as chaves `_en`: nenhum outro campo é tocado.
   await item.ref.update(update);
   written += 1;
-  progress.done.push(`${item.collection}/${item.id}`);
+  if (!docHadFailure) progress.done.push(`${item.collection}/${item.id}`);
   progress.failures = failures;
   writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
   console.info(`  ✓ ${item.collection}/${item.id} · ${Object.keys(update).join(', ')}`);
